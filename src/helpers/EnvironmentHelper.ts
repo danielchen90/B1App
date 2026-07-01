@@ -53,11 +53,12 @@ export class EnvironmentHelper {
     let baseUrl: string;
     if (typeof window !== "undefined") {
       baseUrl = window.location.origin;
-    } else if (process.env.RAILWAY_PUBLIC_DOMAIN) {
-      baseUrl = `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
     } else {
+      // Server-side: fetch our own statically-served locale files over loopback. Do NOT
+      // use RAILWAY_PUBLIC_DOMAIN — for a wildcard custom domain it is "*.huro.church",
+      // an invalid host. The app always answers on 127.0.0.1:$PORT.
       const port = process.env.PORT || "3301";
-      baseUrl = `http://localhost:${port}`;
+      baseUrl = `http://127.0.0.1:${port}`;
     }
     try {
       await Locale.init([baseUrl + `/locales/{{lng}}.json?v=1`, baseUrl + `/apphelper/locales/{{lng}}.json`]);
