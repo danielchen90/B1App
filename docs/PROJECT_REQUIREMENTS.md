@@ -1,8 +1,8 @@
-# B1 Church - Project Requirements Document
+# Huro - Project Requirements Document
 
 ## Overview
 
-B1 Church is a comprehensive multi-tenant church management platform built with Next.js 15 that provides churches with a customizable website and mobile app. The platform integrates various church services and external resources into one unified platform, helping congregations stay connected through digital solutions.
+Huro is a comprehensive multi-tenant church management platform built with Next.js 15 that provides churches with a customizable website and mobile app. The platform integrates various church services and external resources into one unified platform, helping congregations stay connected through digital solutions.
 
 ## Mission Statement
 
@@ -11,7 +11,7 @@ Helping churches stay connected by providing a unified digital platform that int
 ## Core Features
 
 ### 1. Multi-Tenant Architecture
-- **Subdomain-based access**: Each church operates under its own subdomain (e.g., `churchname.b1.church`)
+- **Subdomain-based access**: Each church operates under its own subdomain (e.g., `churchname.huro.church`)
 - **Dynamic routing**: `[sdSlug]` parameter system for church identification
 - **Church-specific configuration**: Customizable settings, appearance, and functionality per church
 - **Scalable infrastructure**: Supports unlimited church tenants
@@ -204,4 +204,4 @@ Helping churches stay connected by providing a unified digital platform that int
 
 ---
 
-*This document serves as the comprehensive requirements specification for the B1 Church platform. It should be regularly updated to reflect new features, changes in requirements, and platform evolution.*
+*This document serves as the comprehensive requirements specification for the Huro platform. It should be regularly updated to reflect new features, changes in requirements, and platform evolution.*

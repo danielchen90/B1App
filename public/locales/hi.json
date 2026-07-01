@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "यह डेमो वातावरण है। सभी डेटा रात में मिटा दिया जाता है।",
-    "demoCredentials": "आप क्रेडेंशियल demo@b1.church / password के साथ एक परीक्षण चर्च में लॉगिन कर सकते हैं।",
+    "demoCredentials": "आप क्रेडेंशियल demo@huro.church / password के साथ एक परीक्षण चर्च में लॉगिन कर सकते हैं।",
     "demoTitle": "डेमो:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "पासवर्ड अपडेट नहीं किया जा सका।",
       "deleteConversation": "बातचीत हटाएं",
       "deleteNotification": "सूचना हटाएं",
-      "demoLoginText": "डेमो: demo@b1.church / password के साथ लॉगिन करें।",
+      "demoLoginText": "डेमो: demo@huro.church / password के साथ लॉगिन करें।",
       "detectingDevice": "आपका डिवाइस पहचाना जा रहा है…",
       "displayNameUpdated": "प्रदर्शित नाम अपडेट किया गया।",
       "email": "ईमेल",

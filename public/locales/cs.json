@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "Toto je demo prostředí. Všechna data jsou každou noc vymazána.",
-    "demoCredentials": "Můžete se přihlásit do testovacího sboru pomocí přihlašovacích údajů demo@b1.church / password .",
+    "demoCredentials": "Můžete se přihlásit do testovacího sboru pomocí přihlašovacích údajů demo@huro.church / password .",
     "demoTitle": "Demo:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Heslo se nepodařilo aktualizovat.",
       "deleteConversation": "Smazat konverzaci",
       "deleteNotification": "Smazat oznámení",
-      "demoLoginText": "Demo: Přihlaste se s demo@b1.church / password.",
+      "demoLoginText": "Demo: Přihlaste se s demo@huro.church / password.",
       "detectingDevice": "Rozpoznávání vašeho zařízení…",
       "displayNameUpdated": "Zobrazované jméno aktualizováno.",
       "email": "E-mail",

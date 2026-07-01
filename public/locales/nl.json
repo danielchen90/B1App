@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "Dit is de demo-omgeving. Alle gegevens worden 's nachts gewist.",
-    "demoCredentials": "U kunt inloggen op een testkerk met de inloggegevens demo@b1.church / password .",
+    "demoCredentials": "U kunt inloggen op een testkerk met de inloggegevens demo@huro.church / password .",
     "demoTitle": "Demo:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Kan wachtwoord niet bijwerken.",
       "deleteConversation": "Gesprek verwijderen",
       "deleteNotification": "Melding verwijderen",
-      "demoLoginText": "Demo: log in met demo@b1.church / password.",
+      "demoLoginText": "Demo: log in met demo@huro.church / password.",
       "detectingDevice": "Uw apparaat wordt gedetecteerd…",
       "displayNameUpdated": "Weergavenaam bijgewerkt.",
       "email": "E-mail",

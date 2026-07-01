@@ -31,7 +31,7 @@ test.describe("Authentication", () => {
   test("invalid credentials keep the user on /login", async ({ page }) => {
     await page.context().clearCookies();
     await page.goto("/login");
-    await page.fill('input[type="email"]', "demo@b1.church");
+    await page.fill('input[type="email"]', "demo@huro.church");
     await page.fill('input[type="password"]', "wrong-password");
     await page.click('button[type="submit"]');
     await page.waitForTimeout(2000);

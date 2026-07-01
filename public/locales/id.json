@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "Ini adalah lingkungan demo. Semua data dihapus setiap malam.",
-    "demoCredentials": "Anda dapat login ke gereja uji coba dengan kredensial demo@b1.church / password .",
+    "demoCredentials": "Anda dapat login ke gereja uji coba dengan kredensial demo@huro.church / password .",
     "demoTitle": "Demo:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Tidak dapat memperbarui kata sandi.",
       "deleteConversation": "Hapus percakapan",
       "deleteNotification": "Hapus notifikasi",
-      "demoLoginText": "Demo: Login dengan demo@b1.church / password.",
+      "demoLoginText": "Demo: Login dengan demo@huro.church / password.",
       "detectingDevice": "Mendeteksi perangkat Anda…",
       "displayNameUpdated": "Nama tampilan diperbarui.",
       "email": "Email",

@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "Tai demonstracinė aplinka. Visi duomenys ištrinami kiekvieną naktį.",
-    "demoCredentials": "Galite prisijungti prie bandomosios bažnyčios naudodami prisijungimo duomenis demo@b1.church / password .",
+    "demoCredentials": "Galite prisijungti prie bandomosios bažnyčios naudodami prisijungimo duomenis demo@huro.church / password .",
     "demoTitle": "Demonstracija:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Nepavyko atnaujinti slaptažodžio.",
       "deleteConversation": "Ištrinti pokalbį",
       "deleteNotification": "Ištrinti pranešimą",
-      "demoLoginText": "Demonstracija: prisijunkite naudodami demo@b1.church / password.",
+      "demoLoginText": "Demonstracija: prisijunkite naudodami demo@huro.church / password.",
       "detectingDevice": "Aptinkamas jūsų įrenginys…",
       "displayNameUpdated": "Rodomas vardas atnaujintas.",
       "email": "El. paštas",

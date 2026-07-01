@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "Це демонстраційне середовище. Усі дані видаляються щоночі.",
-    "demoCredentials": "Ви можете увійти в тестову церкву з обліковими даними demo@b1.church / password .",
+    "demoCredentials": "Ви можете увійти в тестову церкву з обліковими даними demo@huro.church / password .",
     "demoTitle": "Демо:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Не вдалося оновити пароль.",
       "deleteConversation": "Видалити розмову",
       "deleteNotification": "Видалити сповіщення",
-      "demoLoginText": "Демо: Увійдіть з demo@b1.church / password.",
+      "demoLoginText": "Демо: Увійдіть з demo@huro.church / password.",
       "detectingDevice": "Виявлення вашого пристрою…",
       "displayNameUpdated": "Відображуване ім'я оновлено.",
       "email": "Електронна пошта",

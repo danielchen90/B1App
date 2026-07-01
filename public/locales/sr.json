@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "Ово је демо окружење. Сви подаци се бришу сваке ноћи.",
-    "demoCredentials": "Можете се пријавити у тест цркву са акредитивима demo@b1.church / password .",
+    "demoCredentials": "Можете се пријавити у тест цркву са акредитивима demo@huro.church / password .",
     "demoTitle": "Демо:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Nije moguće ažurirati lozinku.",
       "deleteConversation": "Obriši razgovor",
       "deleteNotification": "Obriši obaveštenje",
-      "demoLoginText": "Демо: Пријавите се са demo@b1.church / password.",
+      "demoLoginText": "Демо: Пријавите се са demo@huro.church / password.",
       "detectingDevice": "Препознавање вашег уређаја…",
       "displayNameUpdated": "Prikazano ime je ažurirano.",
       "email": "Имејл",

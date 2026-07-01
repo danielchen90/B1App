@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "Detta är demomiljön. All data raderas varje natt.",
-    "demoCredentials": "Du kan logga in på en testförsamling med uppgifterna demo@b1.church / password .",
+    "demoCredentials": "Du kan logga in på en testförsamling med uppgifterna demo@huro.church / password .",
     "demoTitle": "Demo:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Det gick inte att uppdatera lösenordet.",
       "deleteConversation": "Ta bort konversation",
       "deleteNotification": "Ta bort avisering",
-      "demoLoginText": "Demo: Logga in med demo@b1.church / password.",
+      "demoLoginText": "Demo: Logga in med demo@huro.church / password.",
       "detectingDevice": "Identifierar din enhet…",
       "displayNameUpdated": "Visningsnamnet har uppdaterats.",
       "email": "E-post",

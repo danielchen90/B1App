@@ -1,6 +1,6 @@
 # Comprehensive Data-TestID Reference
 
-This document contains all data-testid attributes found in the B1 Church codebase, organized by category for Playwright testing.
+This document contains all data-testid attributes found in the Huro codebase, organized by category for Playwright testing.
 
 ## Authentication & User Management
 

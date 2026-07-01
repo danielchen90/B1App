@@ -8,7 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const STORAGE_STATE_PATH = path.join(__dirname, ".auth-state.json");
 
 /**
- * Verify Api is in demo mode, then log in once as demo@b1.church and save
+ * Verify Api is in demo mode, then log in once as demo@huro.church and save
  * the browser storage state so every test worker reuses it instead of logging in again.
  *
  * Unlike B1Admin, the church is determined by subdomain (grace.localhost), so no
@@ -28,7 +28,7 @@ async function globalSetup(config: FullConfig) {
   const emailInput = page.locator('input[type="email"]');
   await emailInput.waitFor({ state: "visible", timeout: 30000 });
 
-  await page.fill('input[type="email"]', "demo@b1.church");
+  await page.fill('input[type="email"]', "demo@huro.church");
   await page.fill('input[type="password"]', "password");
   await page.click('button[type="submit"]');
 

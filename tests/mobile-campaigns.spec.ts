@@ -14,7 +14,7 @@ async function gotoOverview(page: import("@playwright/test").Page) {
 
 test.describe.serial("Mobile donate — CampaignProgress", () => {
   test.beforeAll(async ({ request }) => {
-    const loginRes = await request.post("http://localhost:8084/membership/users/login", { data: { email: "demo@b1.church", password: "password" } });
+    const loginRes = await request.post("http://localhost:8084/membership/users/login", { data: { email: "demo@huro.church", password: "password" } });
     const loginBody = await loginRes.json();
     jwt = loginBody.userChurches[0].jwt;
 

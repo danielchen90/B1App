@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { mobileLogoutButton } from "./helpers/mobile";
 
-// Demo user (PER00000082, demo@b1.church) is seeded as a member of:
+// Demo user (PER00000082, demo@huro.church) is seeded as a member of:
 //   - GRP00000001 Sunday Morning Service
 //   - GRP00000004 Adult Bible Class
 //   - GRP00000016 Men's Bible Study

@@ -4,8 +4,8 @@ import { test, expect, type BrowserContext, type Page } from "@playwright/test";
  * End-to-end cross-user realtime test for the consolidated PM stack.
  *
  * Two real users in Grace Community Church:
- *   - demo@b1.church  (PER00000082)
- *   - tester@b1.church (PER00000083, Jane User; seeded for this scenario)
+ *   - demo@huro.church  (PER00000082)
+ *   - tester@huro.church (PER00000083, Jane User; seeded for this scenario)
  *
  * Demo opens a thread to Jane and sends a message. Without reloading, Jane's tab
  * (already on her side of the same thread) should reflect the new message via the
@@ -16,8 +16,8 @@ import { test, expect, type BrowserContext, type Page } from "@playwright/test";
  * user has their own auth + their own WebSocket.
  */
 
-const DEMO_PERSON_ID = "PER00000082";   // demo@b1.church
-const TESTER_PERSON_ID = "PER00000083"; // tester@b1.church (Jane User)
+const DEMO_PERSON_ID = "PER00000082";   // demo@huro.church
+const TESTER_PERSON_ID = "PER00000083"; // tester@huro.church (Jane User)
 
 async function loginAs(page: Page, email: string, password: string) {
   // B1App uses subdomain-based church resolution; storageState is bypassed by the
@@ -65,8 +65,8 @@ test.describe("Realtime — cross-user private messages", () => {
     testerPage = await testerContext.newPage();
 
     await Promise.all([
-      loginAs(demoPage, "demo@b1.church", "password"),
-      loginAs(testerPage, "tester@b1.church", "password"),
+      loginAs(demoPage, "demo@huro.church", "password"),
+      loginAs(testerPage, "tester@huro.church", "password"),
     ]);
   });
 

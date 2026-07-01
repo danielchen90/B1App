@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "Tämä on demoympäristö. Kaikki tiedot poistetaan öisin.",
-    "demoCredentials": "Voit kirjautua testiseurakuntaan tunnuksilla demo@b1.church / password .",
+    "demoCredentials": "Voit kirjautua testiseurakuntaan tunnuksilla demo@huro.church / password .",
     "demoTitle": "Demo:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Salasanaa ei voitu päivittää.",
       "deleteConversation": "Poista keskustelu",
       "deleteNotification": "Poista ilmoitus",
-      "demoLoginText": "Demo: Kirjaudu tunnuksilla demo@b1.church / password.",
+      "demoLoginText": "Demo: Kirjaudu tunnuksilla demo@huro.church / password.",
       "detectingDevice": "Tunnistetaan laitettasi…",
       "displayNameUpdated": "Näyttönimi päivitetty.",
       "email": "Sähköposti",

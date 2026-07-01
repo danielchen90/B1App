@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 /**
  * API-level contract test for the web-push enrollment path.
  *
- * Logs in as demo@b1.church via /membership/users/login, captures the per-API
+ * Logs in as demo@huro.church via /membership/users/login, captures the per-API
  * MessagingApi JWT, then POSTs to /messaging/webpush/subscribe with a fake
  * (but well-formed) PushSubscription. Verifies the server stores the
  * subscription as a `webpush:` token in the devices table.
@@ -18,7 +18,7 @@ async function loginAndGetMessagingJwt() {
   const res = await fetch(`${API_BASE}/membership/users/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: "demo@b1.church", password: "password" }),
+    body: JSON.stringify({ email: "demo@huro.church", password: "password" }),
   });
   const body = await res.json() as any;
   const grace = body.userChurches.find((uc: any) => uc.church.id === "CHU00000001");

@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "Dies ist die Demo-Umgebung. Alle Daten werden nächtlich gelöscht.",
-    "demoCredentials": "Sie können sich mit den Anmeldedaten demo@b1.church / password bei einer Testgemeinde anmelden.",
+    "demoCredentials": "Sie können sich mit den Anmeldedaten demo@huro.church / password bei einer Testgemeinde anmelden.",
     "demoTitle": "Demo:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Passwort konnte nicht aktualisiert werden.",
       "deleteConversation": "Unterhaltung löschen",
       "deleteNotification": "Benachrichtigung löschen",
-      "demoLoginText": "Demo: Anmelden mit demo@b1.church / password.",
+      "demoLoginText": "Demo: Anmelden mit demo@huro.church / password.",
       "detectingDevice": "Ihr Gerät wird erkannt…",
       "displayNameUpdated": "Anzeigename aktualisiert.",
       "email": "E-Mail",

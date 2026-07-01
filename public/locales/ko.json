@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "이것은 데모 환경입니다. 모든 데이터는 매일 밤 삭제됩니다.",
-    "demoCredentials": "demo@b1.church / password 자격 증명으로 테스트 교회에 로그인할 수 있습니다.",
+    "demoCredentials": "demo@huro.church / password 자격 증명으로 테스트 교회에 로그인할 수 있습니다.",
     "demoTitle": "데모:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "비밀번호를 업데이트할 수 없습니다.",
       "deleteConversation": "대화 삭제",
       "deleteNotification": "알림 삭제",
-      "demoLoginText": "데모: demo@b1.church / password로 로그인하세요.",
+      "demoLoginText": "데모: demo@huro.church / password로 로그인하세요.",
       "detectingDevice": "기기를 감지하는 중…",
       "displayNameUpdated": "표시 이름이 업데이트되었습니다.",
       "email": "이메일",

@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "Burası demo ortamıdır. Tüm veriler her gece silinir.",
-    "demoCredentials": "Test kilisesine demo@b1.church / password kimlik bilgileriyle giriş yapabilirsiniz.",
+    "demoCredentials": "Test kilisesine demo@huro.church / password kimlik bilgileriyle giriş yapabilirsiniz.",
     "demoTitle": "Demo:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Parola güncellenemedi.",
       "deleteConversation": "Sohbeti sil",
       "deleteNotification": "Bildirimi sil",
-      "demoLoginText": "Demo: demo@b1.church / password ile giriş yapın.",
+      "demoLoginText": "Demo: demo@huro.church / password ile giriş yapın.",
       "detectingDevice": "Cihazınız tespit ediliyor…",
       "displayNameUpdated": "Görünen ad güncellendi.",
       "email": "E-posta",

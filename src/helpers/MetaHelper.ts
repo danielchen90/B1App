@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 
 export class MetaHelper {
   static getMetaData = (title?: string, description?: string, ogDescription?: string, appearance?: AppearanceInterface): Metadata => {
-    if (!title) title = "B1.church - Free Church Websites and Mobile Apps";
-    if (!description) description = "Providing a simple and seemless way for your congregation to connect is a critical need in the modern church. B1.church provides a way to do this at home, at church or wherever they may be, via their phone.";
+    if (!title) title = "Huro - Free Church Websites and Mobile Apps";
+    if (!description) description = "Providing a simple and seemless way for your congregation to connect is a critical need in the modern church. Huro provides a way to do this at home, at church or wherever they may be, via their phone.";
     const ogImage = (appearance as any)?.ogImage || "https://content.churchapps.org/40/settings/ogImage.png?dt=1717512299395";
     if (!ogDescription) ogDescription = description;
 

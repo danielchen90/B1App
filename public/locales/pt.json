@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "Este é o ambiente de demonstração. Todos os dados são apagados durante a noite.",
-    "demoCredentials": "Você pode entrar em uma igreja de teste com as credenciais demo@b1.church / password .",
+    "demoCredentials": "Você pode entrar em uma igreja de teste com as credenciais demo@huro.church / password .",
     "demoTitle": "Demonstração:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Não foi possível atualizar a senha.",
       "deleteConversation": "Excluir conversa",
       "deleteNotification": "Excluir notificação",
-      "demoLoginText": "Demonstração: Faça login com demo@b1.church / password.",
+      "demoLoginText": "Demonstração: Faça login com demo@huro.church / password.",
       "detectingDevice": "Detectando seu dispositivo…",
       "displayNameUpdated": "Nome de exibição atualizado.",
       "email": "E-mail",

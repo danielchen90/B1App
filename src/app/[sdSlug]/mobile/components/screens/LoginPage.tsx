@@ -69,7 +69,7 @@ export const MobileLoginScreen = ({ config }: Props) => {
   const [mode, setMode] = useState<Mode>(initialMode);
 
   const [email, setEmail] = useState<string>(
-    process.env.NEXT_PUBLIC_STAGE === "demo" ? "demo@b1.church" : ""
+    process.env.NEXT_PUBLIC_STAGE === "demo" ? "demo@huro.church" : ""
   );
   const [password, setPassword] = useState<string>(
     process.env.NEXT_PUBLIC_STAGE === "demo" ? "password" : ""
@@ -410,7 +410,7 @@ export const MobileLoginScreen = ({ config }: Props) => {
     <Box component="form" onSubmit={handleLoginSubmit}>
       {process.env.NEXT_PUBLIC_STAGE === "demo" && (
         <Alert severity="info" sx={{ mb: 2 }}>
-          <b>Demo:</b> Login with <code>demo@b1.church</code> / <code>password</code>.
+          <b>Demo:</b> Login with <code>demo@huro.church</code> / <code>password</code>.
         </Alert>
       )}
       <TextField

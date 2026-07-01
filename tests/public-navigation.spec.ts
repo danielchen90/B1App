@@ -58,7 +58,7 @@ test.describe("Public navigation", () => {
   test("navStyles override applies to live nav rendering", async ({ page, request }) => {
     const API_BASE = "http://localhost:8084";
     const loginRes = await request.post(`${API_BASE}/membership/users/login`, {
-      data: { email: "demo@b1.church", password: "password" },
+      data: { email: "demo@huro.church", password: "password" },
     });
     const loginBody = await loginRes.json();
     const grace = loginBody.userChurches.find((uc: any) => uc.church.id === "CHU00000001");

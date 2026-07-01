@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "Ez a demó környezet. Minden adat éjszakánként törlődik.",
-    "demoCredentials": "Bejelentkezhetsz egy teszt gyülekezetbe a demo@b1.church / password adatokkal.",
+    "demoCredentials": "Bejelentkezhetsz egy teszt gyülekezetbe a demo@huro.church / password adatokkal.",
     "demoTitle": "Demó:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "A jelszót nem sikerült frissíteni.",
       "deleteConversation": "Beszélgetés törlése",
       "deleteNotification": "Értesítés törlése",
-      "demoLoginText": "Demó: Jelentkezz be a demo@b1.church / password adatokkal.",
+      "demoLoginText": "Demó: Jelentkezz be a demo@huro.church / password adatokkal.",
       "detectingDevice": "Eszköz észlelése…",
       "displayNameUpdated": "A megjelenítendő név frissítve.",
       "email": "E-mail",

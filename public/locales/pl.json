@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "To jest środowisko demonstracyjne. Wszystkie dane są codziennie usuwane.",
-    "demoCredentials": "Możesz zalogować się do testowego kościoła, używając danych demo@b1.church / password .",
+    "demoCredentials": "Możesz zalogować się do testowego kościoła, używając danych demo@huro.church / password .",
     "demoTitle": "Demo:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Nie udało się zaktualizować hasła.",
       "deleteConversation": "Usuń rozmowę",
       "deleteNotification": "Usuń powiadomienie",
-      "demoLoginText": "Demo: Zaloguj się przy użyciu demo@b1.church / password.",
+      "demoLoginText": "Demo: Zaloguj się przy użyciu demo@huro.church / password.",
       "detectingDevice": "Wykrywanie urządzenia…",
       "displayNameUpdated": "Nazwa wyświetlana zaktualizowana.",
       "email": "E-mail",

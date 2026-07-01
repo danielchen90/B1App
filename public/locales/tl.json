@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "Ito ang demo environment. Lahat ng data ay binubura tuwing gabi.",
-    "demoCredentials": "Maaari kang mag-login sa isang test church gamit ang credentials na demo@b1.church / password .",
+    "demoCredentials": "Maaari kang mag-login sa isang test church gamit ang credentials na demo@huro.church / password .",
     "demoTitle": "Demo:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Hindi ma-update ang password.",
       "deleteConversation": "Burahin ang usapan",
       "deleteNotification": "Burahin ang notipikasyon",
-      "demoLoginText": "Demo: Mag-login gamit ang demo@b1.church / password.",
+      "demoLoginText": "Demo: Mag-login gamit ang demo@huro.church / password.",
       "detectingDevice": "Tinutukoy ang iyong device…",
       "displayNameUpdated": "Na-update ang display name.",
       "email": "Email",

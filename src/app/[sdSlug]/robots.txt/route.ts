@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest, context: { params: Promise<{ sdSlug: string }> }) {
   const { sdSlug } = await context.params;
-  const host = request.headers.get("x-forwarded-host") || request.headers.get("host") || sdSlug + ".b1.church";
+  const host = request.headers.get("x-forwarded-host") || request.headers.get("host") || sdSlug + ".huro.church";
   const proto = request.headers.get("x-forwarded-proto") || "https";
   const body = [
     "User-agent: *",

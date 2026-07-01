@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "This is the demo environment.  All data is erased nightly.",
-    "demoCredentials": "You can log into a test church with the credentials demo@b1.church / password .",
+    "demoCredentials": "You can log into a test church with the credentials demo@huro.church / password .",
     "demoTitle": "Demo:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Could not update password.",
       "deleteConversation": "Delete conversation",
       "deleteNotification": "Delete notification",
-      "demoLoginText": "Demo: Login with demo@b1.church / password.",
+      "demoLoginText": "Demo: Login with demo@huro.church / password.",
       "detectingDevice": "Detecting your device…",
       "displayNameUpdated": "Display name updated.",
       "email": "Email",

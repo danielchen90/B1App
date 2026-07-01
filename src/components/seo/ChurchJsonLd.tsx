@@ -11,7 +11,7 @@ export function ChurchJsonLd({ config }: Props) {
     "@context": "https://schema.org",
     "@type": "Church",
     name: church.name,
-    url: "https://" + (church.subDomain || config.keyName) + ".b1.church"
+    url: "https://" + (church.subDomain || config.keyName) + ".huro.church"
   };
 
   const logo = config.appearance?.logoLight || config.appearance?.logoDark;

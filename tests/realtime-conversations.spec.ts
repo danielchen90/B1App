@@ -55,8 +55,8 @@ test.describe("Realtime — cross-user group conversations", () => {
     testerPage = await testerContext.newPage();
 
     await Promise.all([
-      loginAs(demoPage, "demo@b1.church", "password"),
-      loginAs(testerPage, "tester@b1.church", "password"),
+      loginAs(demoPage, "demo@huro.church", "password"),
+      loginAs(testerPage, "tester@huro.church", "password"),
     ]);
 
     await Promise.all([

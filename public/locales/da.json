@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "Dette er demo-miljøet. Alle data slettes hver nat.",
-    "demoCredentials": "Du kan logge ind på en testkirke med legitimationsoplysningerne demo@b1.church / password .",
+    "demoCredentials": "Du kan logge ind på en testkirke med legitimationsoplysningerne demo@huro.church / password .",
     "demoTitle": "Demo:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Adgangskoden kunne ikke opdateres.",
       "deleteConversation": "Slet samtale",
       "deleteNotification": "Slet notifikation",
-      "demoLoginText": "Demo: Log ind med demo@b1.church / password.",
+      "demoLoginText": "Demo: Log ind med demo@huro.church / password.",
       "detectingDevice": "Registrerer din enhed…",
       "displayNameUpdated": "Visningsnavn opdateret.",
       "email": "E-mail",

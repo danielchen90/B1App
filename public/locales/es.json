@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "Este es el entorno de demostración. Todos los datos se borran cada noche.",
-    "demoCredentials": "Puede iniciar sesión en una iglesia de prueba con las credenciales demo@b1.church / password .",
+    "demoCredentials": "Puede iniciar sesión en una iglesia de prueba con las credenciales demo@huro.church / password .",
     "demoTitle": "Demostración:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "No se pudo actualizar la contraseña.",
       "deleteConversation": "Eliminar conversación",
       "deleteNotification": "Eliminar notificación",
-      "demoLoginText": "Demostración: Inicie sesión con demo@b1.church / password.",
+      "demoLoginText": "Demostración: Inicie sesión con demo@huro.church / password.",
       "detectingDevice": "Detectando su dispositivo…",
       "displayNameUpdated": "Nombre visible actualizado.",
       "email": "Correo Electrónico",

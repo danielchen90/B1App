@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "Ceci est l'environnement de démonstration. Toutes les données sont effacées chaque nuit.",
-    "demoCredentials": "Vous pouvez vous connecter à une église test avec les identifiants demo@b1.church / password .",
+    "demoCredentials": "Vous pouvez vous connecter à une église test avec les identifiants demo@huro.church / password .",
     "demoTitle": "Démo :"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Impossible de mettre à jour le mot de passe.",
       "deleteConversation": "Supprimer la conversation",
       "deleteNotification": "Supprimer la notification",
-      "demoLoginText": "Démo : Connectez-vous avec demo@b1.church / password.",
+      "demoLoginText": "Démo : Connectez-vous avec demo@huro.church / password.",
       "detectingDevice": "Détection de votre appareil…",
       "displayNameUpdated": "Nom affiché mis à jour.",
       "email": "E-mail",

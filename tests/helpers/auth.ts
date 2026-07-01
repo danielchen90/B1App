@@ -22,7 +22,7 @@ export async function login(page: Page) {
   if (winner === "authenticated") return;
   if (winner === null) throw new Error("Neither login form nor authenticated header appeared within 15s");
 
-  await emailInput.fill("demo@b1.church");
+  await emailInput.fill("demo@huro.church");
   await page.fill('input[type="password"]', "password");
   await page.click('button[type="submit"]');
 

@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "Toto je demo prostredie. Všetky údaje sa každú noc vymažú.",
-    "demoCredentials": "Môžete sa prihlásiť do testovacej cirkvi s prihlasovacími údajmi demo@b1.church / password .",
+    "demoCredentials": "Môžete sa prihlásiť do testovacej cirkvi s prihlasovacími údajmi demo@huro.church / password .",
     "demoTitle": "Demo:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Heslo sa nepodarilo aktualizovať.",
       "deleteConversation": "Odstrániť konverzáciu",
       "deleteNotification": "Odstrániť oznámenie",
-      "demoLoginText": "Demo: Prihlásenie pomocou demo@b1.church / password.",
+      "demoLoginText": "Demo: Prihlásenie pomocou demo@huro.church / password.",
       "detectingDevice": "Zisťuje sa vaše zariadenie…",
       "displayNameUpdated": "Zobrazované meno bolo aktualizované.",
       "email": "E-mail",

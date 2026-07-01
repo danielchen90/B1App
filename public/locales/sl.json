@@ -356,7 +356,7 @@
   },
   "loginClient": {
     "demoBody": "To je demo okolje. Vsi podatki se ponoči izbrišejo.",
-    "demoCredentials": "V testno cerkev se lahko prijavite s podatki demo@b1.church / password .",
+    "demoCredentials": "V testno cerkev se lahko prijavite s podatki demo@huro.church / password .",
     "demoTitle": "Demo:"
   },
   "member": {
@@ -809,7 +809,7 @@
       "couldNotUpdatePassword": "Gesla ni bilo mogoče posodobiti.",
       "deleteConversation": "Izbriši pogovor",
       "deleteNotification": "Izbriši obvestilo",
-      "demoLoginText": "Demo: Prijavite se z demo@b1.church / password.",
+      "demoLoginText": "Demo: Prijavite se z demo@huro.church / password.",
       "detectingDevice": "Zaznavanje vaše naprave…",
       "displayNameUpdated": "Prikazno ime je posodobljeno.",
       "email": "E-pošta",

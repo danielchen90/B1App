@@ -1,8 +1,8 @@
 <img align="right" width="150" src="https://raw.githubusercontent.com/ChurchApps/B1App/main/public/images/logo.png">
 
-# B1 Church
+# Huro
 
-> **B1 Church** is a mobile app and website that helps congregations stay connected by integrating various church services and external resources into one customizable platform. It offers features such as online giving, self-check-in for attendance, live streaming of services, and an interactive member directory. Visit [B1.church](https://b1.church/) to learn more.
+> **Huro** is a mobile app and website that helps congregations stay connected by integrating various church services and external resources into one customizable platform. It offers features such as online giving, self-check-in for attendance, live streaming of services, and an interactive member directory. Visit [Huro](https://huro.church/) to learn more.
 
 ## Preview
 <div style="display: flex;gap: 10px;">
@@ -40,4 +40,4 @@ If you'd like to set up the project locally, see our [development guide](https:/
 2. Install the dependencies with: `npm install`
 3. run `npm start` to launch the project.
 
-You may create a test account at https://staging.b1.church/ if you are using the staging api urls.
+You may create a test account at https://staging.huro.church/ if you are using the staging api urls.
