@@ -46,14 +46,25 @@ export class EnvironmentHelper {
   };
 
   static initLocale = async () => {
-    let baseUrl = "https://ironwood.staging.huro.church";
+    // Locale JSON is served by this app itself from /public. Resolve a base URL that
+    // actually resolves during SSR — never an external brand domain: a dead host here
+    // crashes boot (unhandled rejection on Node 22). Browser: own origin. Server: the
+    // Railway public domain, then localhost for dev.
+    let baseUrl: string;
     if (typeof window !== "undefined") {
       baseUrl = window.location.origin;
-    } else if (process.env.NEXT_PUBLIC_STAGE === "dev" || process.env.NEXT_STAGE === "dev") {
+    } else if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+      baseUrl = `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
+    } else {
       const port = process.env.PORT || "3301";
       baseUrl = `http://localhost:${port}`;
     }
-    await Locale.init([baseUrl + `/locales/{{lng}}.json?v=1`, baseUrl + `/apphelper/locales/{{lng}}.json`]);
+    try {
+      await Locale.init([baseUrl + `/locales/{{lng}}.json?v=1`, baseUrl + `/apphelper/locales/{{lng}}.json`]);
+    } catch (err) {
+      // Never let locale loading take down the server — fall back to untranslated keys.
+      console.error("Locale init failed (continuing with defaults):", err);
+    }
   };
 
   static initDev = () => {
