@@ -9,6 +9,8 @@ import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import "@/styles/vendor/animations.css";
 import { Animate } from "@churchapps/apphelper/website";
 import { redirect } from "next/navigation";
+import { isBtPublicSite } from "./(bt)/isBtSite";
+import { BtLanding, buildBtMetadata } from "./(bt)/BtLanding";
 
 type PageParams = { sdSlug: string; }
 
@@ -22,6 +24,8 @@ const loadSharedData = (sdSlug: string) => {
 export async function generateMetadata({ params }: { params: Promise<PageParams> }): Promise<Metadata> {
   const { sdSlug } = await params;
   const props = await loadSharedData(sdSlug);
+  // BT public tenant → distinct BT landing SEO (SITE-03), sharing the cached loaders.
+  if (isBtPublicSite(sdSlug)) return buildBtMetadata(props.config);
   return MetaHelper.getMetaData(props.pageData.title + " - " + props.config.church.name, props.pageData.title, undefined, props.config.appearance);
 }
 
@@ -36,6 +40,14 @@ export default async function Home({ params }: { params: Promise<PageParams> }) 
   await EnvironmentHelper.initServerSide();
   const { sdSlug } = await params;
   const props = await loadSharedData(sdSlug);
+
+  // BT public tenant → render the hardcoded Bible Teachers org-brochure landing
+  // (Phase 20). A route group cannot own a second index page.tsx without a hard
+  // parallel-route collision, so the shared index delegates the render here (per
+  // the phase RESEARCH: "new BT landing ... replaces render for BT churchId").
+  if (isBtPublicSite(sdSlug)) {
+    return <BtLanding config={props.config} />;
+  }
 
   if (!props.pageData?.url) {
     redirect("/mobile");
