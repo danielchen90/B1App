@@ -30,6 +30,16 @@ export async function GET(request: NextRequest, context: { params: Promise<{ sdS
         const pages: SitemapPage[] = await pagesResponse.json();
         pages.forEach((p) => { if (p.url?.startsWith("/")) urls.add(p.url); });
       }
+
+      // Public campus slugs → /locations/{slug} (Phase 20, SITE-03: per-campus pages crawlable).
+      // membershipApi already ends in "/membership"; the 20-01 controller is
+      // @controller("/membership/public") route "/:churchId/campuses" → client path "/public/...".
+      // Older API deploys 404 here too and we keep whatever urls we already gathered.
+      const campusesResponse = await fetch(membershipApi + "/public/" + church.id + "/campuses", { next: { revalidate: 3600, tags: [sdSlug] } } as RequestInit);
+      if (campusesResponse.ok) {
+        const campuses: { slug?: string | null }[] = await campusesResponse.json();
+        campuses.forEach((c) => { if (c.slug) urls.add("/locations/" + c.slug); });
+      }
     }
   } catch { /* fall back to home page only */ }
 
