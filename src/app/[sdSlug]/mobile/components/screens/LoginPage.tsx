@@ -27,16 +27,6 @@ const RESEND_COOLDOWN_SECONDS = 30;
 
 type Mode = "login" | "register" | "forgot" | "verify" | "setPassword";
 
-interface CheckEmailResponseInterface {
-  exists: boolean;
-  peopleMatches: Array<{
-    firstName?: string;
-    lastName?: string;
-    churchId?: string;
-    churchName?: string;
-  }>;
-}
-
 interface Props {
   config?: ConfigurationInterface;
 }
@@ -121,52 +111,13 @@ export const MobileLoginScreen = ({ config }: Props) => {
   const hydrateFromLoginResponse = (resp: LoginResponseInterface) =>
     hydrateUserSession(resp, context, { sdSlug, churchId, writeCookies: true });
 
-  const prefillRegisterFromMatch = async (emailToCheck: string) => {
-    if (!emailToCheck || !EMAIL_REGEX.test(emailToCheck)) return;
-    try {
-      const resp: CheckEmailResponseInterface = await ApiHelper.postAnonymous(
-        "/users/checkEmail",
-        { email: emailToCheck },
-        "MembershipApi"
-      );
-      if (resp.exists) {
-        showError("An account already exists for this email. Please sign in instead.");
-      } else if (resp.peopleMatches?.length > 0) {
-        const match = resp.peopleMatches[0];
-        if (!regFirstName && match.firstName) setRegFirstName(match.firstName);
-        if (!regLastName && match.lastName) setRegLastName(match.lastName);
-        if (resp.peopleMatches.length === 1) {
-          setMatchedChurchId(match.churchId);
-          setMatchedChurchName(match.churchName || "");
-        }
-      }
-    } catch {
-      /* ignore */
-    }
-  };
-
+  // PUB-02 enumeration-safety: the anonymous /users/checkEmail existence probe was REMOVED
+  // server-side (it leaked account existence + a person's name/church across every church).
+  // On a failed login we no longer ask the server "does this account exist?" — we show a single
+  // GENERIC message and offer to register, without revealing whether the email is known.
   const handleLoginFailure = async () => {
-    try {
-      const resp: CheckEmailResponseInterface = await ApiHelper.postAnonymous(
-        "/users/checkEmail",
-        { email },
-        "MembershipApi"
-      );
-      if (resp.exists) {
-        showError("Invalid login. Please check your email or password.");
-      } else {
-        const match = resp.peopleMatches?.[0];
-        setNoAccountPrompt({
-          email,
-          firstName: match?.firstName,
-          lastName: match?.lastName,
-          churchId: resp.peopleMatches?.length === 1 ? match?.churchId : undefined,
-          churchName: resp.peopleMatches?.length === 1 ? match?.churchName : undefined
-        });
-      }
-    } catch {
-      showError("Invalid login. Please check your email or password.");
-    }
+    showError("Invalid login. Please check your email or password.");
+    setNoAccountPrompt({ email });
   };
 
   const validateLogin = (): boolean => {
@@ -492,7 +443,6 @@ export const MobileLoginScreen = ({ config }: Props) => {
         placeholder={Locale.label("mobile.screens.emailPlaceholder")}
         value={email}
         onChange={e => setEmail(e.target.value)}
-        onBlur={e => prefillRegisterFromMatch(e.target.value)}
         type="email"
         variant="outlined"
         fullWidth
