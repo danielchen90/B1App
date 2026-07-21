@@ -151,7 +151,12 @@ const nextConfig = {
     ];
   },
 
-  // Rewrites for subdomain routing
+  // Rewrites for subdomain routing.
+  // NOTE: these regex rewrites handle *.huro.church subdomains, localhost and
+  // *.up.railway.app ONLY. Custom domains (e.g. bibleteachers.com) are resolved
+  // per-request by src/middleware.ts, which does the DB-backed host→church
+  // lookup a static rewrite cannot do (see RESEARCH Pitfall 2) and rewrites to
+  // the same /{sdSlug}/... shape. Do NOT add a DB lookup here.
   async rewrites() {
     const railwaySlug = process.env.DEFAULT_CHURCH_SLUG || "church";
     const railwayRules = [
