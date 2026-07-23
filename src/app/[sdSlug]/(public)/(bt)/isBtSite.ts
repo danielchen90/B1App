@@ -10,7 +10,7 @@
 // data-driven per-tenant theming this selector is where "is this a BT-branded public
 // site" generalizes (e.g. a church flag) — one place to change.
 
-const DEFAULT_BT_SUBDOMAINS = ["bibleteachers", "church", "chensolutions"];
+const DEFAULT_BT_SUBDOMAINS = ["bibleteachers", "bti", "church", "chensolutions"];
 
 /**
  * True when `sdSlug` is a configured Bible Teachers public subdomain. Reads
