@@ -71,7 +71,11 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // Match → rewrite to the SAME /{sdSlug}{path}{search} shape the static
   // rewrites produce, so [sdSlug] routing + ConfigHelper.load(subDomain) work.
   const { pathname, search } = request.nextUrl;
-  return NextResponse.rewrite(new URL(`/${subDomain}${pathname}${search}`, request.url));
+  // Root pathname is "/"; appending it yields "/{sub}/" (trailing slash), which does
+  // NOT resolve to the [sdSlug] route the way the static rewrite's slash-less "/{sub}"
+  // does — it 404s. Drop the root slash so the rewrite target matches exactly.
+  const rewritePath = pathname === "/" ? "" : pathname;
+  return NextResponse.rewrite(new URL(`/${subDomain}${rewritePath}${search}`, request.url));
 }
 
 // Only run on page routes; skip Next internals, the API, the manifest/sw, and
