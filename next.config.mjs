@@ -191,12 +191,12 @@ const nextConfig = {
       },
       {
         source: "/",
-        has: [{ type: "host", value: "(?<subdomain>.*?)\\..*" }],
+        has: [{ type: "host", value: "(?<subdomain>.*?)\\.huro\\.church" }],
         destination: "/:subdomain"
       },
       {
         source: "/:path*",
-        has: [{ type: "host", value: "(?<subdomain>.*?)\\..*" }],
+        has: [{ type: "host", value: "(?<subdomain>.*?)\\.huro\\.church" }],
         destination: "/:subdomain/:path*"
       }
     ];
