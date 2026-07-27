@@ -24,14 +24,24 @@ import type { NextRequest } from "next/server";
  */
 
 // Hosts that must fall through to the existing next.config.mjs rewrites untouched.
-const isInternalOrSubdomainHost = (host: string): boolean =>
-  host === "localhost" ||
-  host.startsWith("localhost:") ||
-  host.startsWith("127.0.0.1") ||
-  host.endsWith(".huro.church") ||
-  host.endsWith(".up.railway.app") ||
-  host.endsWith(".localtest.me") ||
-  host.endsWith(".localhost");
+// This MUST catch every platform/infra host — especially Railway's healthcheck
+// host (healthcheck.railway.app) and internal probes — so they never trigger the
+// DB-lookup fetch below. Missing one adds cold-boot fetch latency on the "/"
+// healthcheck path and can fail the deploy (replicas never healthy). A bare,
+// dot-less host (internal probe) is treated as infra too.
+const isInternalOrSubdomainHost = (host: string): boolean => {
+  const h = host.split(":")[0]; // strip any :port
+  return (
+    !h.includes(".") ||               // bare hostname (internal probe) — no subdomain to resolve
+    h === "localhost" ||
+    h.startsWith("127.") ||
+    h.endsWith(".huro.church") ||
+    h.endsWith(".railway.app") ||     // *.up.railway.app AND healthcheck.railway.app
+    h.endsWith(".railway.internal") ||
+    h.endsWith(".localtest.me") ||
+    h.endsWith(".localhost")
+  );
+};
 
 const membershipLookupBase = (): string | null => {
   const base = process.env.NEXT_PUBLIC_API_BASE?.replace(/\/+$/, "");
@@ -55,7 +65,9 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   let subDomain: string | undefined;
   try {
-    const res = await fetch(`${lookupBase}/${encodeURIComponent(apex)}`);
+    // Hard cap the lookup so a slow/unreachable Api can never hang a request
+    // (this runs on the hot path for every non-huro host). Timeout → fail safe.
+    const res = await fetch(`${lookupBase}/${encodeURIComponent(apex)}`, { signal: AbortSignal.timeout(2500) });
     if (res.ok) {
       const data = (await res.json()) as { subDomain?: string } | null;
       subDomain = data?.subDomain || undefined;
