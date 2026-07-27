@@ -80,14 +80,17 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // Unknown custom domain / no match → fall through to the default/not-found.
   if (!subDomain) return NextResponse.next();
 
-  // Match → rewrite to the SAME /{sdSlug}{path}{search} shape the static
-  // rewrites produce, so [sdSlug] routing + ConfigHelper.load(subDomain) work.
-  const { pathname, search } = request.nextUrl;
-  // Root pathname is "/"; appending it yields "/{sub}/" (trailing slash), which does
-  // NOT resolve to the [sdSlug] route the way the static rewrite's slash-less "/{sub}"
-  // does — it 404s. Drop the root slash so the rewrite target matches exactly.
-  const rewritePath = pathname === "/" ? "" : pathname;
-  return NextResponse.rewrite(new URL(`/${subDomain}${rewritePath}${search}`, request.url));
+  // Match → set the SAME x-site header an upstream proxy would, then pass through.
+  // next.config.mjs already has x-site rewrite rules ABOVE its broad host rules, so
+  // this maps the request to /{subDomain}{path} while taking PRIORITY over the host
+  // rule — which would otherwise re-prepend the CUSTOM domain's own first label
+  // (church.chensolutions.com -> /church/... -> 404). Rewriting the path here
+  // directly does NOT work: the static host rewrite re-fires on the rewritten path.
+  // Scoping that host rewrite instead breaks Railway's "/" healthcheck (proven by
+  // deploy), so we reuse the existing x-site seam and leave next.config untouched.
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-site", `${subDomain}.huro.church`);
+  return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 // Only run on page routes; skip Next internals, the API, the manifest/sw, and

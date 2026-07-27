@@ -190,21 +190,13 @@ const nextConfig = {
         destination: "/localhost"
       },
       {
-        // Stays broad on purpose: Railway's healthcheck hits "/" with a non-huro
-        // host and relies on this to resolve to a renderable /{label} (200).
-        // Custom domains never reach here at "/" — middleware rewrites their "/"
-        // to "/{subDomain}" before static rewrites run, so this only affects the
-        // healthcheck host and bare *.huro.church roots.
         source: "/",
         has: [{ type: "host", value: "(?<subdomain>.*?)\\..*" }],
         destination: "/:subdomain"
       },
       {
-        // Scoped to huro.church: a broad host here re-fired on middleware's
-        // "/{subDomain}" output for custom domains and prepended the domain's
-        // first label (church.chensolutions.com -> /church/bti -> 404).
         source: "/:path*",
-        has: [{ type: "host", value: "(?<subdomain>.*?)\\.huro\\.church" }],
+        has: [{ type: "host", value: "(?<subdomain>.*?)\\..*" }],
         destination: "/:subdomain/:path*"
       }
     ];
