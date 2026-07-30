@@ -50,6 +50,8 @@ import { GiveButton } from "@/components/public-bt/GiveButton";
 import { LeadershipGrid, type PublicLeader } from "@/components/public-bt/LeadershipGrid";
 import { SermonBlock, type LatestSermon } from "@/components/public-bt/SermonBlock";
 import { EventsList, type PublicEvent } from "@/components/public-bt/EventsList";
+import { PrayerForm } from "@/components/public-bt/forms/PrayerForm";
+import { ContactForm } from "@/components/public-bt/forms/ContactForm";
 import {
   type CampusContent,
   type ServiceTime,
@@ -308,8 +310,27 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
         </div>
       </section>
 
-      {/* (7) Prayer + Contact forms (plan 20-07) mount here. */}
-      {/* Prayer + Contact forms (plan 20-07) */}
+      {/* (7) Prayer + Contact forms (plan 20-07) — two SEPARATE login-free forms, each
+             tagged to THIS campus via campusId. Side by side on desktop, stacked on mobile. */}
+      <section id="connect" style={{ ...BAND_STYLE }}>
+        <div style={SECTION_STYLE}>
+          <h2 style={{ fontSize: "2rem", marginBottom: 8, textAlign: "center" }}>Get in touch</h2>
+          <p style={{ color: "var(--bt-muted)", textAlign: "center", maxWidth: 560, margin: "0 auto 32px", fontSize: "1.1rem" }}>
+            Share a prayer request or send us a message — no account needed.
+          </p>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gap: 24,
+              alignItems: "start"
+            }}
+          >
+            <PrayerForm churchId={churchId} campusId={campus.id} />
+            <ContactForm churchId={churchId} campusId={campus.id} />
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
       <footer style={{ marginTop: "auto", borderTop: "1px solid var(--bt-line)", background: "var(--bt-surface)" }}>
