@@ -25,9 +25,11 @@ import { ApiHelper } from "@churchapps/apphelper";
 import type { ConfigurationInterface } from "@/helpers/ConfigHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
 import { loadPublicCampuses, type PublicCampus } from "@/helpers/PublicCampusHelper";
+import { loadLocatorCampuses } from "@/helpers/LocatorCampusHelper";
 import { BtTheme } from "@/components/public-bt/BtTheme";
 import { BtHeader } from "@/components/public-bt/BtHeader";
 import { BtBrand } from "@/components/public-bt/BtBrand";
+import { CampusLocator } from "@/components/public-bt/CampusLocator";
 import type { LocationLink } from "@/components/public-bt/LocationsMenu";
 
 // The org-default resolved content field-set (mirror of the API's CampusContentFields,
@@ -93,9 +95,11 @@ const SECTION_STYLE: React.CSSProperties = {
  * <BtHeader/>. Consumes the SSR campus list + org content.
  */
 export const BtLanding: React.FC<{ config: ConfigurationInterface }> = async ({ config }) => {
-  const { campuses, content } = await loadBtLandingData(config);
+  const { churchId, campuses, content } = await loadBtLandingData(config);
   const locationLinks = toLocationLinks(campuses);
   const linkableCampuses = campuses.filter((c) => c.slug);
+  // Plottable campuses (real slug + stored lat/lng) for the map+list island (plan 20-06).
+  const locatorCampuses = await loadLocatorCampuses(churchId);
 
   return (
     <div className="bt-root" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
@@ -171,9 +175,16 @@ export const BtLanding: React.FC<{ config: ConfigurationInterface }> = async ({ 
             Find a Bible Teachers campus near you.
           </p>
 
-          {/* LocatorMap island (plan 20-06) */}
+          {/* LocatorMap island (plan 20-06) — the split map+list (second discoverable path).
+              Mounts when there are plottable (slug + stored lat/lng) campuses; its child
+              CampusList is server-rendered as the crawlable fallback. */}
+          {locatorCampuses.length > 0 && (
+            <div style={{ marginBottom: 32 }}>
+              <CampusLocator campuses={locatorCampuses} />
+            </div>
+          )}
 
-          {linkableCampuses.length === 0 ? (
+          {locatorCampuses.length > 0 ? null : linkableCampuses.length === 0 ? (
             <p style={{ color: "var(--bt-muted)" }}>Campus locations are coming soon.</p>
           ) : (
             <ul
