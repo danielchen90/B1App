@@ -27,6 +27,14 @@ interface Props {
   onSelect?: (id: string) => void;
 }
 
+// Format a great-circle distance (km) as visitor-friendly miles. Only shown after the
+// opt-in "near me" stamps a distance onto each campus.
+function formatDistance(km: number): string {
+  const miles = km * 0.621371;
+  if (miles < 0.1) return "Less than 0.1 mi away";
+  return `${miles < 10 ? miles.toFixed(1) : Math.round(miles)} mi away`;
+}
+
 export const CampusList: React.FC<Props> = ({ campuses, activeId, onHover, onSelect }) => {
   if (campuses.length === 0) {
     return <p style={{ color: "var(--bt-muted)" }}>Campus locations are coming soon.</p>;
@@ -63,13 +71,35 @@ export const CampusList: React.FC<Props> = ({ campuses, activeId, onHover, onSel
             >
               <div
                 style={{
-                  fontFamily: "var(--bt-heading-font)",
-                  fontWeight: 700,
-                  fontSize: "1.15rem",
+                  display: "flex",
+                  alignItems: "baseline",
+                  justifyContent: "space-between",
+                  gap: 10,
                   marginBottom: 4
                 }}
               >
-                {c.name}
+                <span
+                  style={{
+                    fontFamily: "var(--bt-heading-font)",
+                    fontWeight: 700,
+                    fontSize: "1.15rem"
+                  }}
+                >
+                  {c.name}
+                </span>
+                {typeof c.distanceKm === "number" && (
+                  <span
+                    style={{
+                      flexShrink: 0,
+                      color: "var(--bt-gold-strong)",
+                      fontWeight: 600,
+                      fontSize: "0.85rem",
+                      whiteSpace: "nowrap"
+                    }}
+                  >
+                    {formatDistance(c.distanceKm)}
+                  </span>
+                )}
               </div>
               {c.address && (
                 <div style={{ color: "var(--bt-muted)", fontSize: "0.95rem", lineHeight: 1.5 }}>

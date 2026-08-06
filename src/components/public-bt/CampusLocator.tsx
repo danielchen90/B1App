@@ -91,11 +91,10 @@ export const CampusLocator: React.FC<Props> = ({ campuses }) => {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
-        const sorted = [...campuses].sort(
-          (a, b) =>
-            haversineKm(latitude, longitude, a.lat, a.lng) -
-            haversineKm(latitude, longitude, b.lat, b.lng)
-        );
+        // Stamp each campus with its distance from the visitor, then sort nearest-first.
+        const sorted = campuses
+          .map((c) => ({ ...c, distanceKm: haversineKm(latitude, longitude, c.lat, c.lng) }))
+          .sort((a, b) => a.distanceKm - b.distanceKm);
         setOrdered(sorted);
         if (sorted[0]) {
           setActiveId(sorted[0].id);

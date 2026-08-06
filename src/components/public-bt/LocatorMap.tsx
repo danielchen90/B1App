@@ -34,6 +34,8 @@ export interface LocatorCampus {
   lng: number;
   address: string;
   serviceTimesLabel: string;
+  /** Great-circle distance from the visitor in km — set ONLY after opt-in "near me". */
+  distanceKm?: number;
 }
 
 interface Props {
