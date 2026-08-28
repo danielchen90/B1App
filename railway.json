@@ -6,7 +6,7 @@
   },
   "deploy": {
     "startCommand": "yarn start",
-    "healthcheckPath": "/",
+    "healthcheckPath": "/socialSuggestions",
     "healthcheckTimeout": 60,
     "restartPolicyType": "on_failure"
   }
