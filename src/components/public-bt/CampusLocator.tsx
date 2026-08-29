@@ -91,7 +91,7 @@ export const CampusLocator: React.FC<Props> = ({ campuses, mapHeight = 640 }) =>
   const locate = React.useCallback(
     (announceErrors: boolean) => {
       if (typeof navigator === "undefined" || !navigator.geolocation) {
-        if (announceErrors) setGeoError("Location isn't available in this browser — the list is grouped by nation instead.");
+        if (announceErrors) setGeoError("Location isn't available in this browser, so the list is grouped by nation instead.");
         return;
       }
       setLocating(true);
@@ -103,7 +103,7 @@ export const CampusLocator: React.FC<Props> = ({ campuses, mapHeight = 640 }) =>
         },
         () => {
           setLocating(false);
-          if (announceErrors) setGeoError("We couldn't get your location — the list is grouped by nation instead.");
+          if (announceErrors) setGeoError("We couldn't get your location, so the list is grouped by nation instead.");
         },
         { enableHighAccuracy: false, timeout: 9000, maximumAge: 600000 }
       );

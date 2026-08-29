@@ -44,7 +44,7 @@ interface Props {
 // the gold pins carry the page; a reference layer adds place labels on top.
 const TILE_BASE = "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}";
 const TILE_LABELS = "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}";
-const TILE_ATTRIB = 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+const TILE_ATTRIB = 'Tiles &copy; Esri | Esri, HERE, Garmin &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 // Gold pin on ink — the brand mark reduced to a map glyph.
 const pinSvg = (active: boolean) => `

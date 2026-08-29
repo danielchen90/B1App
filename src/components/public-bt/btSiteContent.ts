@@ -11,7 +11,7 @@ export const BT = {
   shortName: "Bible Teachers",
   ministry: "Mary Banks Ministries",
   founder: "Apostle Mary Banks",
-  tagline: "Teaching the Word to the nations.",
+  tagline: "Gathering the Lost, One Sheep at a Time.",
   // Matthew 28:19–20 is the house commission — "teach all nations" names the ministry.
   commission: "Go ye therefore, and teach all nations…",
   commissionRef: "Matthew 28:19",
@@ -22,18 +22,28 @@ export const BT = {
 } as const;
 
 export const BT_COPY = {
+  // "A Church for you" copy from the ministry's home page, verbatim.
   heroSub:
-    "Bible Teachers International is a worldwide fellowship of worship centers under Mary Banks Ministries — devoted to the deep, careful teaching of God's Word, from Atlanta to Kingston, Houston to Trinidad.",
+    "Bible Teachers International is committed to growing you up spiritually that you may come to and walk in the full development of your supply of the Spirit. Find a location, and join the growth path today.",
+  // The ministry's own self-description from its About page.
+  identity:
+    "God's influence in the earth. A voice of truth to gather the ignorant into the knowledge of God.",
   mission:
-    "Our calling is simple and unchanging: to teach the Word of God in its depth, to make disciples who know Him by experience — not by hearsay — and to raise worship centers in every nation where the whole counsel of God is taught without compromise.",
+    "We are a division of Mary Banks Ministries and the MSOG Global Church, committed to worldwide evangelism, discipleship, healing, the perfecting of the Body of Christ, and the preparing of God's people for ministry.",
   aboutShort:
-    "For decades, Apostle Mary Banks has taught believers to move beyond church attendance into genuine discipleship — studying the Scriptures line upon line, learning to hear God, and living the life the Bible actually describes. What began as a Bible study has grown into an international fellowship of worship centers across the United States, the Caribbean, and Canada.",
+    "God has charged us to destroy the doctrines of devils by teaching the Word from His perspective. This requires that there be no private interpretation of scripture (II Peter 1:20); in other words, the Bible interprets itself. We teach the body of Christ how to apply God's principles to their real life situations, and as a result many have moved to a higher level of spiritual comprehension of God's Word and into a deeper, more intimate relationship with God.",
   whatToExpect:
-    "Come as you are. A service at any of our worship centers is warm and unhurried: heartfelt worship, real prayer, and teaching that opens the Scriptures plainly — you'll leave with your Bible marked up and your questions taken seriously.",
+    "Come as you are. A service at any of our worship centers is warm and unhurried: heartfelt worship, real prayer, and teaching that opens the Scriptures plainly. Bring your Bible and bring your questions.",
   discipleship:
-    "Beyond Sunday, every worship center gathers through the week for discipleship — smaller settings where the Word is studied deeply, questions are welcomed, and believers are trained for ministry.",
+    "Beyond Sunday, every worship center gathers through the week for discipleship: smaller settings where the Word is studied deeply, questions are welcomed, and believers are trained for ministry.",
   onlineBlurb:
-    "Wherever you are in the world, the Online Church gathers every week — live services, discipleship over Zoom, and a praying community that spans continents."
+    "Wherever you are in the world, the Online Church gathers every week: live services, discipleship over Zoom, and a praying community that spans continents.",
+  // Prayer invitation from the ministry's home page, verbatim.
+  prayerInvite:
+    "Join ministers from all over the world as we send prayers up to heaven. Send in your prayer requests and let us know your praise reports.",
+  beliefs:
+    "We believe that God is a triune being. He is God the Father, God the Son and God the Holy Spirit.",
+  beliefsRef: "1 John 5:7"
 } as const;
 
 // ── Per-campus enrichment (from the ministry's own published site) ──────────────
@@ -246,7 +256,7 @@ export const BT_CAMPUS_EXTRAS: Record<string, BtCampusExtras> = {
     serviceTimes: [
       { day: "Sunday", time: "8:30 AM", label: "Worship service" },
       { day: "Sunday", time: "11:30 AM", label: "Children's church" },
-      { day: "Mon–Fri", time: "6:30 AM", label: "Morning prayer (online)" }
+      { day: "Mon to Fri", time: "6:30 AM", label: "Morning prayer (online)" }
     ],
     leaders: "Pastor Ketha Edmondson",
     phone: "+1 (876) 808-9039",

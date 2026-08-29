@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const { sdSlug } = await params;
   const config = await loadBtConfig(sdSlug);
   const churchName = config.church?.name || BT.name;
-  const title = "About Us — " + churchName;
+  const title = "About Us | " + churchName;
   const description = BT_COPY.mission;
   return MetaHelper.getMetaData(title, description, description, config.appearance);
 }
@@ -40,17 +40,17 @@ const EXPECT = [
   {
     icon: IconBook,
     title: "Teaching that opens the Book",
-    copy: "Messages walk through the Scriptures plainly and in depth — bring your Bible, you'll use it."
+    copy: "Messages walk through the Scriptures plainly and in depth, with no private interpretation: the Bible interprets itself. Bring your Bible, you'll use it."
   },
   {
     icon: IconHeart,
     title: "Worship and real prayer",
-    copy: "Services are warm and unhurried. People pray with you and for you — by name, not in general."
+    copy: "Services are warm and unhurried. People pray with you and for you, by name, not in general."
   },
   {
     icon: IconClock,
     title: "Discipleship through the week",
-    copy: "Midweek classes and prayer meetings are where the Word settles in — every center gathers beyond Sunday."
+    copy: "Midweek classes and prayer meetings are where the Word settles in. Every center gathers beyond Sunday."
   }
 ];
 
@@ -78,9 +78,12 @@ export default async function AboutPage({ params }: { params: Promise<PageParams
         <div className="bt-section" style={{ position: "relative", textAlign: "center", paddingTop: 90, paddingBottom: 90 }}>
           <div className="bt-eyebrow" style={{ justifyContent: "center" }}>Who We Are</div>
           <h1 className="bt-display" style={{ fontSize: "clamp(2.5rem, 5.5vw, 4rem)", maxWidth: 860, margin: "20px auto 0" }}>
-            A fellowship built on the<br />
-            <em style={{ fontStyle: "italic", color: "var(--bt-gold-bright)" }}>whole counsel of God.</em>
+            God&rsquo;s influence<br />
+            <em style={{ fontStyle: "italic", color: "var(--bt-gold-bright)" }}>in the earth.</em>
           </h1>
+          <p className="bt-lede bt-muted-text" style={{ maxWidth: 620, margin: "20px auto 0" }}>
+            A voice of truth to gather the ignorant into the knowledge of God.
+          </p>
         </div>
       </section>
 
@@ -113,13 +116,13 @@ export default async function AboutPage({ params }: { params: Promise<PageParams
             />
             <div>
               <div className="bt-eyebrow">Our Story</div>
-              <h2 className="bt-h2" style={{ marginTop: 14 }}>From a Bible study to six nations</h2>
+              <h2 className="bt-h2" style={{ marginTop: 14 }}>The Bible interprets itself</h2>
               <p className="bt-lede bt-muted-text" style={{ marginTop: 20 }}>
                 {content.about || BT_COPY.aboutShort}
               </p>
               <p className="bt-lede bt-muted-text" style={{ marginTop: 16 }}>
-                Today, worship centers gather under{" "}{BT.ministry}{" "}in{" "}{BT_NATION_COUNT}{" "}nations —
-                each one locally pastored, and all of them fed from the same table of the Word.
+                Today, worship centers gather under{" "}{BT.ministry}{" "}in{" "}{BT_NATION_COUNT}{" "}nations,
+                each one locally pastored and all of them fed from the same table of the Word.
               </p>
             </div>
           </div>
@@ -132,7 +135,7 @@ export default async function AboutPage({ params }: { params: Promise<PageParams
           <div className="bt-eyebrow">Your First Visit</div>
           <h2 className="bt-h2" style={{ marginTop: 14 }}>What to Expect</h2>
           <p className="bt-lede bt-muted-text" style={{ maxWidth: 620, margin: "16px auto 0" }}>
-            Come as you are — you&rsquo;ll be welcomed, not watched.
+            Come as you are. You&rsquo;ll be welcomed, not watched.
           </p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))", gap: 22 }}>
@@ -143,6 +146,22 @@ export default async function AboutPage({ params }: { params: Promise<PageParams
               <p className="bt-muted-text" style={{ lineHeight: 1.7 }}>{copy}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* What we believe */}
+      <section style={{ background: "#F3EDDD", borderTop: "1px solid var(--bt-line)", borderBottom: "1px solid var(--bt-line)" }}>
+        <div className="bt-section-tight" style={{ textAlign: "center" }}>
+          <div className="bt-eyebrow" style={{ justifyContent: "center" }}>What We Believe</div>
+          <p
+            style={{
+              fontFamily: "var(--bt-display-font)", fontSize: "clamp(1.4rem, 2.6vw, 1.9rem)",
+              lineHeight: 1.5, maxWidth: 780, margin: "22px auto 0", fontWeight: 500
+            }}
+          >
+            {BT_COPY.beliefs}
+          </p>
+          <div className="bt-eyebrow" style={{ justifyContent: "center", marginTop: 18 }}>{BT_COPY.beliefsRef}</div>
         </div>
       </section>
 

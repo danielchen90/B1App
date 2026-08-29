@@ -168,7 +168,7 @@ export const BtSidebar: React.FC<Props> = ({ open, onClose, campuses, giveUrl })
             </a>
           </div>
           <p style={{ fontFamily: "var(--bt-display-font)", fontStyle: "italic", fontSize: "0.95rem", color: "var(--bt-ondark-muted)", textAlign: "center" }}>
-            &ldquo;{BT.commission}&rdquo; — {BT.commissionRef}
+            &ldquo;{BT.commission}&rdquo; &middot; {BT.commissionRef}
           </p>
         </div>
       </aside>

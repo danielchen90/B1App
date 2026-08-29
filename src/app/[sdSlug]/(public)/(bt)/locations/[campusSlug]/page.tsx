@@ -124,7 +124,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
 
   const campus = resolved.campus;
   const content = await loadCampusContent(churchId, campus.id);
-  const title = campus.name + " — " + churchName;
+  const title = campus.name + " | " + churchName;
   const locality = [campus.city, campus.state].filter(Boolean).join(", ");
   const description =
     str(content.welcomeNote) ||
@@ -191,7 +191,7 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
         <ServiceTimes
           campusName={campus.name}
           serviceTimes={serviceTimes}
-          address1={extras?.virtual ? "Online — join from anywhere" : campus.address1}
+          address1={extras?.virtual ? "Online: join from anywhere" : campus.address1}
           city={extras?.virtual ? null : campus.city}
           state={extras?.virtual ? null : campus.state}
           zip={extras?.virtual ? null : campus.zip}

@@ -51,7 +51,7 @@ export const BtHeader: React.FC<Props> = ({ campuses, giveUrl }) => {
             display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16
           }}
         >
-          <Link href="/" aria-label="Bible Teachers International — home">
+          <Link href="/" aria-label="Bible Teachers International home">
             <BtBrand size="sm" dark />
           </Link>
 

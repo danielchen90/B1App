@@ -32,7 +32,7 @@ export const CampusHero: React.FC<Props> = ({
 }) => {
   const copy =
     welcomeNote ||
-    `Welcome home. Whoever you are and wherever you're from, there's a seat for you at ${campusName} — come and be taught of the Lord.`;
+    `Welcome home. Whoever you are and wherever you're from, there's a seat for you at ${campusName}. Come and be taught of the Lord.`;
 
   const image = heroImage || "/bt/worship.jpg";
 

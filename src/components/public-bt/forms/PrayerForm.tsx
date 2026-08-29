@@ -20,7 +20,7 @@ export const PrayerForm: React.FC<Props> = ({ churchId, campusId }) => (
     campusId={campusId}
     submissionType="prayer"
     title="Prayer Request"
-    intro="However you're doing today, our team would be honored to pray with you. Share what's on your heart."
+    intro="Join ministers from all over the world as we send prayers up to heaven. Send in your prayer request and let us know your praise reports."
     cta="Submit prayer request"
     thankYouTitle="We're praying with you"
     thankYouCopy="Thank you for sharing. Our prayer team has received your request and is lifting it up. You are not alone."

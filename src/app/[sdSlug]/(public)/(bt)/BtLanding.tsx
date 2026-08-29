@@ -58,7 +58,7 @@ export async function buildBtMetadata(config: ConfigurationInterface): Promise<M
   const churchName = config.church?.name || BT.name;
   const { content } = await loadBtLandingData(config);
   const description = content.mission || BT_COPY.heroSub;
-  return MetaHelper.getMetaData(churchName + " — " + BT.tagline, description, description, config.appearance);
+  return MetaHelper.getMetaData(churchName + " | " + BT.tagline, description, description, config.appearance);
 }
 
 const formatDate = (iso: string): string => {
@@ -112,7 +112,8 @@ export const BtLanding: React.FC<{ config: ConfigurationInterface }> = async ({ 
           style={{
             position: "absolute", inset: 0,
             backgroundImage:
-              "linear-gradient(180deg, rgba(18,16,11,0.82) 0%, rgba(18,16,11,0.62) 45%, rgba(18,16,11,0.94) 100%), url('/bt/worship.jpg')",
+              "radial-gradient(ellipse 70% 60% at 50% 42%, rgba(18,16,11,0.55) 0%, rgba(18,16,11,0) 100%)," +
+              "linear-gradient(180deg, rgba(18,16,11,0.93) 0%, rgba(18,16,11,0.86) 45%, rgba(18,16,11,0.97) 100%), url('/bt/worship.jpg')",
             backgroundSize: "cover", backgroundPosition: "center 30%"
           }}
         />
@@ -125,13 +126,13 @@ export const BtLanding: React.FC<{ config: ConfigurationInterface }> = async ({ 
             <LiveIndicator streamKey={config.church?.subDomain || null} />
           </div>
           <div className="bt-eyebrow bt-rise" style={{ justifyContent: "center" }}>
-            {BT.ministry}{" "}&middot; Bible Teachers International
+            {BT.ministry}{" "}Presents
           </div>
-          <h1 className="bt-display bt-rise-2" style={{ maxWidth: 880, margin: "22px auto 0" }}>
-            Teaching the Word<br />
-            <em style={{ fontStyle: "italic", color: "var(--bt-gold-bright)" }}>to the nations.</em>
+          <h1 className="bt-display bt-rise-2" style={{ maxWidth: 880, margin: "22px auto 0", textShadow: "0 2px 24px rgba(0,0,0,0.55)" }}>
+            Gathering the lost,<br />
+            <em style={{ fontStyle: "italic", color: "var(--bt-gold-bright)" }}>one sheep at a time.</em>
           </h1>
-          <p className="bt-lede bt-muted-text bt-rise-3" style={{ maxWidth: 640, margin: "24px auto 36px" }}>
+          <p className="bt-lede bt-rise-3" style={{ maxWidth: 640, margin: "24px auto 36px", color: "var(--bt-ondark)", textShadow: "0 1px 14px rgba(0,0,0,0.6)" }}>
             {content.welcomeNote || BT_COPY.heroSub}
           </p>
           <div className="bt-rise-3" style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
@@ -255,7 +256,7 @@ export const BtLanding: React.FC<{ config: ConfigurationInterface }> = async ({ 
               One church, <em style={{ fontStyle: "italic", color: "var(--bt-gold-bright)" }}>six nations.</em>
             </h2>
             <p className="bt-lede bt-muted-text" style={{ marginTop: 18 }}>
-              From the Gulf Coast to Kingston, Nassau to Mississauga, Couva to George Town —
+              From the Gulf Coast to Kingston, Nassau to Mississauga, Couva to George Town,
               every worship center opens the same Book and teaches the same Word.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 26 }}>
@@ -316,7 +317,7 @@ export const BtLanding: React.FC<{ config: ConfigurationInterface }> = async ({ 
               <span style={{ color: "var(--bt-gold-deep)" }}><IconHeart size={30} strokeWidth={1.3} /></span>
               <h3 style={{ fontSize: "1.7rem", margin: "14px 0 10px" }}>Need prayer?</h3>
               <p className="bt-muted-text" style={{ lineHeight: 1.7, marginBottom: 18 }}>
-                Our prayer team would be honored to stand with you. Share what&rsquo;s on your heart — no account needed.
+                {BT_COPY.prayerInvite}{" "}No account needed.
               </p>
               <Link className="bt-btn" href="/connect">Send a Prayer Request</Link>
             </div>
@@ -324,7 +325,7 @@ export const BtLanding: React.FC<{ config: ConfigurationInterface }> = async ({ 
               <span style={{ color: "var(--bt-gold-deep)" }}><IconGift size={30} strokeWidth={1.3} /></span>
               <h3 style={{ fontSize: "1.7rem", margin: "14px 0 10px" }}>Sow into the work</h3>
               <p className="bt-muted-text" style={{ lineHeight: 1.7, marginBottom: 18 }}>
-                Your giving carries the teaching of the Word across six nations — and keeps every worship center&rsquo;s doors open.
+                Your giving helps us bless many across the globe. Simple and secure: give a single gift, or schedule recurring giving.
               </p>
               <Link className="bt-btn bt-btn-outline" href="/give">Ways to Give</Link>
             </div>

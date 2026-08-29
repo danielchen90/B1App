@@ -22,10 +22,10 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const { sdSlug } = await params;
   const config = await loadBtConfig(sdSlug);
   const churchName = config.church?.name || BT.name;
-  const title = "Locations — " + churchName;
+  const title = "Locations | " + churchName;
   const description =
-    "Find the " + churchName + " worship center nearest you — " + BT_NATION_COUNT +
-    " nations across the United States, the Caribbean, and Canada. Service times, directions, and contacts for every center.";
+    "Here are all BTI locations. Find the " + churchName + " worship center nearest you across " + BT_NATION_COUNT +
+    " nations in the United States, the Caribbean, and Canada. Service times, directions, and contacts for every center.";
   return MetaHelper.getMetaData(title, description, description, config.appearance);
 }
 
@@ -52,8 +52,8 @@ export default async function LocationsPage({ params }: { params: Promise<PagePa
             Find Your <em style={{ fontStyle: "italic", color: "var(--bt-gold-bright)" }}>Worship Center</em>
           </h1>
           <p className="bt-lede bt-muted-text" style={{ maxWidth: 620, margin: "18px auto 0" }}>
-            {locatorCampuses.length}{" "}worship centers across{" "}{BT_NATION_COUNT}{" "}nations — and an
-            online church that gathers from anywhere. The list orders itself by what&rsquo;s closest to you.
+            Here are all BTI locations:{" "}{locatorCampuses.length}{" "}worship centers across{" "}{BT_NATION_COUNT}{" "}nations,
+            and an online church that gathers from anywhere. The list orders itself by what&rsquo;s closest to you.
           </p>
         </div>
       </section>

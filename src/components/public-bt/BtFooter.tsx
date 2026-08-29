@@ -4,7 +4,7 @@
 import React from "react";
 import Link from "next/link";
 import { BtBrand } from "./BtBrand";
-import { BT } from "./btSiteContent";
+import { BT, BT_COPY } from "./btSiteContent";
 import { getCampusExtras } from "./btSiteContent";
 import { IconYouTube, IconArrowRight } from "./BtIcons";
 import type { LocationLink } from "./LocationsMenu";
@@ -49,7 +49,7 @@ export const BtFooter: React.FC<Props> = ({ campuses = [], churchName }) => {
           <div style={{ maxWidth: 330 }}>
             <Link href="/" aria-label="Home"><BtBrand size="sm" dark /></Link>
             <p style={{ marginTop: 18, color: "var(--bt-ondark-muted)", fontSize: "0.95rem", lineHeight: 1.7 }}>
-              A worldwide fellowship of worship centers devoted to the deep teaching of God&rsquo;s Word.
+              {BT_COPY.identity}
             </p>
             <p style={{ marginTop: 14, fontFamily: "var(--bt-display-font)", fontStyle: "italic", fontSize: "1.02rem", color: "var(--bt-ondark)" }}>
               &ldquo;{BT.commission}&rdquo;

@@ -18,10 +18,10 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const { sdSlug } = await params;
   const config = await loadBtConfig(sdSlug);
   const churchName = config.church?.name || BT.name;
-  const title = "Sermons — " + churchName;
+  const title = "Sermons | " + churchName;
   const description =
     "Watch the latest messages from " + BT.founder + " and the " + churchName +
-    " teaching ministry — Sunday services and weeknight discipleship, free to everyone.";
+    " teaching ministry. Sunday services and weeknight discipleship, free to everyone.";
   return MetaHelper.getMetaData(title, description, description, config.appearance);
 }
 
@@ -53,7 +53,7 @@ export default async function SermonsPage({ params }: { params: Promise<PagePara
               Sit under <em style={{ fontStyle: "italic", color: "var(--bt-gold-bright)" }}>the Word.</em>
             </h1>
             <p className="bt-lede bt-muted-text" style={{ maxWidth: 600, margin: "18px auto 0" }}>
-              Sunday services and weeknight discipleship with{" "}{BT.founder}{" "}— streamed live,
+              Sunday services and weeknight discipleship with{" "}{BT.founder}, streamed live and
               kept here for whenever you&rsquo;re ready to study.
             </p>
           </div>
@@ -96,7 +96,7 @@ export default async function SermonsPage({ params }: { params: Promise<PagePara
           ) : (
             <div style={{ textAlign: "center" }}>
               <p className="bt-muted-text" style={{ marginBottom: 20 }}>
-                The library is loading slowly right now — every message is always available on the channel.
+                The library is loading slowly right now. Every message is always available on the channel.
               </p>
               <a className="bt-btn" href={BT.youtubeUrl} target="_blank" rel="noopener noreferrer">
                 <IconYouTube size={18} /> Watch on YouTube
@@ -166,8 +166,9 @@ export default async function SermonsPage({ params }: { params: Promise<PagePara
         <div className="bt-section-tight" style={{ textAlign: "center" }}>
           <div className="bt-eyebrow" style={{ justifyContent: "center" }}>The Weekly Rhythm</div>
           <p className="bt-lede bt-muted-text" style={{ maxWidth: 640, margin: "16px auto 0" }}>
-            Sunday morning worship, Tuesday and Friday night discipleship — live on the ministry&rsquo;s
-            channel, then kept here. Join a service from your nearest worship center, or from anywhere.
+            Sunday morning worship, and Tuesday and Friday night discipleship, live on the ministry&rsquo;s
+            channel and kept here. Live prayer gathers Mondays to Fridays every three hours, except 9 PM.
+            Join from your nearest worship center, or from anywhere.
           </p>
         </div>
       </section>

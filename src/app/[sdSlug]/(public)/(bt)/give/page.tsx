@@ -18,9 +18,9 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const { sdSlug } = await params;
   const config = await loadBtConfig(sdSlug);
   const churchName = config.church?.name || BT.name;
-  const title = "Give — " + churchName;
+  const title = "Give | " + churchName;
   const description =
-    "Sow into the work of " + churchName + " — secure online giving for the ministry and for every worship center.";
+    "Your giving helps us bless many across the globe. Simple and secure online giving for " + churchName + " and for every worship center.";
   return MetaHelper.getMetaData(title, description, description, config.appearance);
 }
 
@@ -51,8 +51,9 @@ export default async function GivePage({ params }: { params: Promise<PageParams>
             God loves a <em style={{ fontStyle: "italic", color: "var(--bt-gold-bright)" }}>cheerful giver.</em>
           </h1>
           <p className="bt-lede bt-muted-text" style={{ maxWidth: 620, margin: "20px auto 34px" }}>
-            Your giving carries the teaching of the Word across six nations — supporting local
-            worship centers, discipleship, and outreach. Every gift is processed securely through Stripe.
+            Your giving helps us bless many across the globe. Simple and secure: give a single gift,
+            or schedule recurring giving using your debit or credit card. Every gift is processed
+            securely through Stripe.
           </p>
           <a className="bt-btn" href={BT.giveUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: "1.05rem", padding: "16px 34px" }}>
             <IconGift size={20} /> Give to the Ministry
@@ -69,7 +70,7 @@ export default async function GivePage({ params }: { params: Promise<PageParams>
           <SectionOrnament />
           <h2 className="bt-h2" style={{ marginTop: 36 }}>Give to Your Worship Center</h2>
           <p className="bt-lede bt-muted-text" style={{ maxWidth: 560, margin: "16px auto 0" }}>
-            Prefer to sow where you're planted? Give directly to the center you call home.
+            Support our mission in the way that works best for you. Give directly to the center you call home.
           </p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: 14, maxWidth: 1000, margin: "0 auto" }}>
@@ -94,7 +95,12 @@ export default async function GivePage({ params }: { params: Promise<PageParams>
       {/* Reassurance band */}
       <section style={{ background: "#F3EDDD", borderTop: "1px solid var(--bt-line)" }}>
         <div className="bt-section-tight" style={{ textAlign: "center" }}>
-          <p className="bt-lede bt-muted-text" style={{ maxWidth: 640, margin: "0 auto" }}>
+          <p className="bt-lede bt-muted-text" style={{ maxWidth: 680, margin: "0 auto" }}>
+            {BT.ministry}{" "}and Bible Teachers International are dedicated to reaching the globe
+            with the message of Jesus Christ. Bible Teachers International is a certified 501(c)(3)
+            organization, recognized as a non-profit organization in the United States of America.
+          </p>
+          <p className="bt-muted-text" style={{ maxWidth: 640, margin: "18px auto 0" }}>
             Questions about giving, tithes, or receipts? Reach out through the{" "}
             <a href="/connect" style={{ color: "var(--bt-gold-deep)", fontWeight: 700 }}>Connect page</a>{" "}
             and your worship center&rsquo;s team will help.

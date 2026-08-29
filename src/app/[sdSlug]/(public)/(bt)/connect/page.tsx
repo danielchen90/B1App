@@ -20,9 +20,9 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const { sdSlug } = await params;
   const config = await loadBtConfig(sdSlug);
   const churchName = config.church?.name || BT.name;
-  const title = "Connect — " + churchName;
+  const title = "Connect | " + churchName;
   const description =
-    "Send a prayer request or a message to " + churchName + " — no account needed. Or reach your local worship center directly.";
+    "Send a prayer request or a message to " + churchName + ". No account needed. Or reach your local worship center directly.";
   return MetaHelper.getMetaData(title, description, description, config.appearance);
 }
 
@@ -51,11 +51,11 @@ export default async function ConnectPage({ params }: { params: Promise<PagePara
         <div className="bt-section-tight" style={{ textAlign: "center", paddingTop: 64, paddingBottom: 56 }}>
           <div className="bt-eyebrow" style={{ justifyContent: "center" }}>We&rsquo;d Love to Hear From You</div>
           <h1 className="bt-display" style={{ fontSize: "clamp(2.4rem, 5vw, 3.6rem)", marginTop: 16 }}>
-            Let&rsquo;s <em style={{ fontStyle: "italic", color: "var(--bt-gold-bright)" }}>connect.</em>
+            Let&rsquo;s <em style={{ fontStyle: "italic", color: "var(--bt-gold-bright)" }}>engage.</em>
           </h1>
           <p className="bt-lede bt-muted-text" style={{ maxWidth: 600, margin: "18px auto 0" }}>
-            Share a prayer request, ask a question, or plan your first visit —
-            no account needed, and a real person reads every message.
+            Share a prayer request, ask a question, or plan your first visit.
+            No account needed, and a real person reads every message.
           </p>
         </div>
       </section>
@@ -75,7 +75,7 @@ export default async function ConnectPage({ params }: { params: Promise<PagePara
         <div className="bt-section-tight" style={{ textAlign: "center" }}>
           <h2 className="bt-h2">Ready to visit?</h2>
           <p className="bt-lede bt-muted-text" style={{ maxWidth: 540, margin: "14px auto 26px" }}>
-            Find your nearest worship center — service times, directions, and a seat saved for you.
+            Find your nearest worship center: service times, directions, and a seat saved for you.
           </p>
           <Link className="bt-btn" href="/locations"><IconPin size={18} /> Find a Worship Center</Link>
         </div>
