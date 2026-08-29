@@ -1,30 +1,20 @@
 "use client";
 
-// Bible Teachers public CAMPUS LOCATOR orchestrator (Phase 20, Plan 06, MAP-01..06).
+// Worship-center locator — proximity sidebar + Leaflet map, two-way highlighted.
 //
-// Pairs the crawlable <CampusList> with the client-only <LocatorMap> island. Responsibilities:
-//   - Load the map via next/dynamic({ ssr:false }) with a skeleton fallback (RESEARCH
-//     Pattern 2: a Google-Maps SDK component must NOT run during SSR — window/document).
-//     The <CampusList> stays server-rendered (crawlable) even while the island hydrates.
-//   - DESKTOP: split view — CampusList LEFT, LocatorMap RIGHT (LOCKED). Hovering/clicking a
-//     list item sets `activeId` → the matching marker highlights (and a marker click flows
-//     back to highlight the list): two-way highlight.
-//   - "Find a campus near me": a PROMINENT OPT-IN button — NO silent auto-prompt on load
-//     (LOCKED). On click it calls navigator.geolocation.getCurrentPosition, sorts the list
-//     nearest-first via an inline Haversine distance, and asks the map to recenter on the
-//     nearest campus (MAP-06).
-//   - MOBILE: defaults LIST-FIRST with a "Map" toggle, stacked (Claude's discretion per LOCKED).
-//
-// Uses the `--bt-*` brand vars throughout.
+// On mount it quietly asks the browser for the visitor's location (the page's whole job
+// is "which center is nearest to me"); when granted, the sidebar re-orders nearest-first
+// with distance badges and the map drops a "you are here" dot. When denied or
+// unavailable, the list stays grouped by nation and a button offers to try again.
+// The <CampusList> markup server-renders either way, so the full address list is
+// crawlable before the map island hydrates.
 
 import React from "react";
 import dynamic from "next/dynamic";
 import { CampusList } from "./CampusList";
-import type { LocatorCampus } from "./LocatorMap";
+import type { LocatorCampus } from "./LeafletLocatorMap";
 
-// The map is client-only (ssr:false) — its SDK touches window/document. A skeleton holds
-// the layout while it hydrates; the crawlable list is always present regardless.
-const LocatorMap = dynamic(() => import("./LocatorMap"), {
+const LeafletLocatorMap = dynamic(() => import("./LeafletLocatorMap"), {
   ssr: false,
   loading: () => <MapSkeleton />
 });
@@ -33,29 +23,25 @@ const MapSkeleton: React.FC = () => (
   <div
     aria-hidden
     style={{
-      width: "100%",
-      height: "100%",
-      minHeight: 420,
+      width: "100%", height: "100%", minHeight: 420,
       borderRadius: "var(--bt-radius-lg)",
-      background:
-        "repeating-linear-gradient(45deg, var(--bt-surface-alt), var(--bt-surface-alt) 12px, var(--bt-surface) 12px, var(--bt-surface) 24px)",
+      background: "repeating-linear-gradient(45deg, #F3EDDD, #F3EDDD 12px, #FAF6EC 12px, #FAF6EC 24px)",
       border: "1px solid var(--bt-line)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      color: "var(--bt-muted)",
-      fontSize: "0.95rem"
+      display: "flex", alignItems: "center", justifyContent: "center",
+      color: "var(--bt-muted)", fontSize: "0.95rem"
     }}
   >
-    Loading map…
+    Preparing the map…
   </div>
 );
 
 interface Props {
   campuses: LocatorCampus[];
+  /** Map height on desktop (the sidebar scrolls beside it). */
+  mapHeight?: number;
 }
 
-// Inline Haversine great-circle distance in km (MAP-06 near-me sort). No dependency.
+// Great-circle distance in km.
 function haversineKm(aLat: number, aLng: number, bLat: number, bLng: number): number {
   const toRad = (d: number) => (d * Math.PI) / 180;
   const R = 6371;
@@ -67,138 +53,129 @@ function haversineKm(aLat: number, aLng: number, bLat: number, bLng: number): nu
   return 2 * R * Math.asin(Math.sqrt(s));
 }
 
-export const CampusLocator: React.FC<Props> = ({ campuses }) => {
+export const CampusLocator: React.FC<Props> = ({ campuses, mapHeight = 640 }) => {
   const [activeId, setActiveId] = React.useState<string | null>(null);
   const [ordered, setOrdered] = React.useState<LocatorCampus[]>(campuses);
+  const [byDistance, setByDistance] = React.useState(false);
+  const [userPos, setUserPos] = React.useState<{ lat: number; lng: number } | null>(null);
   const [centerOn, setCenterOn] = React.useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating] = React.useState(false);
   const [geoError, setGeoError] = React.useState<string | null>(null);
-  // Mobile default is LIST-FIRST; the toggle flips to the map (LOCKED).
-  const [mobileView, setMobileView] = React.useState<"list" | "map">("list");
 
   React.useEffect(() => {
-    setOrdered(campuses);
-  }, [campuses]);
+    if (!byDistance) setOrdered(campuses);
+  }, [campuses, byDistance]);
 
-  // OPT-IN near-me — fires ONLY on click, never on load (LOCKED: no silent auto-prompt).
-  const findNearMe = React.useCallback(() => {
-    if (typeof navigator === "undefined" || !navigator.geolocation) {
-      setGeoError("Location isn't available in this browser.");
-      return;
-    }
-    setGeoError(null);
-    setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        // Stamp each campus with its distance from the visitor, then sort nearest-first.
-        const sorted = campuses
-          .map((c) => ({ ...c, distanceKm: haversineKm(latitude, longitude, c.lat, c.lng) }))
-          .sort((a, b) => a.distanceKm - b.distanceKm);
-        setOrdered(sorted);
-        if (sorted[0]) {
-          setActiveId(sorted[0].id);
-          setCenterOn({ lat: sorted[0].lat, lng: sorted[0].lng });
-        }
-        setMobileView("list"); // surface the freshly nearest-first list
-        setLocating(false);
-      },
-      () => {
-        setGeoError("We couldn't get your location. You can still browse the list below.");
-        setLocating(false);
-      },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
-    );
-  }, [campuses]);
+  const sortByPosition = React.useCallback(
+    (lat: number, lng: number) => {
+      const stamped = campuses.map((c) =>
+        typeof c.lat === "number" && typeof c.lng === "number" && !c.virtual
+          ? { ...c, distanceKm: haversineKm(lat, lng, c.lat, c.lng) }
+          : { ...c }
+      );
+      stamped.sort((a, b) => {
+        // Physical centers nearest-first; the online church and un-mapped centers close the list.
+        const da = typeof a.distanceKm === "number" ? a.distanceKm : Number.MAX_SAFE_INTEGER;
+        const db = typeof b.distanceKm === "number" ? b.distanceKm : Number.MAX_SAFE_INTEGER;
+        return da - db;
+      });
+      setOrdered(stamped);
+      setByDistance(true);
+      setUserPos({ lat, lng });
+      const nearest = stamped.find((c) => typeof c.distanceKm === "number");
+      if (nearest && typeof nearest.lat === "number") setActiveId(nearest.id);
+    },
+    [campuses]
+  );
 
-  const mapNode = (
-    <LocatorMap campuses={ordered} activeId={activeId} onActive={setActiveId} centerOn={centerOn} />
+  const locate = React.useCallback(
+    (announceErrors: boolean) => {
+      if (typeof navigator === "undefined" || !navigator.geolocation) {
+        if (announceErrors) setGeoError("Location isn't available in this browser — the list is grouped by nation instead.");
+        return;
+      }
+      setLocating(true);
+      setGeoError(null);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          sortByPosition(pos.coords.latitude, pos.coords.longitude);
+          setLocating(false);
+        },
+        () => {
+          setLocating(false);
+          if (announceErrors) setGeoError("We couldn't get your location — the list is grouped by nation instead.");
+        },
+        { enableHighAccuracy: false, timeout: 9000, maximumAge: 600000 }
+      );
+    },
+    [sortByPosition]
   );
-  const listNode = (
-    <CampusList
-      campuses={ordered}
-      activeId={activeId}
-      onHover={setActiveId}
-      onSelect={(id) => {
-        setActiveId(id);
-        const c = ordered.find((x) => x.id === id);
-        if (c) setCenterOn({ lat: c.lat, lng: c.lng });
-      }}
-    />
-  );
+
+  // Silent first attempt on mount; the button below retries loudly.
+  React.useEffect(() => {
+    locate(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="bt-locator">
-      {/* Near-me + count bar */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 12,
-          marginBottom: 18
-        }}
-      >
-        <button type="button" className="bt-btn" onClick={findNearMe} disabled={locating}>
-          {locating ? "Locating…" : "📍 Find a campus near me"}
-        </button>
-
-        {/* Mobile-only Map/List toggle */}
-        <div className="bt-locator-toggle" style={{ display: "none", gap: 8 }}>
-          <button
-            type="button"
-            className={mobileView === "list" ? "bt-btn" : "bt-btn bt-btn-outline"}
-            style={{ padding: "8px 16px", fontSize: "0.9rem" }}
-            onClick={() => setMobileView("list")}
+      {/* Status bar */}
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12, marginBottom: 18 }}>
+        {byDistance ? (
+          <span
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              fontWeight: 700, fontSize: "0.88rem", color: "var(--bt-gold-deep)",
+              background: "rgba(196,160,60,.1)", border: "1px solid rgba(196,160,60,.3)",
+              borderRadius: 999, padding: "7px 16px"
+            }}
           >
-            List
+            ● Sorted by distance from you
+          </span>
+        ) : (
+          <button type="button" className="bt-btn bt-btn-outline" onClick={() => locate(true)} disabled={locating} style={{ padding: "10px 20px", fontSize: "0.9rem" }}>
+            {locating ? "Finding you…" : "Sort by distance from me"}
           </button>
-          <button
-            type="button"
-            className={mobileView === "map" ? "bt-btn" : "bt-btn bt-btn-outline"}
-            style={{ padding: "8px 16px", fontSize: "0.9rem" }}
-            onClick={() => setMobileView("map")}
-          >
-            Map
-          </button>
-        </div>
+        )}
+        {geoError && <span className="bt-muted-text" style={{ fontSize: "0.9rem" }}>{geoError}</span>}
       </div>
 
-      {geoError && (
-        <p style={{ color: "var(--bt-muted)", marginBottom: 14, fontSize: "0.95rem" }}>{geoError}</p>
-      )}
-
-      {/* Split: list LEFT, map RIGHT (desktop). Mobile stacks + honors the toggle. */}
+      {/* Map + proximity sidebar */}
       <div className="bt-locator-grid">
-        <div
-          className="bt-locator-list"
-          data-mobile-visible={mobileView === "list"}
-          style={{ maxHeight: 560, overflowY: "auto", paddingRight: 4 }}
-        >
-          {listNode}
+        <div className="bt-locator-list" style={{ maxHeight: mapHeight, overflowY: "auto", paddingRight: 6 }}>
+          <CampusList
+            campuses={ordered}
+            byDistance={byDistance}
+            activeId={activeId}
+            onHover={setActiveId}
+            onSelect={(id) => {
+              setActiveId(id);
+              const c = ordered.find((x) => x.id === id);
+              if (c && typeof c.lat === "number" && typeof c.lng === "number") setCenterOn({ lat: c.lat, lng: c.lng });
+            }}
+          />
         </div>
-        <div
-          className="bt-locator-map"
-          data-mobile-visible={mobileView === "map"}
-          style={{ minHeight: 420 }}
-        >
-          {mapNode}
+        <div className="bt-locator-map" style={{ height: mapHeight }}>
+          <LeafletLocatorMap
+            campuses={ordered}
+            activeId={activeId}
+            onActive={setActiveId}
+            centerOn={centerOn}
+            userPos={userPos}
+            height="100%"
+          />
         </div>
       </div>
 
-      {/* Scoped responsive rules. Desktop = 2-col split; ≤820px = single column, the
-          toggle appears and shows exactly one pane. */}
+      {/* Desktop: sidebar 400px + map. Mobile: map on top (shorter), list under it. */}
       <style
         dangerouslySetInnerHTML={{
           __html:
-            ".bt-locator-grid { display: grid; grid-template-columns: minmax(300px, 420px) 1fr; gap: 24px; align-items: start; }" +
-            " @media (max-width: 820px) {" +
+            ".bt-locator-grid { display: grid; grid-template-columns: minmax(320px, 400px) 1fr; gap: 22px; align-items: start; }" +
+            " @media (max-width: 900px) {" +
             " .bt-locator-grid { grid-template-columns: 1fr; }" +
-            " .bt-locator-toggle { display: flex !important; }" +
-            " .bt-locator-list[data-mobile-visible='false'] { display: none; }" +
-            " .bt-locator-map[data-mobile-visible='false'] { display: none; }" +
-            " .bt-locator-list { max-height: none !important; }" +
+            " .bt-locator-map { order: -1; height: 46vh !important; min-height: 340px; }" +
+            " .bt-locator-list { max-height: none !important; overflow: visible !important; padding-right: 0 !important; }" +
             " }"
         }}
       />

@@ -1,155 +1,114 @@
 "use client";
 
-// Bible Teachers sticky top nav (Phase 20, Plan 04).
-//
-// position:sticky; top:0 — BtBrand on the left, primary nav links, the Locations
-// dropdown, and a persistent "Give" affordance slot. The give URL is per-campus;
-// on the org landing it links to the org-default give (passed as giveUrl). The
-// sticky Give slot lives HERE so Plan 20-05's campus pages reuse the same header
-// and just pass the campus's give URL. Mobile: the nav collapses behind a
-// hamburger and stacks. Client component (hamburger toggle + embedded client
-// LocationsMenu); campus data arrives as a plain server-fetched prop.
+// Bible Teachers sticky top nav — an ink band that carries the gold mark on every page
+// (the logo's own ground). Desktop shows the primary links + Give; the hamburger is
+// ALWAYS present and opens the full popout sidebar (all pages with icons + every
+// worship center). Campus pages pass their own give URL; everything else falls back
+// to the org's giving link.
 
 import React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { BtBrand } from "./BtBrand";
-import { LocationsMenu, type LocationLink } from "./LocationsMenu";
-
-interface NavLink { label: string; href: string; }
+import { BtSidebar } from "./BtSidebar";
+import { BT } from "./btSiteContent";
+import { IconMenu } from "./BtIcons";
+import type { LocationLink } from "./LocationsMenu";
 
 interface Props {
   campuses: LocationLink[];
-  /** Org-default give URL for the landing; campus pages pass their own. Optional — the slot hides if absent. */
   giveUrl?: string | null;
-  navLinks?: NavLink[];
 }
 
-const DEFAULT_NAV: NavLink[] = [
-  { label: "About", href: "#about" },
-  { label: "Sermons", href: "#sermons" },
-  { label: "Connect", href: "#connect" }
+const NAV = [
+  { label: "About", href: "/about" },
+  { label: "Sermons", href: "/sermons" },
+  { label: "Locations", href: "/locations" },
+  { label: "Connect", href: "/connect" }
 ];
 
-export const BtHeader: React.FC<Props> = ({ campuses, giveUrl, navLinks = DEFAULT_NAV }) => {
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-
-  const giveSlot = giveUrl ? (
-    <a
-      className="bt-btn"
-      href={giveUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{ padding: "10px 20px", fontSize: "0.95rem" }}
-    >
-      Give
-    </a>
-  ) : null;
+export const BtHeader: React.FC<Props> = ({ campuses, giveUrl }) => {
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const pathname = usePathname() || "/";
+  // The tenant segment may prefix the path when rendered via the rewrite; compare tails.
+  const isActive = (href: string) => (href === "/" ? false : pathname.endsWith(href) || pathname.includes(href + "/"));
 
   return (
-    <header
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 50,
-        background: "var(--bt-surface)",
-        borderBottom: "1px solid var(--bt-line)",
-        backdropFilter: "saturate(180%) blur(6px)"
-      }}
-    >
-      <div
+    <>
+      <header
+        className="bt-dark"
         style={{
-          maxWidth: "var(--bt-maxw)",
-          margin: "0 auto",
-          padding: "14px 20px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 16
+          position: "sticky", top: 0, zIndex: 80,
+          background: "rgba(18,16,11,0.92)",
+          backdropFilter: "saturate(160%) blur(10px)",
+          WebkitBackdropFilter: "saturate(160%) blur(10px)",
+          borderBottom: "1px solid var(--bt-line-dark)"
         }}
       >
-        <Link href="/" aria-label="Bible Teachers home">
-          <BtBrand size="sm" />
-        </Link>
-
-        {/* Desktop nav */}
-        <nav
-          className="bt-desktop-nav"
-          style={{ display: "flex", alignItems: "center", gap: 22 }}
-        >
-          {navLinks.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              style={{ fontFamily: "var(--bt-heading-font)", fontWeight: 600, color: "var(--bt-ink)" }}
-            >
-              {l.label}
-            </Link>
-          ))}
-          <LocationsMenu campuses={campuses} />
-          {giveSlot}
-        </nav>
-
-        {/* Mobile hamburger */}
-        <button
-          type="button"
-          className="bt-hamburger"
-          aria-label="Menu"
-          aria-expanded={mobileOpen}
-          onClick={() => setMobileOpen((o) => !o)}
-          style={{
-            display: "none",
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-            fontSize: "1.6rem",
-            color: "var(--bt-ink)",
-            lineHeight: 1
-          }}
-        >
-          {mobileOpen ? "✕" : "☰"}
-        </button>
-      </div>
-
-      {/* Mobile collapsed panel */}
-      {mobileOpen && (
         <div
-          className="bt-mobile-panel"
           style={{
-            borderTop: "1px solid var(--bt-line)",
-            padding: "12px 20px 18px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 12
+            maxWidth: "var(--bt-maxw)", margin: "0 auto", padding: "10px 20px",
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16
           }}
         >
-          {navLinks.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              onClick={() => setMobileOpen(false)}
-              style={{ fontFamily: "var(--bt-heading-font)", fontWeight: 600, padding: "6px 0" }}
-            >
-              {l.label}
-            </Link>
-          ))}
-          <div style={{ paddingTop: 4 }}>
-            <LocationsMenu campuses={campuses} />
-          </div>
-          {giveSlot && <div style={{ paddingTop: 6 }}>{giveSlot}</div>}
-        </div>
-      )}
+          <Link href="/" aria-label="Bible Teachers International — home">
+            <BtBrand size="sm" dark />
+          </Link>
 
-      {/* Responsive toggle: hide desktop nav / show hamburger under 820px. Scoped
-          to the BT header classes so it never touches the admin nav. */}
-      <style
-        dangerouslySetInnerHTML={{
-          __html:
-            "@media (max-width: 820px) {" +
-            " .bt-desktop-nav { display: none !important; }" +
-            " .bt-hamburger { display: inline-flex !important; }" +
-            " }"
-        }}
-      />
-    </header>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {/* Desktop links */}
+            <nav className="bt-desktop-nav" aria-label="Primary" style={{ display: "flex", alignItems: "center", gap: 4, marginRight: 10 }}>
+              {NAV.map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className={isActive(l.href) ? "bt-active" : undefined}
+                  style={{
+                    fontWeight: 600, fontSize: "0.92rem", letterSpacing: "0.05em",
+                    padding: "9px 13px", borderRadius: 8,
+                    color: isActive(l.href) ? "var(--bt-gold-bright)" : "var(--bt-ondark)"
+                  }}
+                >
+                  {l.label}
+                </Link>
+              ))}
+            </nav>
+
+            <a
+              className="bt-btn bt-give-cta"
+              href={giveUrl || BT.giveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ padding: "10px 20px", fontSize: "0.88rem" }}
+            >
+              Give
+            </a>
+
+            {/* Hamburger — always available; opens the popout sidebar */}
+            <button
+              type="button"
+              aria-label="Open menu"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen(true)}
+              style={{
+                background: "none", border: "1px solid var(--bt-line-dark)", borderRadius: 8,
+                color: "var(--bt-ondark)", cursor: "pointer", padding: 9, display: "inline-flex", marginLeft: 2
+              }}
+            >
+              <IconMenu size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* Collapse the inline links under 960px — the sidebar covers everything there. */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: "@media (max-width: 960px) { .bt-desktop-nav { display: none !important; } }"
+          }}
+        />
+      </header>
+
+      <BtSidebar open={menuOpen} onClose={() => setMenuOpen(false)} campuses={campuses} giveUrl={giveUrl} />
+    </>
   );
 };

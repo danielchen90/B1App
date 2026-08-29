@@ -1,9 +1,6 @@
-// BT per-campus HERO (Phase 20, Plan 05). Full-bleed hero — campus name + welcome /
-// plan-your-visit copy ABOVE THE FOLD (SITE-02). Uses content.heroImage (a FilesManager
-// URL resolved server-side; graceful branded fallback when absent) behind a scrim so the
-// gold/white brand type reads. Modern-megachurch: brand-first, big type. The org-level
-// "We're live now" indicator (SITE-05) sits near the hero. RSC-safe (the live pill is the
-// only client island).
+// Per-campus hero — the ink band carrying the center's name in the display serif, the
+// nation eyebrow, welcome copy, and the visit/give calls to action. Uses the campus
+// heroImage when authored; otherwise the shared worship photograph sunk into the ink.
 
 import React from "react";
 import { LiveIndicator } from "./LiveIndicator";
@@ -14,6 +11,9 @@ interface Props {
   heroImage: string | null;
   welcomeNote: string;
   pastorNote: string;
+  flag?: string;
+  country?: string;
+  leaders?: string;
   giveUrl?: string;
   sermonChannel: string | null;
   streamKey: string | null;
@@ -24,85 +24,67 @@ export const CampusHero: React.FC<Props> = ({
   churchName,
   heroImage,
   welcomeNote,
+  flag,
+  country,
+  leaders,
   giveUrl,
   streamKey
 }) => {
   const copy =
     welcomeNote ||
-    `Welcome to ${campusName}. Whoever you are, wherever you're from — we'd love for you to plan your visit and join us.`;
+    `Welcome home. Whoever you are and wherever you're from, there's a seat for you at ${campusName} — come and be taught of the Lord.`;
 
-  const bg: React.CSSProperties = heroImage
-    ? {
-        backgroundImage: `linear-gradient(180deg, rgba(10,10,10,0.35) 0%, rgba(10,10,10,0.62) 100%), url("${heroImage}")`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        color: "#ffffff"
-      }
-    : {
-        // Graceful fallback: brand banding, no image.
-        background: "var(--bt-surface-alt)",
-        color: "var(--bt-ink)"
-      };
-
-  const onImage = !!heroImage;
+  const image = heroImage || "/bt/worship.jpg";
 
   return (
-    <section style={{ ...bg, borderBottom: "1px solid var(--bt-line)" }}>
+    <section
+      className="bt-dark"
+      style={{
+        position: "relative",
+        overflow: "hidden",
+        borderBottom: "1px solid var(--bt-line-dark)"
+      }}
+    >
+      <div
+        aria-hidden
+        style={{
+          position: "absolute", inset: 0,
+          backgroundImage: `linear-gradient(180deg, rgba(18,16,11,0.86) 0%, rgba(18,16,11,0.6) 50%, rgba(18,16,11,0.94) 100%), url("${image}")`,
+          backgroundSize: "cover", backgroundPosition: "center 30%"
+        }}
+      />
       <div
         style={{
-          maxWidth: "var(--bt-maxw)",
-          margin: "0 auto",
-          padding: "clamp(96px, 16vw, 168px) 20px clamp(72px, 12vw, 120px)",
+          position: "relative",
+          maxWidth: "var(--bt-maxw)", margin: "0 auto",
+          padding: "clamp(80px, 12vw, 140px) 22px clamp(64px, 9vw, 104px)",
           textAlign: "center"
         }}
       >
-        {/* Org-level live indicator (SITE-05) — renders only while live. */}
-        <div style={{ marginBottom: 18, minHeight: 30 }}>
+        <div style={{ marginBottom: 16, minHeight: 30 }}>
           <LiveIndicator streamKey={streamKey} />
         </div>
-
-        <div
-          style={{
-            fontFamily: "var(--bt-heading-font)",
-            fontWeight: 600,
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            fontSize: "0.9rem",
-            opacity: 0.85,
-            marginBottom: 14
-          }}
-        >
-          {churchName}
+        <div className="bt-eyebrow" style={{ justifyContent: "center" }}>
+          {churchName}{country ? <> &middot; {flag} {country}</> : null}
         </div>
-
-        <h1 style={{ fontSize: "clamp(2.6rem, 7vw, 4.6rem)", fontWeight: 800, maxWidth: 900, margin: "0 auto", color: "inherit" }}>
-          {campusName}
-        </h1>
-
-        <p
-          style={{
-            fontSize: "clamp(1.05rem, 2.4vw, 1.3rem)",
-            maxWidth: 660,
-            margin: "22px auto 34px",
-            lineHeight: 1.6,
-            color: onImage ? "rgba(255,255,255,0.92)" : "var(--bt-muted)"
-          }}
-        >
+        <h1 className="bt-display" style={{ maxWidth: 900, margin: "20px auto 0" }}>{campusName}</h1>
+        {leaders && (
+          <div
+            style={{
+              marginTop: 14, fontFamily: "var(--bt-display-font)", fontStyle: "italic",
+              fontSize: "1.15rem", color: "var(--bt-gold-bright)"
+            }}
+          >
+            {leaders}
+          </div>
+        )}
+        <p className="bt-lede bt-muted-text" style={{ maxWidth: 640, margin: "20px auto 34px" }}>
           {copy}
         </p>
-
         <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-          <a className="bt-btn" href="#visit">
-            Plan Your Visit
-          </a>
+          <a className="bt-btn" href="#visit">Plan Your Visit</a>
           {giveUrl && (
-            <a
-              className={onImage ? "bt-btn bt-btn-outline" : "bt-btn bt-btn-outline"}
-              href={giveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={onImage ? { color: "#fff", borderColor: "#fff" } : undefined}
-            >
+            <a className="bt-btn bt-btn-ghost" href={giveUrl} target="_blank" rel="noopener noreferrer">
               Give
             </a>
           )}

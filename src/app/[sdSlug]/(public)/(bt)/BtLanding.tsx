@@ -1,62 +1,42 @@
-// Bible Teachers public LANDING page — org-brochure RSC (Phase 20, Plan 04).
-//
-// BRAND IS HARDCODED THIS PHASE: black/white/gold via <BtTheme/>, scoped to `.bt-root`
-// (never leaks to the Huro admin navy/gold). churchId-scoping stays underneath in the
-// data layer; only the LOOK is hardcoded. Generalized, data-driven per-tenant theming
-// is DEFERRED to Phase 21.
+// Bible Teachers International — public landing page.
 //
 // ROUTING NOTE: this is a COMPONENT, not a `page.tsx`. A `(bt)/page.tsx` would resolve
-// to the same `/[sdSlug]` index route as the existing CMS `(public)/page.tsx` and cause
-// a hard Next "two parallel pages resolve to the same path" build error (a route group
-// in parentheses adds NO URL segment). Per the phase RESEARCH ("page.tsx EXISTS — CMS
-// home; new BT landing ... replaces render for BT churchId"), the shared index page
-// delegates its render to <BtLanding/> for the BT public tenant. The `(bt)` route group
-// still hosts the real sub-routes (locations/[campusSlug], plan 20-05) which DO add
-// segments and so never collide.
+// to the same `/[sdSlug]` index route as the CMS `(public)/page.tsx` and cause a hard
+// "two parallel pages" build error. The shared index page delegates its render to
+// <BtLanding/> for the BT public tenant; the `(bt)` group hosts the real sub-routes.
 //
-// Brochure section order (LOCKED): hero → Mission → latest-sermon placeholder → About
-// → PROMINENT Campuses section → Social → footer. Campuses are ONE prominent section
-// among several — NOT a bare hero, NOT a pure find-a-campus hub.
+// Section order: gilded-globe hero (thesis) → latest message → ways to worship →
+// world band (locations) → about/founder teaser → connect band → footer (shell).
 
 import React from "react";
 import type { Metadata } from "next";
 import { cache } from "react";
+import Link from "next/link";
 import { ApiHelper } from "@churchapps/apphelper";
 import type { ConfigurationInterface } from "@/helpers/ConfigHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
-import { loadPublicCampuses, type PublicCampus } from "@/helpers/PublicCampusHelper";
-import { loadLocatorCampuses } from "@/helpers/LocatorCampusHelper";
-import { BtTheme } from "@/components/public-bt/BtTheme";
-import { BtHeader } from "@/components/public-bt/BtHeader";
-import { BtBrand } from "@/components/public-bt/BtBrand";
-import { CampusLocator } from "@/components/public-bt/CampusLocator";
-import type { LocationLink } from "@/components/public-bt/LocationsMenu";
+import { loadSermonFeed, type FeedSermon } from "@/helpers/SermonFeedHelper";
+import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "./btPageData";
+import { BtShell } from "@/components/public-bt/BtShell";
+import { MeridianGlobe, SectionOrnament } from "@/components/public-bt/BtOrnaments";
+import { LiveIndicator } from "@/components/public-bt/LiveIndicator";
+import { BT, BT_COPY, BT_NATION_COUNT, getCampusExtras } from "@/components/public-bt/btSiteContent";
+import { IconPin, IconGlobe, IconPlay, IconHeart, IconGift, IconArrowRight, IconYouTube } from "@/components/public-bt/BtIcons";
 
-// The org-default resolved content field-set (mirror of the API's CampusContentFields,
-// resolved-for-org via GET .../campusContent/public/:churchId). Every field optional.
 interface BtOrgContent {
   mission?: string;
   about?: string;
   welcomeNote?: string;
-  facebookUrl?: string;
-  instagramUrl?: string;
-  youtubeUrl?: string;
   givingUrl?: string;
   sermonYoutubeChannel?: string;
 }
 
-/**
- * Load the org-default resolved public content (mission/about/social/give). Cached
- * per-request. PATH NOTE: like the campus list, the "MembershipApi" base already ends
- * in "/membership", so the client path is "/campusContent/public/:churchId" (controller
- * is @controller("/membership/campusContent"), route "/public/:churchId"). Degrades to
- * {} on an older API deploy (404) so the landing still renders.
- */
+/** Org-default resolved public content — authored copy fills any gap. */
 const loadBtOrgContent = cache(async (churchId: string): Promise<BtOrgContent> => {
   if (!churchId) return {};
   try {
     const data = await ApiHelper.getAnonymous("/campusContent/public/" + churchId, "MembershipApi");
-    return (data && typeof data === "object") ? (data as BtOrgContent) : {};
+    return data && typeof data === "object" ? (data as BtOrgContent) : {};
   } catch {
     return {};
   }
@@ -66,192 +46,291 @@ const loadBtOrgContent = cache(async (churchId: string): Promise<BtOrgContent> =
 export const loadBtLandingData = cache(async (config: ConfigurationInterface) => {
   const churchId = config.church?.id || "";
   const [campuses, content] = await Promise.all([
-    loadPublicCampuses(churchId),
+    loadVisibleCampuses(churchId),
     loadBtOrgContent(churchId)
   ]);
-  return { churchId, campuses, content };
+  const channel = content.sermonYoutubeChannel || BT.youtubeChannelId;
+  const sermons = await loadSermonFeed(channel, 4);
+  return { churchId, campuses, content, sermons };
 });
 
-/** SEO title/meta/OG for the BT landing (SITE-03). Reuses the cached loaders. */
 export async function buildBtMetadata(config: ConfigurationInterface): Promise<Metadata> {
-  const churchName = config.church?.name || "Bible Teachers";
+  const churchName = config.church?.name || BT.name;
   const { content } = await loadBtLandingData(config);
-  const description = content.mission || content.about
-    || (churchName + " — find a campus near you, watch the latest message, and plan your visit.");
-  return MetaHelper.getMetaData(churchName, description, description, config.appearance);
+  const description = content.mission || BT_COPY.heroSub;
+  return MetaHelper.getMetaData(churchName + " — " + BT.tagline, description, description, config.appearance);
 }
 
-const toLocationLinks = (campuses: PublicCampus[]): LocationLink[] =>
-  campuses.map((c) => ({ slug: c.slug, name: c.name }));
-
-const SECTION_STYLE: React.CSSProperties = {
-  maxWidth: "var(--bt-maxw)",
-  margin: "0 auto",
-  padding: "72px 20px"
+const formatDate = (iso: string): string => {
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 };
 
-/**
- * The BT-branded org-brochure landing. Renders inside `.bt-root` with <BtTheme/> +
- * <BtHeader/>. Consumes the SSR campus list + org content.
- */
+// ── Small presentational pieces ─────────────────────────────────────────────────
+
+const WorshipCard: React.FC<{ icon: React.ReactNode; title: string; copy: string; href: string; cta: string; external?: boolean }> =
+  ({ icon, title, copy, href, cta, external }) => (
+    <div className="bt-card bt-card-hover" style={{ padding: "34px 30px", display: "flex", flexDirection: "column", gap: 14 }}>
+      <span style={{ color: "var(--bt-gold-deep)" }}>{icon}</span>
+      <h3 style={{ fontSize: "1.7rem" }}>{title}</h3>
+      <p className="bt-muted-text" style={{ flex: 1, lineHeight: 1.7 }}>{copy}</p>
+      {external ? (
+        <a href={href} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--bt-gold-deep)", fontWeight: 700 }}>
+          {cta} <IconArrowRight size={16} />
+        </a>
+      ) : (
+        <Link href={href} style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--bt-gold-deep)", fontWeight: 700 }}>
+          {cta} <IconArrowRight size={16} />
+        </Link>
+      )}
+    </div>
+  );
+
 export const BtLanding: React.FC<{ config: ConfigurationInterface }> = async ({ config }) => {
-  const { churchId, campuses, content } = await loadBtLandingData(config);
-  const locationLinks = toLocationLinks(campuses);
-  const linkableCampuses = campuses.filter((c) => c.slug);
-  // Plottable campuses (real slug + stored lat/lng) for the map+list island (plan 20-06).
-  const locatorCampuses = await loadLocatorCampuses(churchId);
+  const { campuses, content, sermons } = await loadBtLandingData(config);
+  const navLinks = toLocationLinks(campuses);
+  const giveUrl = content.givingUrl || BT.giveUrl;
+  const latest: FeedSermon | undefined = sermons[0];
+
+  // Country roll-up for the world band.
+  const countryCounts = new Map<string, { flag: string; n: number }>();
+  campuses.forEach((c) => {
+    const ex = getCampusExtras(c.slug);
+    const country = ex?.country || "United States";
+    const cur = countryCounts.get(country) || { flag: ex?.flag || "📍", n: 0 };
+    cur.n += 1;
+    countryCounts.set(country, cur);
+  });
 
   return (
-    <div className="bt-root" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <BtTheme />
-      <BtHeader campuses={locationLinks} giveUrl={content.givingUrl} />
-
-      {/* ── Full-bleed hero ── */}
-      <section style={{ background: "var(--bt-surface-alt)", borderBottom: "1px solid var(--bt-line)" }}>
-        <div style={{ ...SECTION_STYLE, textAlign: "center", padding: "104px 20px" }}>
-          <div style={{ marginBottom: 20 }}>
-            <BtBrand size="lg" />
+    <BtShell config={config} campuses={navLinks} giveUrl={giveUrl}>
+      {/* ══ HERO — the gilded globe ══ */}
+      <section className="bt-dark" style={{ position: "relative", overflow: "hidden", borderBottom: "1px solid var(--bt-line-dark)" }}>
+        {/* congregation photo, sunk deep into the ink */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute", inset: 0,
+            backgroundImage:
+              "linear-gradient(180deg, rgba(18,16,11,0.82) 0%, rgba(18,16,11,0.62) 45%, rgba(18,16,11,0.94) 100%), url('/bt/worship.jpg')",
+            backgroundSize: "cover", backgroundPosition: "center 30%"
+          }}
+        />
+        {/* the meridian globe rising from the fold */}
+        <MeridianGlobe
+          style={{ position: "absolute", left: "50%", bottom: -2, transform: "translateX(-50%)", width: "min(1200px, 130vw)", height: "auto", pointerEvents: "none" }}
+        />
+        <div style={{ position: "relative", maxWidth: "var(--bt-maxw)", margin: "0 auto", padding: "clamp(84px, 12vw, 150px) 22px clamp(96px, 13vw, 160px)", textAlign: "center" }}>
+          <div style={{ minHeight: 32, marginBottom: 10 }}>
+            <LiveIndicator streamKey={config.church?.subDomain || null} />
           </div>
-          <h1 style={{ fontSize: "clamp(2.4rem, 6vw, 4rem)", fontWeight: 800, maxWidth: 820, margin: "0 auto" }}>
-            Teaching the Word. Reaching the region.
+          <div className="bt-eyebrow bt-rise" style={{ justifyContent: "center" }}>
+            {BT.ministry}{" "}&middot; Bible Teachers International
+          </div>
+          <h1 className="bt-display bt-rise-2" style={{ maxWidth: 880, margin: "22px auto 0" }}>
+            Teaching the Word<br />
+            <em style={{ fontStyle: "italic", color: "var(--bt-gold-bright)" }}>to the nations.</em>
           </h1>
-          <p style={{ color: "var(--bt-muted)", fontSize: "1.2rem", maxWidth: 640, margin: "20px auto 32px" }}>
-            {content.welcomeNote || "Find a campus near you, watch the latest message, and plan your visit."}
+          <p className="bt-lede bt-muted-text bt-rise-3" style={{ maxWidth: 640, margin: "24px auto 36px" }}>
+            {content.welcomeNote || BT_COPY.heroSub}
           </p>
-          <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-            <a className="bt-btn" href="#campuses">Find a Campus</a>
-            {content.givingUrl && (
-              <a className="bt-btn bt-btn-outline" href={content.givingUrl} target="_blank" rel="noopener noreferrer">Give</a>
-            )}
+          <div className="bt-rise-3" style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+            <Link className="bt-btn" href="/locations"><IconPin size={18} /> Find a Worship Center</Link>
+            <Link className="bt-btn bt-btn-ghost" href="/sermons"><IconPlay size={18} /> Watch the Latest Message</Link>
           </div>
-        </div>
-      </section>
-
-      {/* ── Mission ── */}
-      {content.mission && (
-        <section id="about" style={SECTION_STYLE}>
-          <h2 style={{ fontSize: "2rem", marginBottom: 16 }}>Our Mission</h2>
-          <p style={{ fontSize: "1.15rem", color: "var(--bt-muted)", maxWidth: 760, lineHeight: 1.65 }}>
-            {content.mission}
-          </p>
-        </section>
-      )}
-
-      {/* ── Latest sermon placeholder (real media island lands in plan 20-06) ── */}
-      <section id="sermons" style={{ ...SECTION_STYLE, background: "var(--bt-surface-alt)", maxWidth: "none" }}>
-        <div style={{ maxWidth: "var(--bt-maxw)", margin: "0 auto", padding: "0 20px" }}>
-          <h2 style={{ fontSize: "2rem", marginBottom: 16 }}>Latest Message</h2>
+          {/* stats strip */}
           <div
+            className="bt-rise-3"
             style={{
-              border: "1px solid var(--bt-line)",
-              borderRadius: "var(--bt-radius-lg)",
-              background: "var(--bt-surface)",
-              padding: "56px 24px",
-              textAlign: "center",
-              color: "var(--bt-muted)"
+              display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "14px 0",
+              marginTop: 64, borderTop: "1px solid var(--bt-line-dark)", paddingTop: 26
             }}
           >
-            {/* Latest-sermon media block (plan 20-06 wires the YouTube-uploads helper here) */}
-            Latest message coming soon.
+            {[
+              [String(campuses.length || 24), "Worship Centers"],
+              [String(BT_NATION_COUNT), "Nations"],
+              ["One", "Word"]
+            ].map(([n, label], i) => (
+              <div key={label} style={{ padding: "0 34px", borderLeft: i === 0 ? "none" : "1px solid var(--bt-line-dark)", textAlign: "center" }}>
+                <div style={{ fontFamily: "var(--bt-display-font)", fontSize: "2rem", fontWeight: 600, color: "var(--bt-gold-bright)", lineHeight: 1.1 }}>{n}</div>
+                <div style={{ fontFamily: "var(--bt-eyebrow-font)", fontSize: "0.66rem", letterSpacing: "0.26em", textTransform: "uppercase", color: "var(--bt-ondark-muted)", marginTop: 5, whiteSpace: "nowrap" }}>{label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── About ── */}
-      {content.about && (
-        <section style={SECTION_STYLE}>
-          <h2 style={{ fontSize: "2rem", marginBottom: 16 }}>About Us</h2>
-          <p style={{ fontSize: "1.15rem", color: "var(--bt-muted)", maxWidth: 760, lineHeight: 1.65 }}>
-            {content.about}
-          </p>
-        </section>
-      )}
-
-      {/* ── PROMINENT Campuses section (discoverable path #2: lower list/map) ── */}
-      <section id="campuses" style={{ ...SECTION_STYLE, background: "var(--bt-surface-alt)", maxWidth: "none" }}>
-        <div style={{ maxWidth: "var(--bt-maxw)", margin: "0 auto", padding: "0 20px" }}>
-          <h2 style={{ fontSize: "2.2rem", marginBottom: 8 }}>Our Campuses</h2>
-          <p style={{ color: "var(--bt-muted)", marginBottom: 28, fontSize: "1.1rem" }}>
-            Find a Bible Teachers campus near you.
-          </p>
-
-          {/* LocatorMap island (plan 20-06) — the split map+list (second discoverable path).
-              Mounts when there are plottable (slug + stored lat/lng) campuses; its child
-              CampusList is server-rendered as the crawlable fallback. */}
-          {locatorCampuses.length > 0 && (
-            <div style={{ marginBottom: 32 }}>
-              <CampusLocator campuses={locatorCampuses} />
-            </div>
-          )}
-
-          {locatorCampuses.length > 0 ? null : linkableCampuses.length === 0 ? (
-            <p style={{ color: "var(--bt-muted)" }}>Campus locations are coming soon.</p>
-          ) : (
-            <ul
+      {/* ══ LATEST MESSAGE ══ */}
+      <section className="bt-section" id="sermons">
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <div className="bt-eyebrow">This Week&rsquo;s Teaching</div>
+          <h2 className="bt-h2" style={{ marginTop: 14 }}>The Latest Message</h2>
+        </div>
+        {latest ? (
+          <div style={{ maxWidth: 920, margin: "0 auto" }}>
+            <div
               style={{
-                listStyle: "none",
-                margin: 0,
-                padding: 0,
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-                gap: 16
+                position: "relative", width: "100%", aspectRatio: "16 / 9",
+                borderRadius: "var(--bt-radius-lg)", overflow: "hidden",
+                border: "1px solid var(--bt-line)", background: "#000",
+                boxShadow: "0 24px 60px rgba(34,29,20,.18)"
               }}
             >
-              {linkableCampuses.map((c) => (
-                <li key={c.id}>
-                  <a
-                    href={`/locations/${c.slug}`}
-                    style={{
-                      display: "block",
-                      height: "100%",
-                      border: "1px solid var(--bt-line)",
-                      borderRadius: "var(--bt-radius)",
-                      background: "var(--bt-surface)",
-                      padding: "20px 22px"
-                    }}
-                  >
-                    <div style={{ fontFamily: "var(--bt-heading-font)", fontWeight: 700, fontSize: "1.2rem", marginBottom: 6 }}>
-                      {c.name}
-                    </div>
-                    {(c.address1 || c.city) && (
-                      <div style={{ color: "var(--bt-muted)", fontSize: "0.95rem", lineHeight: 1.5 }}>
-                        {c.address1}
-                        {c.address1 && (c.city || c.state) ? <br /> : null}
-                        {[c.city, c.state].filter(Boolean).join(", ")} {c.zip || ""}
-                      </div>
-                    )}
-                    <div style={{ marginTop: 14, color: "var(--bt-gold-strong)", fontWeight: 600 }}>
-                      Visit this campus →
-                    </div>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
+              <iframe
+                src={"https://www.youtube-nocookie.com/embed/" + encodeURIComponent(latest.videoId)}
+                title={latest.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                loading="lazy"
+                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
+              />
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "baseline", gap: 10, marginTop: 20 }}>
+              <div>
+                <div style={{ fontFamily: "var(--bt-display-font)", fontSize: "1.4rem", fontWeight: 600 }}>{latest.title}</div>
+                {latest.publishedAt && <div className="bt-muted-text" style={{ fontSize: "0.9rem", marginTop: 3 }}>{formatDate(latest.publishedAt)}</div>}
+              </div>
+              <Link href="/sermons" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--bt-gold-deep)", fontWeight: 700 }}>
+                Browse all messages <IconArrowRight size={16} />
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div style={{ textAlign: "center" }}>
+            <p className="bt-muted-text" style={{ marginBottom: 20 }}>Messages stream every week on the ministry&rsquo;s channel.</p>
+            <a className="bt-btn" href={BT.youtubeUrl} target="_blank" rel="noopener noreferrer"><IconYouTube size={18} /> Watch on YouTube</a>
+          </div>
+        )}
+      </section>
+
+      {/* ══ WAYS TO WORSHIP ══ */}
+      <section style={{ background: "#F3EDDD", borderTop: "1px solid var(--bt-line)", borderBottom: "1px solid var(--bt-line)" }}>
+        <div className="bt-section">
+          <div style={{ textAlign: "center", marginBottom: 44 }}>
+            <div className="bt-eyebrow">Come, Worship With Us</div>
+            <h2 className="bt-h2" style={{ marginTop: 14 }}>Three Ways to Gather</h2>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))", gap: 22 }}>
+            <WorshipCard
+              icon={<IconPin size={30} strokeWidth={1.3} />}
+              title="In Person"
+              copy={BT_COPY.whatToExpect}
+              href="/locations"
+              cta="Find your nearest center"
+            />
+            <WorshipCard
+              icon={<IconGlobe size={30} strokeWidth={1.3} />}
+              title="Online Church"
+              copy={BT_COPY.onlineBlurb}
+              href={BT.onlineChurchUrl}
+              cta="Join the Online Church"
+              external
+            />
+            <WorshipCard
+              icon={<IconPlay size={30} strokeWidth={1.3} />}
+              title="Watch Anytime"
+              copy={BT_COPY.discipleship}
+              href="/sermons"
+              cta="Open the sermon library"
+            />
+          </div>
         </div>
       </section>
 
-      {/* ── Social ── */}
-      {(content.facebookUrl || content.instagramUrl || content.youtubeUrl) && (
-        <section id="connect" style={{ ...SECTION_STYLE, textAlign: "center" }}>
-          <h2 style={{ fontSize: "2rem", marginBottom: 20 }}>Connect With Us</h2>
-          <div style={{ display: "flex", gap: 18, justifyContent: "center", flexWrap: "wrap" }}>
-            {content.facebookUrl && <a className="bt-btn bt-btn-outline" href={content.facebookUrl} target="_blank" rel="noopener noreferrer">Facebook</a>}
-            {content.instagramUrl && <a className="bt-btn bt-btn-outline" href={content.instagramUrl} target="_blank" rel="noopener noreferrer">Instagram</a>}
-            {content.youtubeUrl && <a className="bt-btn bt-btn-outline" href={content.youtubeUrl} target="_blank" rel="noopener noreferrer">YouTube</a>}
+      {/* ══ THE WORLD BAND — locations ══ */}
+      <section className="bt-dark" style={{ position: "relative", overflow: "hidden" }}>
+        <div
+          aria-hidden
+          style={{
+            position: "absolute", inset: 0,
+            backgroundImage:
+              "linear-gradient(100deg, rgba(18,16,11,0.97) 38%, rgba(18,16,11,0.55) 100%), url('/bt/globe.jpg')",
+            backgroundSize: "cover", backgroundPosition: "center right"
+          }}
+        />
+        <div className="bt-section" style={{ position: "relative" }}>
+          <div style={{ maxWidth: 560 }}>
+            <div className="bt-eyebrow">{BT.commissionRef}</div>
+            <h2 className="bt-h2" style={{ marginTop: 14 }}>
+              One church, <em style={{ fontStyle: "italic", color: "var(--bt-gold-bright)" }}>six nations.</em>
+            </h2>
+            <p className="bt-lede bt-muted-text" style={{ marginTop: 18 }}>
+              From the Gulf Coast to Kingston, Nassau to Mississauga, Couva to George Town —
+              every worship center opens the same Book and teaches the same Word.
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 26 }}>
+              {[...countryCounts.entries()].map(([country, { flag, n }]) => (
+                <span
+                  key={country}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: 8,
+                    border: "1px solid var(--bt-line-dark)", borderRadius: 999,
+                    padding: "7px 15px", fontSize: "0.88rem", color: "var(--bt-ondark)"
+                  }}
+                >
+                  <span aria-hidden>{flag}</span> {country}
+                  <span style={{ color: "var(--bt-gold-bright)", fontWeight: 700 }}>{n}</span>
+                </span>
+              ))}
+            </div>
+            <div style={{ marginTop: 34 }}>
+              <Link className="bt-btn" href="/locations"><IconPin size={17} /> Explore the Map</Link>
+            </div>
           </div>
-        </section>
-      )}
-
-      {/* ── Footer ── */}
-      <footer style={{ marginTop: "auto", borderTop: "1px solid var(--bt-line)", background: "var(--bt-surface)" }}>
-        <div style={{ maxWidth: "var(--bt-maxw)", margin: "0 auto", padding: "36px 20px", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 16, alignItems: "center" }}>
-          <BtBrand size="sm" />
-          <span style={{ color: "var(--bt-muted)", fontSize: "0.9rem" }}>
-            © {new Date().getFullYear()} {config.church?.name || "Bible Teachers"}
-          </span>
         </div>
-      </footer>
-    </div>
+      </section>
+
+      {/* ══ ABOUT TEASER ══ */}
+      <section className="bt-section">
+        <SectionOrnament />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 48, alignItems: "center", marginTop: 44 }}>
+          <div>
+            <div className="bt-eyebrow">Our Story</div>
+            <h2 className="bt-h2" style={{ marginTop: 14 }}>
+              Taught by the Book,<br />led by the Spirit.
+            </h2>
+            <p className="bt-lede bt-muted-text" style={{ marginTop: 20 }}>
+              {content.about || BT_COPY.aboutShort}
+            </p>
+            <div style={{ marginTop: 28 }}>
+              <Link className="bt-btn bt-btn-outline" href="/about">About the Ministry</Link>
+            </div>
+          </div>
+          <div
+            aria-hidden
+            style={{
+              backgroundImage: "url('/bt/gathering.jpg')",
+              backgroundSize: "cover", backgroundPosition: "center",
+              borderRadius: "var(--bt-radius-lg)", border: "1px solid var(--bt-line)",
+              minHeight: 360, boxShadow: "0 24px 60px rgba(34,29,20,.16)"
+            }}
+          />
+        </div>
+      </section>
+
+      {/* ══ CONNECT BAND ══ */}
+      <section style={{ background: "#F3EDDD", borderTop: "1px solid var(--bt-line)" }}>
+        <div className="bt-section">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))", gap: 22 }}>
+            <div className="bt-card bt-card-hover" style={{ padding: "34px 30px" }}>
+              <span style={{ color: "var(--bt-gold-deep)" }}><IconHeart size={30} strokeWidth={1.3} /></span>
+              <h3 style={{ fontSize: "1.7rem", margin: "14px 0 10px" }}>Need prayer?</h3>
+              <p className="bt-muted-text" style={{ lineHeight: 1.7, marginBottom: 18 }}>
+                Our prayer team would be honored to stand with you. Share what&rsquo;s on your heart — no account needed.
+              </p>
+              <Link className="bt-btn" href="/connect">Send a Prayer Request</Link>
+            </div>
+            <div className="bt-card bt-card-hover" style={{ padding: "34px 30px" }}>
+              <span style={{ color: "var(--bt-gold-deep)" }}><IconGift size={30} strokeWidth={1.3} /></span>
+              <h3 style={{ fontSize: "1.7rem", margin: "14px 0 10px" }}>Sow into the work</h3>
+              <p className="bt-muted-text" style={{ lineHeight: 1.7, marginBottom: 18 }}>
+                Your giving carries the teaching of the Word across six nations — and keeps every worship center&rsquo;s doors open.
+              </p>
+              <Link className="bt-btn bt-btn-outline" href="/give">Ways to Give</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </BtShell>
   );
 };

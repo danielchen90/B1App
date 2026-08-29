@@ -1,43 +1,57 @@
-// Bible Teachers brand mark — the SINGLE logo drop-in seam (Phase 20, Plan 04).
-//
-// This is the ONLY place brand-asset markup lives. Right now it renders a
-// typographic wordmark placeholder ("Bible Teachers"). When the real logo lands,
-// swap the wordmark <span> block for a single <Image src=... /> here — no consumer
-// (BtHeader, footer, campus pages) changes.
+// Bible Teachers brand mark — the single logo seam. The real mark (gold globe on a
+// transparent circle) now renders beside a two-line wordmark lockup.
 
 import React from "react";
+import Image from "next/image";
 
 interface Props {
-  /** Slightly smaller mark for the sticky header vs. the hero. */
+  /** sm = header/footer; lg = hero-scale. */
   size?: "sm" | "lg";
+  /** Set when rendering on a dark band. */
+  dark?: boolean;
 }
 
-/**
- * Typographic wordmark placeholder. LOGO SWAP SEAM: replace the inner block with
- * `<Image src="/bt-logo.svg" alt="Bible Teachers" width={...} height={...} />`
- * (next/image) once the user provides the asset. Keep the alt text + link wrapper
- * in the consumer, not here.
- */
-export const BtBrand: React.FC<Props> = ({ size = "lg" }) => {
-  const fontSize = size === "sm" ? "1.15rem" : "1.6rem";
+export const BtBrand: React.FC<Props> = ({ size = "sm", dark = false }) => {
+  const logo = size === "sm" ? 44 : 92;
+  const nameSize = size === "sm" ? "1.02rem" : "1.7rem";
+  const subSize = size === "sm" ? "0.56rem" : "0.8rem";
   return (
-    <span
-      aria-label="Bible Teachers"
-      style={{
-        display: "inline-flex",
-        alignItems: "baseline",
-        gap: 8,
-        fontFamily: "var(--bt-heading-font)",
-        fontWeight: 800,
-        fontSize,
-        letterSpacing: "-0.03em",
-        color: "var(--bt-ink)",
-        lineHeight: 1
-      }}
-    >
-      {/* --- LOGO SWAP SEAM (drop the real <Image> here) --- */}
-      <span>Bible</span>
-      <span style={{ color: "var(--bt-gold)" }}>Teachers</span>
+    <span aria-label="Bible Teachers International" style={{ display: "inline-flex", alignItems: "center", gap: size === "sm" ? 11 : 18 }}>
+      <Image
+        src="/bt/logo.png"
+        alt=""
+        width={logo}
+        height={logo}
+        priority={size === "sm"}
+        style={{ display: "block", borderRadius: "50%" }}
+      />
+      <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.15 }}>
+        <span
+          style={{
+            fontFamily: "var(--bt-display-font)",
+            fontWeight: 600,
+            fontSize: nameSize,
+            letterSpacing: "0.01em",
+            color: dark ? "var(--bt-ondark)" : "var(--bt-ink)",
+            whiteSpace: "nowrap"
+          }}
+        >
+          Bible Teachers Int&rsquo;l
+        </span>
+        <span
+          style={{
+            fontFamily: "var(--bt-eyebrow-font)",
+            fontWeight: 600,
+            fontSize: subSize,
+            letterSpacing: "0.3em",
+            textTransform: "uppercase",
+            color: dark ? "var(--bt-gold-bright)" : "var(--bt-gold-deep)",
+            whiteSpace: "nowrap"
+          }}
+        >
+          Mary Banks Ministries
+        </span>
+      </span>
     </span>
   );
 };
