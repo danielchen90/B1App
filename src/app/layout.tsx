@@ -1,5 +1,6 @@
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { Roboto } from "next/font/google";
+import { AskMary } from "@/components/askMary/AskMary";
 
 const roboto = Roboto({
   weight: ["400", "700"],
@@ -23,7 +24,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html className={roboto.className}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <AskMary />
+      </body>
     </html>
   );
 }
