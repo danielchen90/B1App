@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Suspense, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
+import { useAskMaryConsent } from "@/components/askMary/useAskMaryConsent";
 
 declare global {
   interface Window {
@@ -15,18 +16,20 @@ function GoogleAnalyticsInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const gaId = EnvironmentHelper.Common.GoogleAnalyticsTag;
+  // Gated on the visitor's Ask Mary consent: nothing loads until analytics === true.
+  const analyticsAllowed = useAskMaryConsent()?.analytics === true;
 
   useEffect(() => {
-    if (!gaId || !pathname) return;
+    if (!gaId || !pathname || !analyticsAllowed) return;
 
     const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : "");
 
     if (typeof window.gtag !== "undefined") {
       window.gtag("config", gaId, { page_path: url });
     }
-  }, [pathname, searchParams, gaId]);
+  }, [pathname, searchParams, gaId, analyticsAllowed]);
 
-  if (!gaId) return null;
+  if (!gaId || !analyticsAllowed) return null;
 
   return (
     <>

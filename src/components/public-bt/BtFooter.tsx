@@ -22,6 +22,13 @@ const PAGES = [
   { label: "Connect", href: "/connect" }
 ];
 
+// Ecosystem policies (privacy, terms, cookies) — served by Ask Mary, one text for every site.
+const LEGAL = [
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
+  { label: "Cookies", href: "/cookies" }
+];
+
 const colHead: React.CSSProperties = {
   fontFamily: "var(--bt-eyebrow-font)", fontWeight: 600, fontSize: "0.72rem",
   letterSpacing: "0.26em", textTransform: "uppercase", color: "var(--bt-gold-bright)",
@@ -110,7 +117,15 @@ export const BtFooter: React.FC<Props> = ({ campuses = [], churchName }) => {
             color: "var(--bt-ondark-muted)", fontSize: "0.85rem"
           }}
         >
-          <span>© {new Date().getFullYear()} {churchName || BT.name} · {BT.ministry}</span>
+          <span>
+            © {new Date().getFullYear()} {churchName || BT.name} · {BT.ministry}
+            {LEGAL.map((l) => (
+              <React.Fragment key={l.href}>
+                {" · "}
+                <Link href={l.href} style={{ color: "inherit" }}>{l.label}</Link>
+              </React.Fragment>
+            ))}
+          </span>
           <span style={{ fontFamily: "var(--bt-eyebrow-font)", letterSpacing: "0.22em", fontSize: "0.68rem", textTransform: "uppercase" }}>
             {BT.tagline}
           </span>

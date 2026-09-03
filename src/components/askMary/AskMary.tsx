@@ -3,6 +3,7 @@
 import Script from "next/script";
 import { useCallback, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import type { AskMaryConsent } from "./useAskMaryConsent";
 
 /**
  * Ask Mary — the Mary Banks Ministries assistant, hosted by the Global
@@ -17,6 +18,8 @@ const SITE_ID = "huro";
 type AskMaryGlobal = {
   configure: (cfg: Record<string, unknown>) => void;
   setContext: (ctx: Record<string, unknown> | null) => void;
+  /** The visitor's current consent (see useAskMaryConsent), or null before they have chosen. */
+  consent?: () => AskMaryConsent | null;
   q?: unknown[];
 };
 
