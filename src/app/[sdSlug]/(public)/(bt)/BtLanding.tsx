@@ -6,7 +6,8 @@
 // <BtLanding/> for the BT public tenant; the `(bt)` group hosts the real sub-routes.
 //
 // 2026-09 redesign. The page is built around "your center", the way multi-campus
-// churches work: the visitor's remembered worship center sits in the hero, then the
+// churches work: a worship-photo hero, the visitor's remembered worship center and My
+// Church on the dock that rises over it, then the
 // week's live gatherings, the latest message, "I want to...", upcoming events, the
 // six nations, and giving/partnership. Section order is the product decision; keep it.
 
@@ -22,13 +23,12 @@ import { loadLocatorCampuses } from "@/helpers/LocatorCampusHelper";
 import { loadPublicEvents } from "@/helpers/PublicEventsHelper";
 import { toLocationLinks } from "./btPageData";
 import { BtShell } from "@/components/public-bt/BtShell";
-import { LiveIndicator } from "@/components/public-bt/LiveIndicator";
-import { MyCenter } from "@/components/public-bt/MyCenter";
+import { BtHomeHero } from "@/components/public-bt/BtHomeHero";
 import { ThisWeek } from "@/components/public-bt/ThisWeek";
 import { MessageCard } from "@/components/public-bt/MessageCard";
 import { EventCards } from "@/components/public-bt/EventCards";
 import { BT, BT_COPY, BT_STEPS, BT_COUNTRY_ORDER, BT_LINKS } from "@/components/public-bt/btSiteContent";
-import { IconArrowRight, IconPlay, IconPin, IconGift, IconHeart } from "@/components/public-bt/BtIcons";
+import { IconArrowRight, IconPin, IconGift, IconHeart } from "@/components/public-bt/BtIcons";
 
 
 interface BtOrgContent {
@@ -71,12 +71,6 @@ export async function buildBtMetadata(config: ConfigurationInterface): Promise<M
 }
 
 const CSS = `
-.bt-home-hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--bt-line);
-  background: radial-gradient(60rem 26rem at 20% -6rem, rgba(240,191,76,.22), transparent 70%), var(--bt-ivory); }
-.bt-home-hero-in { max-width: var(--bt-maxw); margin: 0 auto; padding: clamp(40px, 7vw, 84px) 20px clamp(40px, 6vw, 72px);
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
-@media (max-width: 900px) { .bt-home-hero-in { grid-template-columns: 1fr; } }
-.bt-home-hero h1 em { font-style: italic; color: var(--bt-gold-deep); }
 .bt-msgs { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 28px; }
 .bt-msgs-side { display: grid; gap: 22px; align-content: start; }
 @media (max-width: 900px) { .bt-msgs { grid-template-columns: 1fr; } .bt-msgs-side { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); } }
@@ -113,30 +107,8 @@ export const BtLanding: React.FC<{ config: ConfigurationInterface }> = async ({ 
     <BtShell config={config} campuses={navLinks}>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
-      {/* ══ HERO: welcome + your center ══ */}
-      <section className="bt-home-hero">
-        <div className="bt-home-hero-in">
-          <div>
-            <div style={{ minHeight: 30, marginBottom: 6 }}>
-              <LiveIndicator streamKey={config.church?.subDomain || null} />
-            </div>
-            <div className="bt-eyebrow bt-rise">{BT.name} · {BT.ministry}</div>
-            <h1 className="bt-display bt-rise-2" style={{ marginTop: 14 }}>
-              Come and be <em>taught of the Lord.</em>
-            </h1>
-            <p className="bt-lede bt-rise-3" style={{ marginTop: 18, maxWidth: 540 }}>
-              {`${physical.length} worship centers in ${nations} nations and an Online Church, opening the same Book and teaching the same Word. There’s a seat for you.`}
-            </p>
-            <div className="bt-rise-3" style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 26 }}>
-              <Link className="bt-btn" href="/watch"><IconPlay size={18} /> Watch</Link>
-              <Link className="bt-btn bt-btn-outline" href="/locations"><IconPin size={18} /> All locations</Link>
-            </div>
-          </div>
-          <div className="bt-rise-2">
-            <MyCenter centers={centers} />
-          </div>
-        </div>
-      </section>
+      {/* ══ HERO: worship photography, the welcome, then your center + My Church on the dock ══ */}
+      <BtHomeHero centers={centers} physicalCount={physical.length} nations={nations} streamKey={config.church?.subDomain || null} />
 
       {/* ══ THIS WEEK ══ */}
       <section className="bt-section-tight">

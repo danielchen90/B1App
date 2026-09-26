@@ -13,8 +13,8 @@ import { getCampusExtras } from "./btSiteContent";
 import type { LocationLink } from "./LocationsMenu";
 import {
   IconHome, IconBook, IconPlay, IconPin, IconGift, IconCalendar, IconStep,
-  IconClose, IconChevronDown, IconYouTube, IconGlobe
-} from "./BtIcons";
+  IconClose, IconChevronDown, IconYouTube, IconGlobe, IconUser } from "./BtIcons";
+import { useMemberBadge } from "./BtAccountButton";
 
 interface Props {
   open: boolean;
@@ -34,6 +34,7 @@ const NAV = [
 ];
 
 export const BtSidebar: React.FC<Props> = ({ open, onClose, campuses }) => {
+  const member = useMemberBadge();
   const [centersOpen, setCentersOpen] = React.useState(false);
   const panelRef = React.useRef<HTMLElement>(null);
 
@@ -159,6 +160,20 @@ export const BtSidebar: React.FC<Props> = ({ open, onClose, campuses }) => {
 
         {/* Foot */}
         <div style={{ padding: "16px 20px 22px", borderTop: "1px solid var(--bt-line)" }}>
+          {member.enabled && (
+            <Link
+              href="/my" onClick={onClose}
+              style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", marginBottom: 12, borderRadius: 12, background: "var(--bt-gold-soft)", border: "1px solid rgba(184,145,42,.3)", color: "var(--bt-ink)" }}
+            >
+              <span aria-hidden style={{ width: 36, height: 36, borderRadius: "50%", display: "inline-flex", alignItems: "center", justifyContent: "center", background: member.name ? "var(--bt-ink)" : "var(--bt-paper)", color: member.name ? "#fff" : "var(--bt-gold-deep)", fontWeight: 600 }}>
+                {member.name ? member.name.trim().charAt(0).toUpperCase() : <IconUser size={18} />}
+              </span>
+              <span style={{ display: "grid", lineHeight: 1.25 }}>
+                <b style={{ fontWeight: 600 }}>My Church</b>
+                <span style={{ fontSize: "0.85rem", color: "var(--bt-muted)" }}>{member.name ? "Your center, classes, serving and giving" : "Sign in with your Mary Banks ID"}</span>
+              </span>
+            </Link>
+          )}
           <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
             <Link className="bt-btn" href="/give" onClick={onClose} style={{ flex: 1, padding: "12px 18px" }}>
               <IconGift size={17} /> Give
