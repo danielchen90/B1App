@@ -126,3 +126,31 @@ export const IconDots: React.FC<IconProps> = ({ size = 20 }) => (
 export const IconLive: React.FC<IconProps> = (p) => (
   <Svg {...p}><circle cx="12" cy="12" r="2.2" /><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14" /></Svg>
 );
+
+export const IconSettings: React.FC<IconProps> = (p) => (
+  <Svg {...p}><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" /></Svg>
+);
+
+export const IconHelp: React.FC<IconProps> = (p) => (
+  <Svg {...p}><circle cx="12" cy="12" r="9" /><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.8" /><path d="M12 17.2h.01" /></Svg>
+);
+
+export const IconLogout: React.FC<IconProps> = (p) => (
+  <Svg {...p}><path d="M9 20H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h4" /><path d="m16 16 4-4-4-4" /><path d="M20 12H9" /></Svg>
+);
+
+export const IconCheck: React.FC<IconProps> = (p) => (
+  <Svg {...p}><circle cx="12" cy="12" r="9" /><path d="m8.5 12.2 2.4 2.4 4.8-5" /></Svg>
+);
+
+export const IconBell: React.FC<IconProps> = (p) => (
+  <Svg {...p}><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15Z" /><path d="M10 20.5a2 2 0 0 0 4 0" /></Svg>
+);
+
+export const IconChevronRight: React.FC<IconProps> = (p) => (
+  <Svg {...p}><path d="m9 6 6 6-6 6" /></Svg>
+);
+
+export const IconAward: React.FC<IconProps> = (p) => (
+  <Svg {...p}><circle cx="12" cy="9" r="5.5" /><path d="m8.5 13.5-1.5 7 5-2.5 5 2.5-1.5-7" /></Svg>
+);
