@@ -15,6 +15,13 @@ import { EnvironmentHelper } from "@/helpers";
 import { StreamingServiceHelper } from "@/helpers/StreamingServiceHelper";
 import type { StreamConfigInterface, StreamingServiceExtendedInterface } from "@/helpers";
 
+// The church's own content API (EnvironmentHelper applies the page's API base in the
+// browser; see app/layout.tsx).
+const contentApiBase = (): string => {
+  EnvironmentHelper.init();
+  return EnvironmentHelper.Common.ContentApi;
+};
+
 interface Props {
   /** The church stream key (config.church.subDomain) — same key LiveStream uses. */
   streamKey: string | null;
@@ -30,7 +37,7 @@ export const LiveIndicator: React.FC<Props> = ({ streamKey }) => {
     const load = async () => {
       try {
         const result: StreamConfigInterface = await fetch(
-          `${EnvironmentHelper.Common.ContentApi}/preview/data/${streamKey}`
+          `${contentApiBase()}/preview/data/${streamKey}`
         ).then((r) => r.json());
         StreamingServiceHelper.updateServiceTimes(result);
       } catch {

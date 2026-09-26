@@ -45,6 +45,13 @@ const fmtCountdown = (ms: number): string => {
   return "in " + days + (days === 1 ? " day" : " days");
 };
 
+// The church's own content API (EnvironmentHelper applies the page's API base in the
+// browser; see app/layout.tsx).
+const contentApiBase = (): string => {
+  EnvironmentHelper.init();
+  return EnvironmentHelper.Common.ContentApi;
+};
+
 const CSS = `
 .bt-tw { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
 .bt-tw-item { background: var(--bt-paper); border: 1px solid var(--bt-line); border-radius: var(--bt-radius); padding: 16px 18px; display: grid; gap: 4px; }
@@ -63,7 +70,7 @@ export const ThisWeek: React.FC<{ streamKey: string | null }> = ({ streamKey }) 
   React.useEffect(() => {
     if (!streamKey) { setSlots([]); return; }
     let active = true;
-    fetch(`${EnvironmentHelper.Common.ContentApi}/preview/data/${streamKey}`)
+    fetch(`${contentApiBase()}/preview/data/${streamKey}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data: { services?: StreamService[] } | null) => {
         if (!active) return;

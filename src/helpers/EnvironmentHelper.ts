@@ -32,6 +32,9 @@ export class EnvironmentHelper {
       default: EnvironmentHelper.initDev(); break;
     }
     EnvironmentHelper.Common.init(stage);
+    // In the browser, use the API base the server put on the page (see app/layout.tsx).
+    const pageBase = typeof window !== "undefined" ? (window as unknown as { __API_BASE__?: string }).__API_BASE__ : undefined;
+    if (pageBase) (EnvironmentHelper.Common as unknown as { applyApiBase: (b: string) => void }).applyApiBase(pageBase);
 
     ApiHelper.apiConfigs = [
       { keyName: "MembershipApi", url: EnvironmentHelper.Common.MembershipApi, jwt: "", permissions: [] },
