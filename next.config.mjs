@@ -143,7 +143,14 @@ const nextConfig = {
 
   async redirects() {
     return [
-      { source: "/my", destination: "/mobile", permanent: true },
+      // Bible Teachers sites serve their own member home ("My Church") at /my; every
+      // other church keeps the stock redirect into the mobile member screens.
+      {
+        source: "/my",
+        has: [{ type: "host", value: "^(?!(?:bti|church|bibleteachers|www\\.bibleteachers)\\.).*$" }],
+        destination: "/mobile",
+        permanent: false
+      },
       // HTTP-level redirect for the mobile root. Doing this in a server
       // component via redirect() trips a "Rendered more hooks" crash in the
       // Next.js App Router client (16.2.x), causing a reload loop.
