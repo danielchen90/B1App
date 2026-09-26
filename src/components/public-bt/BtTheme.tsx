@@ -127,7 +127,8 @@ a.bt-card:hover, .bt-card-hover:hover {
 /* ── Chips ── */
 .bt-chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 14px; border-radius: 999px;
   background: var(--bt-paper); box-shadow: inset 0 0 0 1px var(--bt-line-strong); color: var(--bt-ink);
-  font-weight: 500; font-size: 0.93rem; transition: box-shadow .15s, background-color .15s; }
+  font-family: var(--bt-body-font); font-weight: 500; font-size: 0.93rem; border: 0; cursor: pointer;
+  transition: box-shadow .15s, background-color .15s; }
 a.bt-chip:hover, button.bt-chip:hover { box-shadow: inset 0 0 0 1.5px var(--bt-gold); background: var(--bt-gold-soft); }
 .bt-dark .bt-chip { background: transparent; box-shadow: inset 0 0 0 1px var(--bt-line-dark); color: var(--bt-ondark); }
 

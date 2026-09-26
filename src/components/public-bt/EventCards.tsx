@@ -48,7 +48,7 @@ export const EventCards: React.FC<{ events: PublicEvent[]; limit?: number; showC
             </div>
             <div style={{ minWidth: 0 }}>
               <h3 className="bt-ev-title">{e.title}</h3>
-              <div className="bt-ev-when">{fmt(e)}</div>
+              <div className="bt-ev-when">{e.repeats ? e.repeats + " · next " : ""}{fmt(e)}</div>
               {showCenter && (
                 <div className="bt-ev-where">
                   <IconPin size={14} />
