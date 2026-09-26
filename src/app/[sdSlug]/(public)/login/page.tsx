@@ -1,3 +1,4 @@
+import { memberSignInEnabled } from "@/lib/memberSignIn";
 import { redirect } from "next/navigation";
 import { Login } from "@/components";
 import { ConfigHelper, EnvironmentHelper } from "@/helpers";
@@ -17,7 +18,7 @@ export default async function LoginPage({ params, searchParams }: { params: Para
   const q = await searchParams;
   const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) || "";
 
-  if (isBtPublicSite(sdSlug) && process.env.NEXT_PUBLIC_BT_MEMBER_SIGNIN === "1") {
+  if (isBtPublicSite(sdSlug) && memberSignInEnabled()) {
     if (one(q.mbid_error)) return <MbidError reason={one(q.mbid_error)} />;
     if (!one(q.jwt)) {
       const returnUrl = one(q.returnUrl) || "/my";

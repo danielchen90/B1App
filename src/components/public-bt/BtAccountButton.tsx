@@ -2,7 +2,7 @@
 
 // Header account action. Signed out: "Sign in" (Mary Banks ID). Signed in: the
 // member's initial, linking to My Church. Hidden entirely until member accounts are
-// switched on with NEXT_PUBLIC_BT_MEMBER_SIGNIN=1, so the public site never shows a
+// switched on with BT_MEMBER_SIGNIN=1 (see lib/memberSignIn.ts), so the public site never shows a
 // sign-in that goes nowhere.
 //
 // The signed-in state is read from the small `bt_member` display cookie the sign-in
@@ -10,6 +10,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { memberSignInEnabledInBrowser } from "@/lib/memberSignIn";
 
 const readMemberName = (): string | null => {
   if (typeof document === "undefined") return null;
@@ -23,12 +24,14 @@ const readMemberName = (): string | null => {
 };
 
 export const BtAccountButton: React.FC = () => {
-  const enabled = process.env.NEXT_PUBLIC_BT_MEMBER_SIGNIN === "1";
+  const [enabled, setEnabled] = React.useState(false);
   const [name, setName] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    if (enabled) setName(readMemberName());
-  }, [enabled]);
+    const on = memberSignInEnabledInBrowser();
+    setEnabled(on);
+    if (on) setName(readMemberName());
+  }, []);
 
   if (!enabled) return null;
 

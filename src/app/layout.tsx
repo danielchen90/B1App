@@ -1,6 +1,7 @@
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { Roboto } from "next/font/google";
 import { AskMary } from "@/components/askMary/AskMary";
+import { memberSignInEnabled } from "@/lib/memberSignIn";
 
 const roboto = Roboto({
   weight: ["400", "700"],
@@ -31,7 +32,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html className={roboto.className}>
       <body>
-        <script dangerouslySetInnerHTML={{ __html: "window.__API_BASE__=" + JSON.stringify(apiBase) + ";" }} />
+        <script dangerouslySetInnerHTML={{ __html: "window.__API_BASE__=" + JSON.stringify(apiBase) + ";window.__BT_SIGNIN__=" + JSON.stringify(memberSignInEnabled()) + ";" }} />
         {children}
         <AskMary />
       </body>

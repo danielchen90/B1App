@@ -117,7 +117,13 @@ export const MyChurch: React.FC<Props> = ({ subDomain, churchId, centers }) => {
   const claim = async (personId: string, name: string) => {
     try {
       const r: any = await ApiHelper.post("/me/claim", { personId }, "MembershipApi");
-      setClaimNote(r?.linked ? "Done. Your church record is now part of your account." : "Thanks. That record belongs to another account, so your center's team will check it and link it for you.");
+      if (r?.linked) {
+        // The session was issued before the link: sign in again with the same token so
+        // groups, serving and giving load for the newly linked record.
+        window.location.reload();
+        return;
+      }
+      setClaimNote("Thanks. That record belongs to another account, so your center's team will check it and link it for you.");
       await load();
     } catch {
       setClaimNote("We couldn't link " + name + " just now. Please try again later.");

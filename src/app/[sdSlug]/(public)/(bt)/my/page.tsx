@@ -3,6 +3,7 @@
 // only (Mary Banks ID); signed-out visitors get a short explanation and Sign in.
 
 import React from "react";
+import { memberSignInEnabled } from "@/lib/memberSignIn";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
 
 export default async function MyChurchPage({ params }: { params: Promise<PageParams> }) {
   // Hidden until member sign-in is switched on for this deployment.
-  if (process.env.NEXT_PUBLIC_BT_MEMBER_SIGNIN !== "1") notFound();
+  if (!memberSignInEnabled()) notFound();
   await EnvironmentHelper.initServerSide();
   const { sdSlug } = await params;
   const config = await loadBtConfig(sdSlug);
