@@ -1,6 +1,10 @@
-// Giving — /give. Display-only: every button is the hosted Stripe Payment Link for the
-// org or a specific worship center (campusContent override → in-repo extras → org
-// default). No Stripe SDK, no gift records — giving is entirely handed off.
+// Giving — /give.
+//
+// When the church's giving is set up in B1Admin (a Stripe gateway and funds), the page
+// embeds the ChurchApps giving form: gifts are recorded per person and per fund, so
+// members get history, recurring-gift management and statements in My Church. Until
+// then it falls back to the hosted Stripe Payment Links for the ministry and each
+// center (campusContent override → in-repo extras → org default), as before.
 
 import React from "react";
 import type { Metadata } from "next";
@@ -11,6 +15,23 @@ import { BtShell } from "@/components/public-bt/BtShell";
 import { BtPageHead } from "@/components/public-bt/BtPageHead";
 import { BT, BT_LINKS, getCampusExtras } from "@/components/public-bt/btSiteContent";
 import { IconGift, IconArrowRight } from "@/components/public-bt/BtIcons";
+import { GiveEmbed, type GiveFund } from "@/components/public-bt/GiveEmbed";
+import { ApiHelper } from "@churchapps/apphelper";
+
+/** Online giving is live once the church has a payment gateway and at least one fund. */
+const loadGiving = async (churchId: string): Promise<{ enabled: boolean; funds: GiveFund[] }> => {
+  if (!churchId) return { enabled: false, funds: [] };
+  try {
+    const [gateways, funds] = await Promise.all([
+      ApiHelper.getAnonymous("/gateways/churchId/" + churchId, "GivingApi"),
+      ApiHelper.getAnonymous("/funds/churchId/" + churchId, "GivingApi")
+    ]);
+    const list: GiveFund[] = Array.isArray(funds) ? funds.filter((f: any) => f && f.id && !f.removed).map((f: any) => ({ id: f.id, name: f.name })) : [];
+    return { enabled: Array.isArray(gateways) && gateways.length > 0 && list.length > 0, funds: list };
+  } catch {
+    return { enabled: false, funds: [] };
+  }
+};
 
 type PageParams = { sdSlug: string };
 
@@ -31,6 +52,7 @@ export default async function GivePage({ params }: { params: Promise<PageParams>
   const churchId = config.church?.id || "";
   const campuses = await loadVisibleCampuses(churchId);
   const navLinks = toLocationLinks(campuses);
+  const giving = await loadGiving(churchId);
 
   // Centers with their own giving link, ahead of those on the org default.
   const centerGiving = campuses
@@ -49,14 +71,22 @@ export default async function GivePage({ params }: { params: Promise<PageParams>
         lede="Your giving helps us bless many across the globe. Give a single gift, or schedule recurring giving with your debit or credit card. Every gift is processed securely through Stripe."
         actions={
           <>
-            <a className="bt-btn" href={BT.giveUrl} target="_blank" rel="noopener noreferrer"><IconGift size={19} /> Give to the ministry</a>
+            {giving.enabled
+              ? <a className="bt-btn" href="#give-now"><IconGift size={19} /> Give now</a>
+              : <a className="bt-btn" href={BT.giveUrl} target="_blank" rel="noopener noreferrer"><IconGift size={19} /> Give to the ministry</a>}
             <a className="bt-btn bt-btn-outline" href={BT_LINKS.partners}>Become a partner</a>
           </>
         }
       />
 
-      {/* Give to your worship center */}
-      <section className="bt-section">
+      {giving.enabled && (
+        <section id="give-now" className="bt-section-tight" style={{ maxWidth: 820 }}>
+          <GiveEmbed churchId={churchId} funds={giving.funds} centers={campuses.map((c) => ({ slug: c.slug, name: c.name }))} />
+        </section>
+      )}
+
+      {/* Give to your worship center (payment links, until online giving is set up) */}
+      {!giving.enabled && <section className="bt-section">
         <div style={{ textAlign: "center", marginBottom: 40 }}>
                     <h2 className="bt-h2" style={{ marginTop: 36 }}>Give to Your Worship Center</h2>
           <p className="bt-lede bt-muted-text" style={{ maxWidth: 560, margin: "16px auto 0" }}>
@@ -80,7 +110,7 @@ export default async function GivePage({ params }: { params: Promise<PageParams>
             </a>
           ))}
         </div>
-      </section>
+      </section>}
 
       {/* Reassurance band */}
       <section style={{ background: "var(--bt-sunk)", borderTop: "1px solid var(--bt-line)" }}>

@@ -287,7 +287,7 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
             <span style={{ color: "var(--bt-gold)" }}><IconGift size={24} /></span>
             <h2 className="bt-h3">Give to {campus.name}</h2>
             <p>Your giving supports the ministry of {campus.name} and carries the Word further. Once or every month.</p>
-            <div><a className="bt-btn" href={giveUrl} target="_blank" rel="noopener noreferrer">Give</a></div>
+            <div><Link className="bt-btn" href={"/give?center=" + encodeURIComponent(campus.slug || "") + "#give-now"}>Give</Link></div>
           </div>
         </div>
       </section>
