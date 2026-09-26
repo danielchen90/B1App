@@ -36,4 +36,23 @@ export interface CampusContent {
   givingUrl?: string | typeof HIDDEN;
   sermonYoutubeChannel?: string | typeof HIDDEN;
   extraLinks?: ExtraLink[] | typeof HIDDEN;
+  // 2026-09 redesign: authored by each center's admin in B1Admin.
+  /** Photo gallery (FilesManager URLs), in the order the admin arranged them. */
+  photos?: string[] | typeof HIDDEN;
+  /** Pastor(s) as the center names them, e.g. "Pastors Marvin & Julia Brown". */
+  leaders?: string | typeof HIDDEN;
+  phone?: string | typeof HIDDEN;
+  email?: string | typeof HIDDEN;
+  /** "Your first visit": parking, what to wear, kids, how long, language help. */
+  whatToExpect?: string | typeof HIDDEN;
 }
+
+/** First usable photo for a center: the hero image, else the first gallery photo. */
+export const firstPhoto = (c: CampusContent): string | null => {
+  if (typeof c.heroImage === "string" && c.heroImage && c.heroImage !== HIDDEN) return c.heroImage;
+  if (Array.isArray(c.photos)) return c.photos.find((p) => !!p) || null;
+  return null;
+};
+
+/** Read a text field, treating the explicit-hide sentinel as absent. */
+export const contentText = (v: string | typeof HIDDEN | undefined): string => (v && v !== HIDDEN ? v : "");

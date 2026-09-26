@@ -92,3 +92,37 @@ export const IconFacebook: React.FC<IconProps> = (p) => (
 export const IconInstagram: React.FC<IconProps> = (p) => (
   <Svg {...p}><rect x="4" y="4" width="16" height="16" rx="4.5" /><circle cx="12" cy="12" r="3.6" /><circle cx="16.8" cy="7.2" r="0.6" fill="currentColor" stroke="none" /></Svg>
 );
+
+export const IconCalendar: React.FC<IconProps> = (p) => (
+  <Svg {...p}><rect x="4" y="5.5" width="16" height="14.5" rx="2" /><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4" /></Svg>
+);
+
+export const IconUsers: React.FC<IconProps> = (p) => (
+  <Svg {...p}><circle cx="9" cy="8.5" r="3.2" /><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5" /><circle cx="16.8" cy="9.4" r="2.5" /><path d="M16.5 14.2c2 .2 3.5 1.7 4 4.3" /></Svg>
+);
+
+export const IconDrop: React.FC<IconProps> = (p) => (
+  <Svg {...p}><path d="M12 3.5s-6 6.4-6 10.6a6 6 0 0 0 12 0c0-4.2-6-10.6-6-10.6Z" /><path d="M9.3 14.6a2.8 2.8 0 0 0 2.7 2.6" /></Svg>
+);
+
+export const IconHands: React.FC<IconProps> = (p) => (
+  <Svg {...p}><path d="M8 20v-3.5L4.8 12a1.6 1.6 0 0 1 2.5-2l2.2 2.7V5.5a1.5 1.5 0 0 1 3 0V11" /><path d="M16 20v-3.5l3.2-4.5a1.6 1.6 0 0 0-2.5-2l-2.2 2.7V5.5" /></Svg>
+);
+
+export const IconStep: React.FC<IconProps> = (p) => (
+  <Svg {...p}><path d="M4 19h5v-5h5V9h5V4" /><path d="M16 4h3v3" /></Svg>
+);
+
+export const IconUser: React.FC<IconProps> = (p) => (
+  <Svg {...p}><circle cx="12" cy="8.5" r="3.8" /><path d="M4.5 20c.9-3.9 3.8-6 7.5-6s6.6 2.1 7.5 6" /></Svg>
+);
+
+export const IconDots: React.FC<IconProps> = ({ size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden style={{ flex: "none" }}>
+    {[5, 12, 19].flatMap((y) => [5, 12, 19].map((x) => <circle key={x + "-" + y} cx={x} cy={y} r={2} fill="currentColor" />))}
+  </svg>
+);
+
+export const IconLive: React.FC<IconProps> = (p) => (
+  <Svg {...p}><circle cx="12" cy="12" r="2.2" /><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14" /></Svg>
+);

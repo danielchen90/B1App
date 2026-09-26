@@ -37,12 +37,17 @@ const Card: React.FC<{
     className="bt-card"
     style={{
       borderColor: isActive ? "var(--bt-gold)" : undefined,
-      boxShadow: isActive ? "0 10px 26px rgba(196,160,60,.22)" : undefined,
-      background: isActive ? "#FFF9EA" : undefined,
-      padding: "16px 18px",
+      boxShadow: isActive ? "0 10px 26px -12px rgba(184,145,42,.45)" : undefined,
+      background: isActive ? "#FFFBF0" : undefined,
+      padding: "14px 16px",
+      display: "grid", gridTemplateColumns: c.photo ? "84px 1fr" : "1fr", gap: 14,
       cursor: onSelect ? "pointer" : "default"
     }}
   >
+    {c.photo && (
+      <div aria-hidden style={{ width: 84, height: 84, borderRadius: 10, background: "var(--bt-sunk) center / cover no-repeat", backgroundImage: "url('" + c.photo + "')" }} />
+    )}
+    <div style={{ minWidth: 0 }}>
     <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10 }}>
       <span style={{ fontFamily: "var(--bt-display-font)", fontWeight: 600, fontSize: "1.28rem", lineHeight: 1.2 }}>
         {c.virtual ? <IconGlobe size={16} /> : null} {c.name}
@@ -51,8 +56,8 @@ const Card: React.FC<{
         <span
           style={{
             flexShrink: 0, fontWeight: 700, fontSize: "0.78rem", letterSpacing: "0.04em",
-            color: "var(--bt-gold-deep)", background: "rgba(196,160,60,.12)",
-            border: "1px solid rgba(196,160,60,.35)", borderRadius: 999, padding: "3px 10px",
+            color: "var(--bt-gold-deep)", background: "var(--bt-gold-soft)",
+            border: "1px solid rgba(184,145,42,.35)", borderRadius: 999, padding: "3px 10px",
             whiteSpace: "nowrap"
           }}
         >
@@ -66,8 +71,13 @@ const Card: React.FC<{
       </div>
     )}
     {c.serviceTimesLabel && (
-      <div style={{ color: "var(--bt-muted)", fontSize: "0.84rem", marginTop: 4 }}>
+      <div style={{ color: "var(--bt-body)", fontSize: "0.86rem", marginTop: 4 }}>
         {c.serviceTimesLabel}
+      </div>
+    )}
+    {c.leaders && (
+      <div style={{ color: "var(--bt-muted)", fontSize: "0.84rem", marginTop: 2 }}>
+        {c.leaders}
       </div>
     )}
     {c.slug && (
@@ -79,6 +89,7 @@ const Card: React.FC<{
         Visit this center <IconArrowRight size={15} />
       </Link>
     )}
+    </div>
   </div>
 );
 
@@ -108,12 +119,12 @@ export const CampusList: React.FC<Props> = ({ campuses, byDistance, activeId, on
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
       {groups.map((g) => (
-        <section key={g.country} aria-label={g.country}>
+        <section key={g.country} id={g.country} aria-label={g.country} style={{ scrollMarginTop: 80 }}>
           <div
             style={{
               display: "flex", alignItems: "center", gap: 10, marginBottom: 10,
               fontFamily: "var(--bt-eyebrow-font)", fontWeight: 600, fontSize: "0.72rem",
-              letterSpacing: "0.24em", textTransform: "uppercase", color: "var(--bt-gold-deep)"
+              letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--bt-gold-deep)"
             }}
           >
             <span aria-hidden style={{ fontSize: "0.95rem", letterSpacing: 0 }}>{g.flag}</span>

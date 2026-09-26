@@ -14,6 +14,7 @@ import { loadLocatorCampuses } from "@/helpers/LocatorCampusHelper";
 import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../btPageData";
 import { BtShell } from "@/components/public-bt/BtShell";
 import { CampusLocator } from "@/components/public-bt/CampusLocator";
+import { BtPageHead } from "@/components/public-bt/BtPageHead";
 import { BT, BT_NATION_COUNT } from "@/components/public-bt/btSiteContent";
 
 type PageParams = { sdSlug: string };
@@ -44,19 +45,11 @@ export default async function LocationsPage({ params }: { params: Promise<PagePa
 
   return (
     <BtShell config={config} campuses={navLinks}>
-      {/* Header band */}
-      <section className="bt-dark" style={{ borderBottom: "1px solid var(--bt-line-dark)" }}>
-        <div className="bt-section-tight" style={{ textAlign: "center", paddingTop: 64, paddingBottom: 56 }}>
-          <div className="bt-eyebrow" style={{ justifyContent: "center" }}>{BT.commissionRef}</div>
-          <h1 className="bt-display" style={{ fontSize: "clamp(2.4rem, 5vw, 3.6rem)", marginTop: 16 }}>
-            Find Your <em style={{ fontStyle: "italic", color: "var(--bt-gold-bright)" }}>Worship Center</em>
-          </h1>
-          <p className="bt-lede bt-muted-text" style={{ maxWidth: 620, margin: "18px auto 0" }}>
-            Here are all BTI locations:{" "}{locatorCampuses.length}{" "}worship centers across{" "}{BT_NATION_COUNT}{" "}nations,
-            and an online church that gathers from anywhere. The list orders itself by what&rsquo;s closest to you.
-          </p>
-        </div>
-      </section>
+      <BtPageHead
+        eyebrow="Locations"
+        title="Find your worship center"
+        lede={`${locatorCampuses.filter((c) => !c.virtual).length} worship centers across ${BT_NATION_COUNT} nations, and an Online Church that gathers from anywhere. Share your location and the list puts the nearest first.`}
+      />
 
       {/* The locator */}
       <section className="bt-section-tight">

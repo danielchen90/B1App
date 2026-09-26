@@ -297,3 +297,69 @@ export const BT_COUNTRY_ORDER = [
 ];
 
 export const BT_NATION_COUNT = 6; // US, Jamaica, Bahamas, Trinidad & Tobago, Cayman, Canada
+
+// ── 2026-09 redesign: navigation, weekly rhythm, next steps ─────────────────────
+
+/** The primary menu, in order. Give and Sign in sit beside it as actions. */
+export const BT_NAV = [
+  { label: "Locations", href: "/locations" },
+  { label: "Watch", href: "/watch" },
+  { label: "Events", href: "/events" },
+  { label: "Next Steps", href: "/next-steps" },
+  { label: "About", href: "/about" }
+] as const;
+
+/**
+ * The ministry's weekly rhythm as it publishes it ("Sunday morning worship, and Tuesday
+ * and Friday night discipleship, live on the ministry's channel... Live prayer gathers
+ * Mondays to Fridays every three hours, except 9 PM"). Shown in the "This week" strip
+ * until the stream schedule is entered in the admin (Sermons > Live stream times), at
+ * which point exact times and a countdown take over. No times are invented here.
+ */
+export const BT_RHYTHM: { days: string; title: string; detail: string }[] = [
+  { days: "Sunday", title: "Sunday Morning Live", detail: "Worship and the Word, live from the worship centers and online." },
+  { days: "Tuesday", title: "Tuesday Night Discipleship", detail: "Teaching that goes deeper into the Scriptures." },
+  { days: "Friday", title: "Friday Night Discipleship", detail: "Study, questions and training for ministry." },
+  { days: "Mon to Fri", title: "Live Prayer", detail: "Every three hours through the day, except 9 PM." }
+];
+
+/** "I want to..." — each step opens its section on the Next Steps page. */
+export const BT_STEPS = [
+  { id: "visit", label: "Plan a visit", blurb: "Tell a center you're coming and we'll look out for you." },
+  { id: "prayer", label: "Request prayer", blurb: "Ministers around the world pray over every request." },
+  { id: "salvation", label: "Follow Jesus", blurb: "Talk with someone about giving your life to Christ." },
+  { id: "baptism", label: "Get baptized", blurb: "Take the step of water baptism at your center." },
+  { id: "discipleship", label: "Join a discipleship class", blurb: "Weeknight classes in person and online." },
+  { id: "serve", label: "Serve", blurb: "Use your gifts on a team at your center." },
+  { id: "grow", label: "Grow and train", blurb: "Free courses and Growth Paths in the Global Training Center." },
+  { id: "partner", label: "Become a partner", blurb: "Carry the teaching to the nations with your giving." }
+] as const;
+
+export const BT_LINKS = {
+  gtc: "https://mbmonline.global",
+  growthPaths: "https://mbmonline.global/growth-paths",
+  partners: "https://partners.mbmonline.global",
+  faithLibrary: "https://new.mbfaithlibrary.com"
+} as const;
+
+// ── Sermon titles → speaker + series ─────────────────────────────────────────────
+// The ministry titles its uploads "Friday Night Discipleship - Bishop Daniel Chen",
+// "Indiantown Tent Revival // Sunday Morning Live", "Apostle Mary Banks Ministering at
+// ...". These read the speaker and series back out so the library can be browsed.
+
+const SPEAKER_RE = /\b(Apostle|Bishop|Pastor|Prophet|Prophetess|Elder|Evangelist|Minister|Dr\.)\s+[A-Z][A-Za-z.'-]*(?:\s+(?:&\s+)?[A-Z][A-Za-z.'-]*){0,2}/;
+
+export interface SermonMeta { series: string; speaker: string | null }
+
+export const classifySermon = (title: string): SermonMeta => {
+  const clean = title.replace(/\s+/g, " ").trim();
+  const speaker = clean.match(SPEAKER_RE)?.[0]?.replace(/\s+(Ministering|Preaching|Teaching|Live)$/i, "") || null;
+  const parts = clean.split(/\s(?:-|–|\/\/|\|)\s/).map((s) => s.trim()).filter(Boolean);
+  let series = parts.find((p) => !SPEAKER_RE.test(p)) || parts[0] || clean;
+  series = series.replace(/\s*[-:]?\s*Night\s+\d+$/i, "").replace(/!+$/, "").trim();
+  if (/sunday morning live/i.test(clean)) series = "Sunday Morning Live";
+  else if (/tuesday night discipleship/i.test(clean)) series = "Tuesday Night Discipleship";
+  else if (/friday night discipleship/i.test(clean)) series = "Friday Night Discipleship";
+  else if (/tent revival/i.test(clean)) series = "Tent Revival";
+  return { series, speaker };
+};

@@ -26,6 +26,12 @@ export interface LocatorCampus {
   flag: string;
   /** The online congregation — listed, never pinned. */
   virtual?: boolean;
+  /** First photo the center's admin uploaded (hero image, else first gallery photo). */
+  photo?: string | null;
+  /** Pastor(s), as the center names them. */
+  leaders?: string | null;
+  phone?: string | null;
+  email?: string | null;
   /** Distance from the visitor in km — present once geolocation resolves. */
   distanceKm?: number;
 }
@@ -50,9 +56,9 @@ const TILE_ATTRIB = 'Tiles &copy; Esri | Esri, HERE, Garmin &copy; <a href="http
 const pinSvg = (active: boolean) => `
 <svg width="${active ? 44 : 34}" height="${active ? 54 : 42}" viewBox="0 0 34 42" fill="none" xmlns="http://www.w3.org/2000/svg">
   <path d="M17 41C17 41 32 28.6 32 15.9A15 15 0 0 0 17 1 15 15 0 0 0 2 15.9C2 28.6 17 41 17 41Z"
-        fill="${active ? "#EDC368" : "#C4A03C"}" stroke="#12100B" stroke-width="1.6"/>
-  <circle cx="17" cy="15.5" r="6.2" fill="#12100B"/>
-  <circle cx="17" cy="15.5" r="2.4" fill="${active ? "#EDC368" : "#C4A03C"}"/>
+        fill="${active ? "#F0BF4C" : "#B8912A"}" stroke="#1B1B22" stroke-width="1.6"/>
+  <circle cx="17" cy="15.5" r="6.2" fill="#1B1B22"/>
+  <circle cx="17" cy="15.5" r="2.4" fill="${active ? "#F0BF4C" : "#B8912A"}"/>
 </svg>`;
 
 const makeIcon = (active: boolean) =>
@@ -66,11 +72,11 @@ const makeIcon = (active: boolean) =>
 
 const POPUP_CSS = `
 .bt-map .leaflet-popup-content-wrapper {
-  background: #12100B; color: #F4EDDD; border: 1px solid rgba(237,195,104,.35);
+  background: #1B1B22; color: #F4F2EC; border: 1px solid rgba(240,191,76,.35);
   border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,.4);
   font-family: 'Mulish', system-ui, sans-serif; }
 .bt-map .leaflet-popup-content { margin: 14px 16px; line-height: 1.5; }
-.bt-map .leaflet-popup-tip { background: #12100B; border: 1px solid rgba(237,195,104,.35); }
+.bt-map .leaflet-popup-tip { background: #1B1B22; border: 1px solid rgba(240,191,76,.35); }
 .bt-map .leaflet-popup-close-button { color: #B3A78B !important; }
 .bt-map .leaflet-control-attribution { background: rgba(250,246,236,.85); font-size: 10px; }
 .bt-map .leaflet-control-zoom a { color: #221D14; }
@@ -112,8 +118,8 @@ export const LeafletLocatorMap: React.FC<Props> = ({ campuses, activeId, onActiv
         L.divIcon({
           className: "bt-map-cluster",
           html: `<div style="width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-                   background:radial-gradient(circle at 35% 30%, #EDC368, #C4A03C 60%, #8F701F);
-                   border:2px solid #12100B;color:#171204;font-weight:800;font-family:Mulish,system-ui,sans-serif;
+                   background:radial-gradient(circle at 35% 30%, #F0BF4C, #B8912A 60%, #8A6A14);
+                   border:2px solid #1B1B22;color:#171204;font-weight:800;font-family:Outfit,system-ui,sans-serif;
                    box-shadow:0 4px 14px rgba(18,16,11,.35);">${c.getChildCount()}</div>`,
           iconSize: [40, 40],
           iconAnchor: [20, 20]
@@ -146,7 +152,7 @@ export const LeafletLocatorMap: React.FC<Props> = ({ campuses, activeId, onActiv
         riseOnHover: true
       });
       const link = c.slug
-        ? `<a href="/locations/${c.slug}" style="color:#EDC368;font-weight:700;text-decoration:none;">Visit this center &rarr;</a>`
+        ? `<a href="/locations/${c.slug}" style="color:#F0BF4C;font-weight:700;text-decoration:none;">Visit this center &rarr;</a>`
         : "";
       marker.bindPopup(
         `<div style="min-width:180px">
@@ -198,7 +204,7 @@ export const LeafletLocatorMap: React.FC<Props> = ({ campuses, activeId, onActiv
     userMarkerRef.current = null;
     if (userPos) {
       userMarkerRef.current = L.circleMarker([userPos.lat, userPos.lng], {
-        radius: 7, color: "#12100B", weight: 2, fillColor: "#4B7BEC", fillOpacity: 0.9
+        radius: 7, color: "#1B1B22", weight: 2, fillColor: "#4B7BEC", fillOpacity: 0.9
       })
         .bindTooltip("You are here")
         .addTo(map);

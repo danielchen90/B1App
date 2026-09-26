@@ -20,5 +20,5 @@ export const loadVisibleCampuses = cache(async (churchId: string): Promise<Publi
   return campuses.filter((c) => !isHiddenCampusSlug(c.slug));
 });
 
-export const toLocationLinks = (campuses: PublicCampus[]): LocationLink[] =>
+export const toLocationLinks = (campuses: { slug: string | null; name: string }[]): LocationLink[] =>
   campuses.filter((c) => c.slug).map((c) => ({ slug: c.slug, name: c.name }));

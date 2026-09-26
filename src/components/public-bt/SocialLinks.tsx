@@ -28,15 +28,14 @@ export const SocialLinks: React.FC<Props> = ({ facebookUrl, instagramUrl, youtub
   if (all.length === 0) return null;
 
   return (
-    <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+    <div style={{ display: "flex", gap: 8, justifyContent: "flex-start", flexWrap: "wrap" }}>
       {all.map((l, i) => (
         <a
           key={l.label + i}
-          className="bt-btn bt-btn-outline"
+          className="bt-btn bt-btn-sm bt-btn-outline"
           href={l.url}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ padding: "10px 20px", fontSize: "0.95rem" }}
         >
           {l.label}
         </a>

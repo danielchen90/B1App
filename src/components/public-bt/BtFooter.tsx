@@ -15,11 +15,12 @@ interface Props {
 }
 
 const PAGES = [
-  { label: "About Us", href: "/about" },
-  { label: "Sermons", href: "/sermons" },
   { label: "Locations", href: "/locations" },
-  { label: "Give", href: "/give" },
-  { label: "Connect", href: "/connect" }
+  { label: "Watch", href: "/watch" },
+  { label: "Events", href: "/events" },
+  { label: "Next Steps", href: "/next-steps" },
+  { label: "About", href: "/about" },
+  { label: "Give", href: "/give" }
 ];
 
 // Ecosystem policies (privacy, terms, cookies) — served by Ask Mary, one text for every site.
@@ -31,7 +32,7 @@ const LEGAL = [
 
 const colHead: React.CSSProperties = {
   fontFamily: "var(--bt-eyebrow-font)", fontWeight: 600, fontSize: "0.72rem",
-  letterSpacing: "0.26em", textTransform: "uppercase", color: "var(--bt-gold-bright)",
+  letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--bt-gold-bright)",
   marginBottom: 18
 };
 
@@ -103,9 +104,9 @@ export const BtFooter: React.FC<Props> = ({ campuses = [], churchName }) => {
               <a className="bt-btn bt-btn-ghost" href={BT.youtubeUrl} target="_blank" rel="noopener noreferrer" style={{ padding: "10px 18px", fontSize: "0.9rem" }}>
                 <IconYouTube size={17} /> YouTube
               </a>
-              <a className="bt-btn" href={BT.giveUrl} target="_blank" rel="noopener noreferrer" style={{ padding: "10px 18px", fontSize: "0.9rem" }}>
-                Give Online
-              </a>
+              <Link className="bt-btn" href="/give" style={{ padding: "10px 18px", fontSize: "0.9rem" }}>
+                Give
+              </Link>
             </div>
           </div>
         </div>
@@ -126,7 +127,7 @@ export const BtFooter: React.FC<Props> = ({ campuses = [], churchName }) => {
               </React.Fragment>
             ))}
           </span>
-          <span style={{ fontFamily: "var(--bt-eyebrow-font)", letterSpacing: "0.22em", fontSize: "0.68rem", textTransform: "uppercase" }}>
+          <span style={{ fontFamily: "var(--bt-eyebrow-font)", letterSpacing: "0.14em", fontSize: "0.68rem", textTransform: "uppercase" }}>
             {BT.tagline}
           </span>
         </div>

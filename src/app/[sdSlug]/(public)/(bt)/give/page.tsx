@@ -8,8 +8,8 @@ import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
 import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../btPageData";
 import { BtShell } from "@/components/public-bt/BtShell";
-import { SectionOrnament } from "@/components/public-bt/BtOrnaments";
-import { BT, getCampusExtras } from "@/components/public-bt/btSiteContent";
+import { BtPageHead } from "@/components/public-bt/BtPageHead";
+import { BT, BT_LINKS, getCampusExtras } from "@/components/public-bt/btSiteContent";
 import { IconGift, IconArrowRight } from "@/components/public-bt/BtIcons";
 
 type PageParams = { sdSlug: string };
@@ -43,32 +43,22 @@ export default async function GivePage({ params }: { params: Promise<PageParams>
 
   return (
     <BtShell config={config} campuses={navLinks}>
-      {/* Hero */}
-      <section className="bt-dark" style={{ borderBottom: "1px solid var(--bt-line-dark)" }}>
-        <div className="bt-section" style={{ textAlign: "center", paddingTop: 80, paddingBottom: 80 }}>
-          <div className="bt-eyebrow" style={{ justifyContent: "center" }}>2 Corinthians 9:7</div>
-          <h1 className="bt-display" style={{ fontSize: "clamp(2.4rem, 5vw, 3.6rem)", marginTop: 16 }}>
-            God loves a <em style={{ fontStyle: "italic", color: "var(--bt-gold-bright)" }}>cheerful giver.</em>
-          </h1>
-          <p className="bt-lede bt-muted-text" style={{ maxWidth: 620, margin: "20px auto 34px" }}>
-            Your giving helps us bless many across the globe. Simple and secure: give a single gift,
-            or schedule recurring giving using your debit or credit card. Every gift is processed
-            securely through Stripe.
-          </p>
-          <a className="bt-btn" href={BT.giveUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: "1.05rem", padding: "16px 34px" }}>
-            <IconGift size={20} /> Give to the Ministry
-          </a>
-          <p className="bt-muted-text" style={{ fontSize: "0.85rem", marginTop: 16 }}>
-            Opens the ministry&rsquo;s secure Stripe giving page in a new tab.
-          </p>
-        </div>
-      </section>
+      <BtPageHead
+        eyebrow="2 Corinthians 9:7"
+        title={<>God loves a <em style={{ fontStyle: "italic", color: "var(--bt-gold-deep)" }}>cheerful giver.</em></>}
+        lede="Your giving helps us bless many across the globe. Give a single gift, or schedule recurring giving with your debit or credit card. Every gift is processed securely through Stripe."
+        actions={
+          <>
+            <a className="bt-btn" href={BT.giveUrl} target="_blank" rel="noopener noreferrer"><IconGift size={19} /> Give to the ministry</a>
+            <a className="bt-btn bt-btn-outline" href={BT_LINKS.partners}>Become a partner</a>
+          </>
+        }
+      />
 
       {/* Give to your worship center */}
       <section className="bt-section">
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <SectionOrnament />
-          <h2 className="bt-h2" style={{ marginTop: 36 }}>Give to Your Worship Center</h2>
+                    <h2 className="bt-h2" style={{ marginTop: 36 }}>Give to Your Worship Center</h2>
           <p className="bt-lede bt-muted-text" style={{ maxWidth: 560, margin: "16px auto 0" }}>
             Support our mission in the way that works best for you. Give directly to the center you call home.
           </p>
@@ -93,7 +83,7 @@ export default async function GivePage({ params }: { params: Promise<PageParams>
       </section>
 
       {/* Reassurance band */}
-      <section style={{ background: "#F3EDDD", borderTop: "1px solid var(--bt-line)" }}>
+      <section style={{ background: "var(--bt-sunk)", borderTop: "1px solid var(--bt-line)" }}>
         <div className="bt-section-tight" style={{ textAlign: "center" }}>
           <p className="bt-lede bt-muted-text" style={{ maxWidth: 680, margin: "0 auto" }}>
             {BT.ministry}{" "}and Bible Teachers International are dedicated to reaching the globe
@@ -102,7 +92,7 @@ export default async function GivePage({ params }: { params: Promise<PageParams>
           </p>
           <p className="bt-muted-text" style={{ maxWidth: 640, margin: "18px auto 0" }}>
             Questions about giving, tithes, or receipts? Reach out through the{" "}
-            <a href="/connect" style={{ color: "var(--bt-gold-deep)", fontWeight: 700 }}>Connect page</a>{" "}
+            <a href="/next-steps#contact" style={{ color: "var(--bt-gold-deep)", fontWeight: 700 }}>Next Steps page</a>{" "}
             and your worship center&rsquo;s team will help.
           </p>
         </div>

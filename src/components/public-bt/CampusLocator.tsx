@@ -25,7 +25,7 @@ const MapSkeleton: React.FC = () => (
     style={{
       width: "100%", height: "100%", minHeight: 420,
       borderRadius: "var(--bt-radius-lg)",
-      background: "repeating-linear-gradient(45deg, #F3EDDD, #F3EDDD 12px, #FAF6EC 12px, #FAF6EC 24px)",
+      background: "var(--bt-sunk)",
       border: "1px solid var(--bt-line)",
       display: "flex", alignItems: "center", justifyContent: "center",
       color: "var(--bt-muted)", fontSize: "0.95rem"
@@ -126,7 +126,7 @@ export const CampusLocator: React.FC<Props> = ({ campuses, mapHeight = 640 }) =>
             style={{
               display: "inline-flex", alignItems: "center", gap: 8,
               fontWeight: 700, fontSize: "0.88rem", color: "var(--bt-gold-deep)",
-              background: "rgba(196,160,60,.1)", border: "1px solid rgba(196,160,60,.3)",
+              background: "var(--bt-gold-soft)", border: "1px solid rgba(184,145,42,.3)",
               borderRadius: 999, padding: "7px 16px"
             }}
           >

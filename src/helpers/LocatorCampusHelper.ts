@@ -17,6 +17,7 @@ import { cache } from "react";
 import { loadPublicCampuses, type PublicCampus } from "./PublicCampusHelper";
 import { getCampusExtras, isHiddenCampusSlug, BT_COUNTRY_ORDER } from "@/components/public-bt/btSiteContent";
 import type { LocatorCampus } from "@/components/public-bt/LeafletLocatorMap";
+import { firstPhoto, contentText } from "@/components/public-bt/campusContentTypes";
 
 export type { LocatorCampus };
 
@@ -57,6 +58,20 @@ const loadCampusContent = cache(async (churchId: string, campusId: string): Prom
 });
 
 /**
+ * Every center's resolved content in one call (GET .../campusContent/public/:churchId/all,
+ * added in the 2026-09 redesign). Resolves to null when the API predates it, so the
+ * per-campus reads above take over.
+ */
+const loadAllCampusContent = cache(async (churchId: string): Promise<Record<string, any> | null> => {
+  try {
+    const data = await ApiHelper.getAnonymous("/campusContent/public/" + churchId + "/all", "MembershipApi");
+    return data && typeof data === "object" && !Array.isArray(data) ? (data as Record<string, any>) : null;
+  } catch {
+    return null;
+  }
+});
+
+/**
  * Build the locator SSR props: every public worship center with address, country/flag,
  * and a short service-times label (API content first, in-repo extras as fallback).
  * Ordered by country (the fellowship's home regions first), then name. Never throws.
@@ -65,10 +80,14 @@ export const loadLocatorCampuses = cache(async (churchId: string): Promise<Locat
   if (!churchId) return [];
   const campuses = await loadPublicCampuses(churchId);
   const visible = campuses.filter((c) => !isHiddenCampusSlug(c.slug));
+  // Trust the bulk answer only when it is keyed by real campus ids: an API that predates
+  // the /all route matches it as /:churchId/:campusId="all" and returns a plain object.
+  const rawBulk = await loadAllCampusContent(churchId);
+  const bulk = rawBulk && visible.some((c) => Object.prototype.hasOwnProperty.call(rawBulk, c.id)) ? rawBulk : null;
 
   const built = await Promise.all(
     visible.map(async (c): Promise<LocatorCampus> => {
-      const content = await loadCampusContent(churchId, c.id);
+      const content = bulk ? (bulk[c.id] || {}) : await loadCampusContent(churchId, c.id);
       const extras = getCampusExtras(c.slug);
       // serviceTimes may be the array, absent, or the HIDDEN sentinel string — Array.isArray
       // narrows to the real list; the extras fill the gap when the API row is empty.
@@ -84,7 +103,11 @@ export const loadLocatorCampuses = cache(async (churchId: string): Promise<Locat
         serviceTimesLabel: formatServiceTimes(times),
         country: extras?.country || "United States",
         flag: extras?.flag || "📍",
-        virtual: extras?.virtual
+        virtual: extras?.virtual,
+        photo: firstPhoto(content),
+        leaders: contentText(content.leaders) || extras?.leaders || null,
+        phone: contentText(content.phone) || extras?.phone || null,
+        email: contentText(content.email) || extras?.email || null
       };
     })
   );

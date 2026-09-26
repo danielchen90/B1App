@@ -11,7 +11,7 @@ import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
 import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../btPageData";
 import { BtShell } from "@/components/public-bt/BtShell";
-import { SectionOrnament } from "@/components/public-bt/BtOrnaments";
+import { BtPageHead } from "@/components/public-bt/BtPageHead";
 import { BT, BT_COPY, BT_NATION_COUNT } from "@/components/public-bt/btSiteContent";
 import { IconPin, IconPlay, IconBook, IconHeart, IconGlobe, IconClock } from "@/components/public-bt/BtIcons";
 
@@ -64,33 +64,15 @@ export default async function AboutPage({ params }: { params: Promise<PageParams
 
   return (
     <BtShell config={config} campuses={navLinks}>
-      {/* Hero */}
-      <section className="bt-dark" style={{ position: "relative", overflow: "hidden", borderBottom: "1px solid var(--bt-line-dark)" }}>
-        <div
-          aria-hidden
-          style={{
-            position: "absolute", inset: 0,
-            backgroundImage:
-              "linear-gradient(180deg, rgba(18,16,11,0.88) 0%, rgba(18,16,11,0.7) 60%, rgba(18,16,11,0.95) 100%), url('/bt/gathering.jpg')",
-            backgroundSize: "cover", backgroundPosition: "center 35%"
-          }}
-        />
-        <div className="bt-section" style={{ position: "relative", textAlign: "center", paddingTop: 90, paddingBottom: 90 }}>
-          <div className="bt-eyebrow" style={{ justifyContent: "center" }}>Who We Are</div>
-          <h1 className="bt-display" style={{ fontSize: "clamp(2.5rem, 5.5vw, 4rem)", maxWidth: 860, margin: "20px auto 0" }}>
-            God&rsquo;s influence<br />
-            <em style={{ fontStyle: "italic", color: "var(--bt-gold-bright)" }}>in the earth.</em>
-          </h1>
-          <p className="bt-lede bt-muted-text" style={{ maxWidth: 620, margin: "20px auto 0" }}>
-            A voice of truth to gather the ignorant into the knowledge of God.
-          </p>
-        </div>
-      </section>
+      <BtPageHead
+        eyebrow="About"
+        title={<>God&rsquo;s influence <em style={{ fontStyle: "italic", color: "var(--bt-gold-deep)" }}>in the earth.</em></>}
+        lede="A voice of truth to gather the ignorant into the knowledge of God."
+      />
 
       {/* Mission */}
       <section className="bt-section" style={{ textAlign: "center" }}>
-        <SectionOrnament />
-        <div className="bt-eyebrow" style={{ justifyContent: "center", marginTop: 40 }}>Our Mission</div>
+                <div className="bt-eyebrow" style={{ justifyContent: "center", marginTop: 40 }}>Our Mission</div>
         <p
           style={{
             fontFamily: "var(--bt-display-font)", fontSize: "clamp(1.5rem, 3vw, 2.1rem)",
@@ -102,7 +84,7 @@ export default async function AboutPage({ params }: { params: Promise<PageParams
       </section>
 
       {/* Story */}
-      <section style={{ background: "#F3EDDD", borderTop: "1px solid var(--bt-line)", borderBottom: "1px solid var(--bt-line)" }}>
+      <section style={{ background: "var(--bt-sunk)", borderTop: "1px solid var(--bt-line)", borderBottom: "1px solid var(--bt-line)" }}>
         <div className="bt-section">
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 48, alignItems: "center" }}>
             <div
@@ -150,7 +132,7 @@ export default async function AboutPage({ params }: { params: Promise<PageParams
       </section>
 
       {/* What we believe */}
-      <section style={{ background: "#F3EDDD", borderTop: "1px solid var(--bt-line)", borderBottom: "1px solid var(--bt-line)" }}>
+      <section style={{ background: "var(--bt-sunk)", borderTop: "1px solid var(--bt-line)", borderBottom: "1px solid var(--bt-line)" }}>
         <div className="bt-section-tight" style={{ textAlign: "center" }}>
           <div className="bt-eyebrow" style={{ justifyContent: "center" }}>What We Believe</div>
           <p
@@ -178,8 +160,8 @@ export default async function AboutPage({ params }: { params: Promise<PageParams
             library of teaching reaching back decades are open to everyone, anywhere, at no cost.
           </p>
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap", marginTop: 32 }}>
-            <Link className="bt-btn" href="/sermons"><IconPlay size={17} /> Hear the Teaching</Link>
-            <a className="bt-btn bt-btn-ghost" href={BT.onlineChurchUrl} target="_blank" rel="noopener noreferrer">
+            <Link className="bt-btn" href="/watch"><IconPlay size={17} /> Hear the Teaching</Link>
+            <a className="bt-btn bt-btn-ghost" href="/locations/online-church">
               <IconGlobe size={17} /> Visit the Online Church
             </a>
           </div>
