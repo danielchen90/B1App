@@ -44,7 +44,7 @@ const CSS = `
 @media (max-width: 420px) { .bt-give-top { display: none !important; } }
 /* Phone widths: tighten the bar so the wordmark never runs under the actions. */
 @media (max-width: 400px) {
-  .bt-header-in { padding: 10px 12px; gap: 8px; }
+  .bt-header-in { padding: 10px 12px; padding-inline-end: 68px; gap: 8px; }
   .bt-actions { gap: 2px; }
   .bt-header .bt-brand-sub { letter-spacing: 0.14em !important; }
 }
