@@ -5,7 +5,9 @@
 import * as Sentry from "@sentry/nextjs";
 
 Sentry.init({
-  dsn: process.env.SENTRY_DSN ?? "https://862938d48d0a19a662dc97429cbce33f@o4510432524107776.ingest.us.sentry.io/4510435232514048",
+  // Off unless this deployment names its own Sentry project: the upstream default sent
+  // this site's errors and session replays to ChurchApps' Sentry.
+  dsn: process.env.SENTRY_DSN || undefined,
 
   // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
   tracesSampleRate: 1,

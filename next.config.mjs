@@ -60,11 +60,14 @@ const nextConfig = {
           ...config.optimization,
           splitChunks: {
             chunks: 'all',
+            // Each group is JS-only (type): letting CSS into these chunks made Next list a
+            // stylesheet as <script src="...css">, a syntax error on every page.
             cacheGroups: {
               default: false,
               vendors: false,
               // Vendor code splitting
               vendor: {
+                type: /javascript/,
                 name: 'vendor',
                 chunks: 'all',
                 test: /node_modules/,
@@ -72,6 +75,7 @@ const nextConfig = {
               },
               // MUI components
               mui: {
+                type: /javascript/,
                 name: 'mui',
                 test: /[\\/]node_modules[\\/]@mui[\\/]/,
                 chunks: 'all',
@@ -79,6 +83,7 @@ const nextConfig = {
               },
               // ChurchApps packages
               churchapps: {
+                type: /javascript/,
                 name: 'churchapps',
                 test: /[\\/]node_modules[\\/]@churchapps[\\/]/,
                 chunks: 'all',
@@ -86,6 +91,7 @@ const nextConfig = {
               },
               // Common components
               common: {
+                type: /javascript/,
                 name: 'common',
                 minChunks: 2,
                 priority: 10,
@@ -130,7 +136,26 @@ const nextConfig = {
   },
 
   async headers() {
+    // Baseline security headers on every response. The CSP is deliberately narrow (no
+    // script/style allowlist) so YouTube, Stripe, Leaflet tiles, Ask Mary and the Mary
+    // Banks ID sign-in keep working: it stops framing by other sites, plugins and <base>
+    // hijacking (HSTS keeps every request on https).
+    const securityHeaders = [
+      { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+      { key: 'X-Content-Type-Options', value: 'nosniff' },
+      { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+      { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+      { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self), payment=(self "https://js.stripe.com")' },
+      { key: 'Content-Security-Policy', value: "frame-ancestors 'self'; object-src 'none'; base-uri 'self'" },
+    ];
     return [
+      { source: '/:path*', headers: securityHeaders },
+      // Railway preview hosts must never be indexed.
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: '.*\\.railway\\.app' }],
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
       {
         source: '/sw.js',
         headers: [
