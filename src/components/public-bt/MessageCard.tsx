@@ -11,7 +11,9 @@ import { classifySermon } from "./btSiteContent";
 
 const fmtDate = (iso: string): string => {
   const d = new Date(iso);
-  return isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  // One time zone on server and browser (the ministry's), or evening visitors in the
+  // Americas get a different date than the server rendered and React re-renders the page.
+  return isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "America/New_York" });
 };
 
 const CSS = `

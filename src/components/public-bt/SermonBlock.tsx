@@ -26,7 +26,7 @@ const formatDate = (iso: string): string => {
   if (!iso) return "";
   const d = new Date(iso);
   if (isNaN(d.getTime())) return "";
-  return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+  return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "America/New_York" });
 };
 
 export const SermonBlock: React.FC<Props> = ({ sermon }) => {
