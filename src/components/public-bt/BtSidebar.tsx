@@ -54,7 +54,7 @@ export const BtSidebar: React.FC<Props> = ({ open, onClose, campuses }) => {
   const linkable = campuses.filter((c) => c.slug);
 
   return (
-    <div aria-hidden={!open} style={{ pointerEvents: open ? "auto" : "none" }}>
+    <div aria-hidden={!open} inert={!open} style={{ pointerEvents: open ? "auto" : "none" }}>
       {/* Scrim */}
       <div
         onClick={onClose}

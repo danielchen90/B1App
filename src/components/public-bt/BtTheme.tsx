@@ -81,7 +81,7 @@ body:has(.bt-root) { margin: 0; }
 .bt-eyebrow {
   display: inline-flex; align-items: center; gap: 10px;
   font-family: var(--bt-eyebrow-font); font-weight: 600; font-size: 0.74rem;
-  letter-spacing: 0.16em; text-transform: uppercase; color: var(--bt-gold-deep); }
+  letter-spacing: 0.16em; text-transform: uppercase; color: #7C5E10; }
 .bt-dark .bt-eyebrow { color: var(--bt-gold-bright); }
 
 /* ── Display sizes ── */
