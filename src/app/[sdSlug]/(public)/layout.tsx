@@ -8,6 +8,7 @@ import "@/styles/master-detail.css";
 import ClientLayout from "@/app/ClientLayout";
 import { PwaRegister } from "../mobile/PwaRegister";
 import { loadChurchAppearance } from "../mobile/loadChurchAppearance";
+import { isBtPublicSite } from "./(bt)/isBtSite";
 
 type LayoutParams = Promise<{ sdSlug: string }>;
 
@@ -24,13 +25,15 @@ export default async function PublicLayout({
   const { churchName } = await loadChurchAppearance(sdSlug);
 
   const appTitle = (churchName && churchName.trim()) || sdSlug || "Church";
-  const iconUrl = "/mobile/icon/192";
-  const iconUrl512 = "/mobile/icon/512";
+  // Bible Teachers ships its own mark; other churches get the generated app icon.
+  const isBt = isBtPublicSite(sdSlug);
+  const iconUrl = isBt ? "/bt/icon-192.png" : "/mobile/icon/192";
+  const iconUrl512 = isBt ? "/bt/icon-512.png" : "/mobile/icon/512";
 
   return (
     <>
       <link rel="manifest" href={`/manifest.webmanifest?church=${encodeURIComponent(sdSlug)}`} />
-      <link rel="apple-touch-icon" href={iconUrl} />
+      {!isBt && <link rel="apple-touch-icon" href={iconUrl} />}
       <link rel="apple-touch-icon" sizes="192x192" href={iconUrl} />
       <link rel="apple-touch-icon" sizes="512x512" href={iconUrl512} />
       <meta name="apple-mobile-web-app-capable" content="yes" />

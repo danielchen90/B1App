@@ -67,6 +67,7 @@ const BT_CSS = `
   font-family: var(--bt-body-font); font-size: 16.5px; line-height: 1.65;
   -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 .bt-root *, .bt-root *::before, .bt-root *::after { box-sizing: border-box; }
+body:has(.bt-root) { margin: 0; }
 .bt-root h1, .bt-root h2, .bt-root h3 {
   font-family: var(--bt-display-font); font-weight: 600; color: var(--bt-ink);
   letter-spacing: 0; line-height: 1.08; margin: 0; text-wrap: balance; }

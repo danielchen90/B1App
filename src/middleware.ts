@@ -96,5 +96,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 // Only run on page routes; skip Next internals, the API, the manifest/sw, and
 // anything with a file extension (static assets).
 export const config = {
-  matcher: ["/((?!_next/|api/|manifest\\.json|manifest\\.webmanifest|sw\\.js|.*\\.[\\w]+$).*)"]
+  // robots.txt and sitemap.xml are listed too so a custom domain gets its own church's.
+  matcher: ["/((?!_next/|api/|manifest\\.json|manifest\\.webmanifest|sw\\.js|.*\\.[\\w]+$).*)", "/robots.txt", "/sitemap.xml"]
 };

@@ -18,6 +18,7 @@ import Link from "next/link";
 import { ApiHelper } from "@churchapps/apphelper";
 import type { ConfigurationInterface } from "@/helpers/ConfigHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
+import { btSeo } from "@/components/public-bt/btSeo";
 import { loadSermonFeed, type FeedSermon } from "@/helpers/SermonFeedHelper";
 import { loadLocatorCampuses } from "@/helpers/LocatorCampusHelper";
 import { loadPublicEvents } from "@/helpers/PublicEventsHelper";
@@ -67,7 +68,7 @@ export async function buildBtMetadata(config: ConfigurationInterface): Promise<M
   const churchName = config.church?.name || BT.name;
   const { content } = await loadBtLandingData(config);
   const description = content.mission || BT_COPY.heroSub;
-  return MetaHelper.getMetaData(churchName + " | " + BT.tagline, description, description, config.appearance);
+  return btSeo(MetaHelper.getMetaData(churchName + " | " + BT.tagline, description, description, config.appearance), "/");
 }
 
 const CSS = `

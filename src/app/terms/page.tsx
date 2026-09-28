@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
-import { PolicyPage } from "@/components/policies/PolicyPage";
+import { SitePolicyPage, sitePolicyMetadata } from "@/components/policies/SitePolicyPage";
+import { requestSiteSlug } from "@/components/public-bt/requestSite";
 
-export const metadata: Metadata = { title: "Terms of Use" };
+// Served straight from the filesystem (ahead of the tenant rewrite), so the church is
+// read from the request host.
+export async function generateMetadata(): Promise<Metadata> {
+  return sitePolicyMetadata(await requestSiteSlug(), "terms");
+}
 
-export default function TermsPage() {
-  return <PolicyPage slug="terms" />;
+export default async function TermsPage() {
+  return <SitePolicyPage sdSlug={await requestSiteSlug()} slug="terms" />;
 }

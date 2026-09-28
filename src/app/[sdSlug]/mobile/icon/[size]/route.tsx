@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import sharp from "sharp";
 import { loadChurchAppearance } from "../../loadChurchAppearance";
+import { isBtPublicSite } from "@/app/[sdSlug]/(public)/(bt)/isBtSite";
 
 type Params = Promise<{ sdSlug: string; size: string }>;
 
@@ -17,6 +18,9 @@ export async function GET(_req: Request, { params }: { params: Params }) {
   if (n !== 192 && n !== 512) {
     return new Response("Not found", { status: 404 });
   }
+
+  // Bible Teachers ships its own mark in /public/bt.
+  if (isBtPublicSite(sdSlug)) return new Response(null, { status: 307, headers: { Location: "/bt/icon-" + n + ".png" } });
 
   const { churchName, primaryColor, favicon } = await loadChurchAppearance(sdSlug);
   const fallbackInitials = sdSlug.substring(0, 2).toUpperCase();

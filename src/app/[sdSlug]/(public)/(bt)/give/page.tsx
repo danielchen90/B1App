@@ -10,6 +10,7 @@ import React from "react";
 import type { Metadata } from "next";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
+import { btSeo } from "@/components/public-bt/btSeo";
 import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../btPageData";
 import { BtShell } from "@/components/public-bt/BtShell";
 import { BtPageHead } from "@/components/public-bt/BtPageHead";
@@ -42,7 +43,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const title = "Give | " + churchName;
   const description =
     "Your giving helps us bless many across the globe. Simple and secure online giving for " + churchName + " and for every worship center.";
-  return MetaHelper.getMetaData(title, description, description, config.appearance);
+  return btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/give");
 }
 
 export default async function GivePage({ params }: { params: Promise<PageParams> }) {

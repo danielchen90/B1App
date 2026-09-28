@@ -9,6 +9,7 @@ import React from "react";
 import type { Metadata } from "next";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
+import { btSeo } from "@/components/public-bt/btSeo";
 import { loadLocatorCampuses } from "@/helpers/LocatorCampusHelper";
 import { loadBtConfig, toLocationLinks } from "../btPageData";
 import { BtShell } from "@/components/public-bt/BtShell";
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const churchName = config.church?.name || BT.name;
   const title = "Next Steps | " + churchName;
   const description = "Plan a visit, request prayer, get baptized, join a discipleship class or serve at your " + churchName + " worship center. No account needed.";
-  return MetaHelper.getMetaData(title, description, description, config.appearance);
+  return btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/next-steps");
 }
 
 interface StepCopy {

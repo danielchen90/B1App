@@ -37,6 +37,8 @@ export async function generateMetadata({ params }: {params:PageParams}): Promise
       case "stream": title = Locale.label("pageSlug.liveStream"); break;
     }
   }
+  // No CMS page and no built-in page: the render is a 404, so say so (not "undefined - ...").
+  if (!title) return { title: "Page not found", robots: { index: false } };
   return MetaHelper.getMetaData(title + " - " + props.config.church.name, props.pageData.title, undefined, props.config.appearance);
 }
 

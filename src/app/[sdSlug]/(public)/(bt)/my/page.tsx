@@ -7,6 +7,7 @@ import { memberSignInEnabled } from "@/lib/memberSignIn";
 import type { Metadata } from "next";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
+import { btSeo } from "@/components/public-bt/btSeo";
 import { loadLocatorCampuses } from "@/helpers/LocatorCampusHelper";
 import { loadSermonFeed } from "@/helpers/SermonFeedHelper";
 import { loadDailyVerse } from "@/helpers/DailyVerseHelper";
@@ -21,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const { sdSlug } = await params;
   const config = await loadBtConfig(sdSlug);
   const meta = MetaHelper.getMetaData("My Church | " + (config.church?.name || BT.name), "Your worship center, classes, serving and giving.", "", config.appearance);
-  return { ...meta, robots: { index: false, follow: false } };
+  return { ...btSeo(meta, "/my"), robots: { index: false, follow: false } };
 }
 
 export default async function MyChurchPage({ params }: { params: Promise<PageParams> }) {

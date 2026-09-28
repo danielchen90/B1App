@@ -1,10 +1,14 @@
+import { isBtPublicSite } from "./[sdSlug]/(public)/(bt)/isBtSite";
 import { loadChurchAppearance } from "./[sdSlug]/mobile/loadChurchAppearance";
 
 export async function buildManifest(sdSlug: string) {
   const { churchName, primaryColor } = await loadChurchAppearance(sdSlug);
   const themeColor = primaryColor || "#0D47A1";
   const safeName = (churchName && churchName.trim()) || sdSlug || "Church";
-  const shortName = safeName.length > 12 ? safeName.substring(0, 12) : safeName;
+  const isBt = isBtPublicSite(sdSlug);
+  const shortName = isBt ? "Bible Teachers" : safeName.length > 12 ? safeName.substring(0, 12) : safeName;
+  const icon192 = isBt ? "/bt/icon-192.png" : "/mobile/icon/192";
+  const icon512 = isBt ? "/bt/icon-512.png" : "/mobile/icon/512";
 
   return {
     id: "/mobile/dashboard",
@@ -19,10 +23,10 @@ export async function buildManifest(sdSlug: string) {
     theme_color: themeColor,
     categories: ["lifestyle", "social"],
     icons: [
-      { src: "/mobile/icon/192", sizes: "192x192", type: "image/png", purpose: "any" },
-      { src: "/mobile/icon/512", sizes: "512x512", type: "image/png", purpose: "any" },
-      { src: "/mobile/icon/192", sizes: "192x192", type: "image/png", purpose: "maskable" },
-      { src: "/mobile/icon/512", sizes: "512x512", type: "image/png", purpose: "maskable" }
+      { src: icon192, sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: icon512, sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: icon192, sizes: "192x192", type: "image/png", purpose: "maskable" },
+      { src: icon512, sizes: "512x512", type: "image/png", purpose: "maskable" }
     ],
     screenshots: [
       {

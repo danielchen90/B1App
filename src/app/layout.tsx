@@ -2,6 +2,11 @@ import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { Roboto } from "next/font/google";
 import { AskMary } from "@/components/askMary/AskMary";
 import { memberSignInEnabled } from "@/lib/memberSignIn";
+import type { Metadata } from "next";
+import { isBtPublicSite } from "@/app/[sdSlug]/(public)/(bt)/isBtSite";
+import { requestSiteSlug } from "@/components/public-bt/requestSite";
+import { btSiteUrl, BT_ICONS } from "@/components/public-bt/btSeo";
+import { BT, BT_COPY } from "@/components/public-bt/btSiteContent";
 
 const roboto = Roboto({
   weight: ["400", "700"],
@@ -9,10 +14,22 @@ const roboto = Roboto({
   display: "swap"
 });
 
-export const metadata = {
-  title: "ChurchApps",
-  description: "Open Source Software for Churches"
-};
+export async function generateMetadata(): Promise<Metadata> {
+  // The Bible Teachers public site gets its own name, icons and title template on every
+  // route (policy pages, sign-in, the 404); other churches keep the stock defaults.
+  if (isBtPublicSite(await requestSiteSlug())) {
+    return {
+      metadataBase: new URL(btSiteUrl()),
+      title: { default: BT.name, template: "%s | " + BT.name },
+      description: BT_COPY.heroSub,
+      icons: BT_ICONS
+    };
+  }
+  return {
+    title: "ChurchApps",
+    description: "Open Source Software for Churches"
+  };
+}
 
 export const viewport = {
   width: "device-width",
@@ -30,7 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const apiBase = EnvironmentHelper.Common.MembershipApi.replace(/\/membership\/?$/, "");
 
   return (
-    <html className={roboto.className}>
+    <html lang="en" className={roboto.className}>
       <body>
         <script dangerouslySetInnerHTML={{ __html: "window.__API_BASE__=" + JSON.stringify(apiBase) + ";window.__BT_SIGNIN__=" + JSON.stringify(memberSignInEnabled()) + ";" }} />
         {children}

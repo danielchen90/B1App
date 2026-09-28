@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
-import { PolicyPage } from "@/components/policies/PolicyPage";
+import { SitePolicyPage, sitePolicyMetadata } from "@/components/policies/SitePolicyPage";
 
-export const metadata: Metadata = { title: "Cookie Policy" };
+type PageParams = Promise<{ sdSlug: string }>;
 
-export default function CookiesPage() {
-  return <PolicyPage slug="cookies" />;
+export async function generateMetadata({ params }: { params: PageParams }): Promise<Metadata> {
+  const { sdSlug } = await params;
+  return sitePolicyMetadata(sdSlug, "cookies");
+}
+
+export default async function CookiesPage({ params }: { params: PageParams }) {
+  const { sdSlug } = await params;
+  return <SitePolicyPage sdSlug={sdSlug} slug="cookies" />;
 }

@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
+import { btSeo } from "@/components/public-bt/btSeo";
 import { loadPublicEvents } from "@/helpers/PublicEventsHelper";
 import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../btPageData";
 import { BtShell } from "@/components/public-bt/BtShell";
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const churchName = config.church?.name || BT.name;
   const title = "Events | " + churchName;
   const description = "Conferences, revivals, classes and gatherings at every " + churchName + " worship center.";
-  return MetaHelper.getMetaData(title, description, description, config.appearance);
+  return btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/events");
 }
 
 export default async function EventsPage({ params }: { params: Promise<PageParams> }) {

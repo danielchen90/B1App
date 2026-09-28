@@ -9,6 +9,7 @@ import Link from "next/link";
 import { ApiHelper } from "@churchapps/apphelper";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
+import { btSeo } from "@/components/public-bt/btSeo";
 import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../btPageData";
 import { BtShell } from "@/components/public-bt/BtShell";
 import { BtPageHead } from "@/components/public-bt/BtPageHead";
@@ -33,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const churchName = config.church?.name || BT.name;
   const title = "About Us | " + churchName;
   const description = BT_COPY.mission;
-  return MetaHelper.getMetaData(title, description, description, config.appearance);
+  return btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/about");
 }
 
 const EXPECT = [
