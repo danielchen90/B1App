@@ -25,8 +25,9 @@ export const BtBrand: React.FC<Props> = ({ size = "sm", dark = false }) => {
         priority={size === "sm"}
         style={{ display: "block", borderRadius: "50%" }}
       />
-      <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.15 }}>
+      <span className="bt-brand-words" style={{ display: "flex", flexDirection: "column", lineHeight: 1.15 }}>
         <span
+          className="bt-brand-name"
           style={{
             fontFamily: "var(--bt-display-font)",
             fontWeight: 600,
@@ -39,6 +40,7 @@ export const BtBrand: React.FC<Props> = ({ size = "sm", dark = false }) => {
           Bible Teachers Int&rsquo;l
         </span>
         <span
+          className="bt-brand-sub"
           style={{
             fontFamily: "var(--bt-eyebrow-font)",
             fontWeight: 600,
