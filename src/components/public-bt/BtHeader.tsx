@@ -53,7 +53,7 @@ export const BtHeader: React.FC<Props> = ({ campuses, giveUrl }) => {
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <header className="bt-header">
         <div className="bt-header-in">
-          <Link href="/" aria-label="Bible Teachers International home">
+          <Link href="/">
             <BtBrand size="sm" />
           </Link>
 

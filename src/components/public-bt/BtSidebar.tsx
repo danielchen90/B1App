@@ -83,7 +83,7 @@ export const BtSidebar: React.FC<Props> = ({ open, onClose, campuses }) => {
       >
         {/* Head */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px", borderBottom: "1px solid var(--bt-line)" }}>
-          <Link href="/" onClick={onClose} aria-label="Home"><BtBrand size="sm" /></Link>
+          <Link href="/" onClick={onClose}><BtBrand size="sm" /></Link>
           <button
             type="button" onClick={onClose} aria-label="Close menu"
             style={{ background: "none", border: "1px solid var(--bt-line)", borderRadius: 8, color: "var(--bt-ink)", cursor: "pointer", padding: 8, display: "inline-flex" }}

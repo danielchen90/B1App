@@ -55,7 +55,7 @@ export const BtFooter: React.FC<Props> = ({ campuses = [], churchName }) => {
         >
           {/* Brand + verse */}
           <div style={{ maxWidth: 330 }}>
-            <Link href="/" aria-label="Home"><BtBrand size="sm" dark /></Link>
+            <Link href="/"><BtBrand size="sm" dark /></Link>
             <p style={{ marginTop: 18, color: "var(--bt-ondark-muted)", fontSize: "0.95rem", lineHeight: 1.7 }}>
               {BT_COPY.identity}
             </p>

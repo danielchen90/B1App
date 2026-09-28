@@ -16,7 +16,7 @@ export const BtBrand: React.FC<Props> = ({ size = "sm", dark = false }) => {
   const nameSize = size === "sm" ? "1.02rem" : "1.7rem";
   const subSize = size === "sm" ? "0.56rem" : "0.8rem";
   return (
-    <span aria-label="Bible Teachers International" style={{ display: "inline-flex", alignItems: "center", gap: size === "sm" ? 11 : 18 }}>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: size === "sm" ? 11 : 18 }}>
       <Image
         src="/bt/logo.png"
         alt=""

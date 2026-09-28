@@ -9,6 +9,7 @@
 // one fading in. prefers-reduced-motion shows the first photograph, still.
 
 import React from "react";
+import { preload } from "react-dom";
 import Link from "next/link";
 import type { LocatorCampus } from "./LeafletLocatorMap";
 import { LiveIndicator } from "./LiveIndicator";
@@ -93,6 +94,8 @@ interface Props {
 export const BtHomeHero: React.FC<Props> = ({ centers, physicalCount, nations, streamKey }) => {
   // Slide i is on top from i*STEP seconds into the cycle; negative delays start them mid-cycle.
   const delay = (i: number) => (i === 0 ? "0s" : `-${CYCLE - i * STEP}s`);
+  // The slides are CSS backgrounds, found late; fetch them with the document instead.
+  SLIDES.forEach((s, i) => preload(s.src, { as: "image", fetchPriority: i === 0 ? "high" : "low" }));
 
   return (
     <>

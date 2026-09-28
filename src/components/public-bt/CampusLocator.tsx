@@ -111,9 +111,12 @@ export const CampusLocator: React.FC<Props> = ({ campuses, mapHeight = 640 }) =>
     [sortByPosition]
   );
 
-  // Silent first attempt on mount; the button below retries loudly.
+  // Silent first attempt on mount, only when the visitor already allowed location for
+  // this site (no permission prompt on arrival); the button below asks and retries loudly.
   React.useEffect(() => {
-    locate(false);
+    const perms = typeof navigator !== "undefined" ? (navigator as any).permissions : undefined;
+    if (!perms?.query) return;
+    perms.query({ name: "geolocation" }).then((p: { state: string }) => { if (p.state === "granted") locate(false); }).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

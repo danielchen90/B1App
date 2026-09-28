@@ -114,6 +114,13 @@ body:has(.bt-root) { margin: 0; }
   background: transparent; color: var(--bt-ondark); box-shadow: inset 0 0 0 1.5px var(--bt-line-dark); }
 .bt-dark .bt-btn-outline:hover, .bt-dark .bt-btn-ghost:hover { background: rgba(240,191,76,.12); color: var(--bt-gold-bright); box-shadow: inset 0 0 0 1.5px var(--bt-gold); }
 .bt-btn-sm { min-height: 40px; padding: 8px 16px; font-size: 0.9rem; }
+/* .bt-root a { color: inherit } outranks the single-class button colours on links. */
+.bt-root .bt-btn { color: #1B1408; }
+.bt-root .bt-btn:hover { color: #fff; }
+.bt-root .bt-btn-outline, .bt-root .bt-btn-ghost,
+.bt-root .bt-btn-outline:hover, .bt-root .bt-btn-ghost:hover { color: var(--bt-ink); }
+.bt-root .bt-dark .bt-btn-outline, .bt-root .bt-dark .bt-btn-ghost { color: var(--bt-ondark); }
+.bt-root .bt-dark .bt-btn-outline:hover, .bt-root .bt-dark .bt-btn-ghost:hover { color: var(--bt-gold-bright); }
 .bt-root .bt-active { color: var(--bt-ink); }
 .bt-link { display: inline-flex; align-items: center; gap: 7px; color: var(--bt-gold-deep); font-weight: 600; }
 .bt-link:hover { color: var(--bt-ink); }
