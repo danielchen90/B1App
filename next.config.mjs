@@ -42,7 +42,7 @@ const nextConfig = {
   },
 
   // Module federation for code splitting
-  webpack: (config, { dev, isServer }) => {
+  webpack: (config) => {
     // OpenTelemetry (transitively pulled in by Sentry on the server) uses
     // dynamic require() expressions that webpack cannot statically resolve.
     // The runtime is fine; suppress the noisy "Critical dependency" warning.
@@ -54,54 +54,9 @@ const nextConfig = {
 
     // Only apply when not using Turbopack
     if (!process.env.TURBOPACK) {
-      // Optimize chunking strategy
-      if (!isServer) {
-        config.optimization = {
-          ...config.optimization,
-          splitChunks: {
-            chunks: 'all',
-            // Each group is JS-only (type): letting CSS into these chunks made Next list a
-            // stylesheet as <script src="...css">, a syntax error on every page.
-            cacheGroups: {
-              default: false,
-              vendors: false,
-              // Vendor code splitting
-              vendor: {
-                type: /javascript/,
-                name: 'vendor',
-                chunks: 'all',
-                test: /node_modules/,
-                priority: 20
-              },
-              // MUI components
-              mui: {
-                type: /javascript/,
-                name: 'mui',
-                test: /[\\/]node_modules[\\/]@mui[\\/]/,
-                chunks: 'all',
-                priority: 30
-              },
-              // ChurchApps packages
-              churchapps: {
-                type: /javascript/,
-                name: 'churchapps',
-                test: /[\\/]node_modules[\\/]@churchapps[\\/]/,
-                chunks: 'all',
-                priority: 25
-              },
-              // Common components
-              common: {
-                type: /javascript/,
-                name: 'common',
-                minChunks: 2,
-                priority: 10,
-                reuseExistingChunk: true,
-                enforce: true
-              }
-            }
-          }
-        };
-      }
+      // Chunking is left to Next's defaults. A custom scheme here put every node_modules
+      // package in one "vendor" chunk (about 5 MB of script on every page) and let
+      // stylesheets into script chunks, which Next then ran as JavaScript.
 
       // Handle cropperjs CSS import issue
       const cropperCssPath = "react-cropper/node_modules/cropperjs/dist/cropper.css";
