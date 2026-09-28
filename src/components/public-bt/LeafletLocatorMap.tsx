@@ -170,9 +170,9 @@ export const LeafletLocatorMap: React.FC<Props> = ({ campuses, activeId, onActiv
 
     if (plottable.length > 1) {
       const bounds = L.latLngBounds(plottable.map((c) => [c.lat as number, c.lng as number] as [number, number]));
-      map.fitBounds(bounds, { padding: [46, 46] });
+      map.fitBounds(bounds, { padding: [46, 46], animate: false });
     } else if (plottable.length === 1) {
-      map.setView([plottable[0].lat as number, plottable[0].lng as number], 11);
+      map.setView([plottable[0].lat as number, plottable[0].lng as number], 11, { animate: false });
     }
   }, [plottable]);
 

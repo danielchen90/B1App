@@ -89,9 +89,9 @@ export const LocationsMenu: React.FC<Props> = ({ campuses }) => {
           }}
         >
           {linkable.length === 0 && (
-            <div style={{ padding: "10px 12px", color: "var(--bt-muted)", fontSize: "0.9rem" }}>
-              Locations coming soon
-            </div>
+            <Link role="menuitem" href="/locations" style={{ display: "block", padding: "10px 12px", fontSize: "0.9rem" }}>
+              See all worship centers
+            </Link>
           )}
           {linkable.map((c) => (
             <Link

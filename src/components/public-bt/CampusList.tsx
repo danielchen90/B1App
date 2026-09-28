@@ -95,7 +95,7 @@ const Card: React.FC<{
 
 export const CampusList: React.FC<Props> = ({ campuses, byDistance, activeId, onHover, onSelect }) => {
   if (campuses.length === 0) {
-    return <p className="bt-muted-text">Worship-center locations are coming soon.</p>;
+    return <p className="bt-muted-text">The list of worship centers could not be loaded. Please try again shortly.</p>;
   }
 
   if (byDistance) {

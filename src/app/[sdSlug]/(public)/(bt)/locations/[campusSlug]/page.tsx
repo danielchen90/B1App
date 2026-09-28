@@ -17,6 +17,7 @@ import { notFound, redirect } from "next/navigation";
 import { ApiHelper } from "@churchapps/apphelper";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
+import { btSeo } from "@/components/public-bt/btSeo";
 import type { PublicCampus } from "@/helpers/PublicCampusHelper";
 import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../../btPageData";
 import { BtShell } from "@/components/public-bt/BtShell";
@@ -99,7 +100,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const resolved = await resolveCampusBySlug(churchId, campusSlug);
   const churchName = config.church?.name || BT.name;
 
-  if (!resolved) return MetaHelper.getMetaData(churchName, churchName, churchName, config.appearance);
+  if (!resolved) return { ...MetaHelper.getMetaData("Worship center not found | " + churchName, churchName, churchName, config.appearance), robots: { index: false } };
 
   const campus = resolved.campus;
   const content = await loadCampusContent(churchId, campus.id);
@@ -107,9 +108,9 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const locality = [campus.city, campus.state].filter(Boolean).join(", ");
   const description =
     str(content.welcomeNote) ||
-    ("Visit the " + campus.name + " worship center" + (locality ? " in " + locality : "") +
+    ("Visit the " + campus.name.replace(/^the\s+/i, "") + " worship center" + (locality ? " in " + locality : "") +
       ". Service times, directions, the latest message, and how to plan your visit.");
-  return MetaHelper.getMetaData(title, description, description, config.appearance);
+  return btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/locations/" + (campus.slug || campusSlug));
 }
 
 export default async function CampusDetailPage({ params }: { params: Promise<PageParams> }) {
@@ -226,7 +227,7 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
                 ))}
               </ul>
             ) : (
-              <p>Service times are coming soon. Send the team a note and they&rsquo;ll help you plan a visit.</p>
+              <p>Send the team a note for service times and they&rsquo;ll help you plan a visit.</p>
             )}
           </div>
           <div className="bt-card">

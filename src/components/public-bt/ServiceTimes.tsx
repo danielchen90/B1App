@@ -54,7 +54,7 @@ export const ServiceTimes: React.FC<Props> = ({ campusName, serviceTimes, addres
               ))}
             </ul>
           ) : (
-            <p style={{ color: "var(--bt-muted)" }}>Service times coming soon. Reach out and we&apos;ll help you plan a visit.</p>
+            <p style={{ color: "var(--bt-muted)" }}>Reach out for this center&apos;s service times and we&apos;ll help you plan a visit.</p>
           )}
         </div>
 

@@ -22,7 +22,7 @@ export const GiveButton: React.FC<Props> = ({ givingUrl, variant = "section" }) 
   if (!givingUrl) {
     // Core-always-show: no link yet → a non-link placeholder, never a hidden section.
     return variant === "section" ? (
-      <span style={{ color: "var(--bt-muted)" }}>Online giving is coming soon.</span>
+      <span style={{ color: "var(--bt-muted)" }}>To give, contact your worship center.</span>
     ) : null;
   }
 
