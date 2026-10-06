@@ -12,6 +12,7 @@
 // empty (mixed empty-state: core always visible).
 
 import React from "react";
+import { trackAttrs } from "@/lib/analytics";
 
 interface Props {
   givingUrl?: string | null;
@@ -36,6 +37,7 @@ export const GiveButton: React.FC<Props> = ({ givingUrl, variant = "section" }) 
       target="_blank"
       rel="noopener noreferrer"
       style={style}
+      {...trackAttrs("give_started", { method: "payment_link", placement: variant })}
     >
       Give
     </a>

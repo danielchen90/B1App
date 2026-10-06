@@ -20,6 +20,7 @@ import { MessageCard } from "@/components/public-bt/MessageCard";
 import { MessageLibrary } from "@/components/public-bt/MessageLibrary";
 import { BT } from "@/components/public-bt/btSiteContent";
 import { IconYouTube, IconLive, IconArrowRight } from "@/components/public-bt/BtIcons";
+import { trackAttrs } from "@/lib/analytics";
 
 type PageParams = { sdSlug: string };
 
@@ -54,7 +55,7 @@ export default async function WatchPage({ params }: { params: Promise<PageParams
         lede={"Sunday worship, weeknight discipleship and live prayer with " + BT.founder + " and the ministry's teachers, streamed every week and kept here for whenever you're ready to study."}
         actions={
           <>
-            <a className="bt-btn" href={BT.youtubeUrl + "/live"} target="_blank" rel="noopener noreferrer"><IconLive size={18} /> Watch live</a>
+            <a className="bt-btn" href={BT.youtubeUrl + "/live"} target="_blank" rel="noopener noreferrer" {...trackAttrs("live_service_joined", { service_id: "youtube_live", placement: "watch_page" })}><IconLive size={18} /> Watch live</a>
             <a className="bt-btn bt-btn-outline" href={BT.youtubeUrl + "?sub_confirmation=1"} target="_blank" rel="noopener noreferrer"><IconYouTube size={18} /> Subscribe on YouTube</a>
           </>
         }
@@ -76,7 +77,7 @@ export default async function WatchPage({ params }: { params: Promise<PageParams
         <section className="bt-band">
           <div className="bt-section-tight" style={{ maxWidth: 980 }}>
             <div className="bt-eyebrow" style={{ marginBottom: 14 }}>The latest message</div>
-            <MessageCard sermon={latest} feature />
+            <MessageCard sermon={latest} feature placement="watch_latest" />
           </div>
         </section>
       )}

@@ -6,6 +6,7 @@ import React from "react";
 import Link from "next/link";
 import type { PublicEvent } from "@/helpers/PublicEventsHelper";
 import { IconPin, IconArrowRight } from "./BtIcons";
+import { trackAttrs } from "@/lib/analytics";
 
 const CSS = `
 .bt-ev { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
@@ -57,7 +58,7 @@ export const EventCards: React.FC<{ events: PublicEvent[]; limit?: number; showC
               )}
               {e.description && <p className="bt-ev-desc">{e.description}</p>}
               {e.registrationUrl && (
-                <a className="bt-link" style={{ marginTop: 8 }} href={e.registrationUrl}>Register <IconArrowRight size={14} /></a>
+                <a className="bt-link" style={{ marginTop: 8 }} href={e.registrationUrl} {...trackAttrs("event_registration_clicked", { event_id: e.id, event_title: e.title, church_id: e.campusId || null })}>Register <IconArrowRight size={14} /></a>
               )}
             </div>
           </article>

@@ -18,6 +18,7 @@ import { BT, BT_LINKS, getCampusExtras } from "@/components/public-bt/btSiteCont
 import { IconGift, IconArrowRight } from "@/components/public-bt/BtIcons";
 import { GiveEmbed, type GiveFund } from "@/components/public-bt/GiveEmbed";
 import { ApiHelper } from "@churchapps/apphelper";
+import { trackAttrs } from "@/lib/analytics";
 
 /** Online giving is live once the church has a payment gateway and at least one fund. */
 const loadGiving = async (churchId: string): Promise<{ enabled: boolean; funds: GiveFund[] }> => {
@@ -74,7 +75,7 @@ export default async function GivePage({ params }: { params: Promise<PageParams>
           <>
             {giving.enabled
               ? <a className="bt-btn" href="#give-now"><IconGift size={19} /> Give now</a>
-              : <a className="bt-btn" href={BT.giveUrl} target="_blank" rel="noopener noreferrer"><IconGift size={19} /> Give to the ministry</a>}
+              : <a className="bt-btn" href={BT.giveUrl} target="_blank" rel="noopener noreferrer" {...trackAttrs("give_started", { method: "payment_link", fund_name: "ministry", placement: "give_page" })}><IconGift size={19} /> Give to the ministry</a>}
             <a className="bt-btn bt-btn-outline" href={BT_LINKS.partners}>Become a partner</a>
           </>
         }
@@ -102,6 +103,7 @@ export default async function GivePage({ params }: { params: Promise<PageParams>
               href={c.url}
               target="_blank"
               rel="noopener noreferrer"
+              {...trackAttrs("give_started", { method: "payment_link", fund_name: c.name, placement: "give_page" })}
               style={{ padding: "16px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}
             >
               <span style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 700 }}>

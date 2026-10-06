@@ -8,6 +8,7 @@
 import React from "react";
 import type { FeedSermon } from "@/helpers/SermonFeedHelper";
 import { classifySermon } from "./btSiteContent";
+import { track } from "@/lib/analytics";
 
 const fmtDate = (iso: string): string => {
   const d = new Date(iso);
@@ -30,7 +31,16 @@ const CSS = `
 .bt-msg-sub { font-size: .9rem; color: var(--bt-muted); }
 `;
 
-export const MessageCard: React.FC<{ sermon: FeedSermon; feature?: boolean }> = ({ sermon, feature = false }) => {
+interface Props {
+  sermon: FeedSermon;
+  feature?: boolean;
+  /** Where the card sits, for analytics (watch_latest, library, center_page, my_church). */
+  placement?: string;
+  /** The worship center whose page shows it, if any. */
+  churchId?: string;
+}
+
+export const MessageCard: React.FC<Props> = ({ sermon, feature = false, placement, churchId }) => {
   const [playing, setPlaying] = React.useState(false);
   const meta = classifySermon(sermon.title);
   const thumb = feature ? `https://i.ytimg.com/vi/${sermon.videoId}/maxresdefault.jpg` : sermon.thumbnail;
@@ -52,7 +62,11 @@ export const MessageCard: React.FC<{ sermon: FeedSermon; feature?: boolean }> = 
           type="button"
           className="bt-msg-frame"
           aria-label={"Play " + sermon.title}
-          onClick={() => setPlaying(true)}
+          onClick={() => {
+            setPlaying(true);
+            const where = placement || (feature ? "latest" : "library");
+            track("sermon_played", { video_id: sermon.videoId, video_title: sermon.title, series: meta.series || null, speaker: meta.speaker || null, church_id: churchId || null, placement: where });
+          }}
           style={{ backgroundImage: `url('${thumb}'), url('${sermon.thumbnail}')` }}
         >
           <span className="bt-msg-play" aria-hidden>

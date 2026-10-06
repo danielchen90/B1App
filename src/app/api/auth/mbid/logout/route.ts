@@ -14,7 +14,7 @@ export async function GET(req: Request) {
   end.searchParams.set("post_logout_redirect_uri", origin + "/");
   if (hint) end.searchParams.set("id_token_hint", hint);
   const res = NextResponse.redirect(end.toString(), 302);
-  for (const name of ["jwt", "name", "email", "lastChurchId", "bt_member"]) res.cookies.set(name, "", { path: "/", maxAge: 0 });
+  for (const name of ["jwt", "name", "email", "lastChurchId", "bt_member", "bt_mbid"]) res.cookies.set(name, "", { path: "/", maxAge: 0 });
   res.cookies.set("mbid_hint", "", { path: "/api/auth/mbid", maxAge: 0 });
   return res;
 }

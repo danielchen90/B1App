@@ -28,6 +28,8 @@ import { MessageCard } from "@/components/public-bt/MessageCard";
 import { EventCards } from "@/components/public-bt/EventCards";
 import { PhotoGallery } from "@/components/public-bt/PhotoGallery";
 import { MakeMyCenter } from "@/components/public-bt/CenterActions";
+import { TrackOnView } from "@/components/public-bt/BtAnalytics";
+import { trackAttrs } from "@/lib/analytics";
 import { NextStepForm } from "@/components/public-bt/forms/NextStepForm";
 import { loadSermonFeed } from "@/helpers/SermonFeedHelper";
 import { loadPublicEvents } from "@/helpers/PublicEventsHelper";
@@ -162,6 +164,8 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
   const directionsUrl = "https://www.google.com/maps/dir/?api=1&destination=" +
     encodeURIComponent([campus.address1, campus.city, campus.state, campus.zip].filter(Boolean).join(", ") || campus.name);
   const thisCenter = [{ id: campus.id, slug: campus.slug, name: campus.name, virtual }];
+  // Analytics: the same church properties on every event from this page.
+  const churchProps = { church_id: campus.id, church_slug: campus.slug || "", church_name: campus.name, city: campus.city || "", country: extras?.country || "", virtual };
 
   const CSS = `
 .bt-ch { border-bottom: 1px solid var(--bt-line); background: var(--bt-ivory); }
@@ -185,6 +189,7 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
   return (
     <BtShell config={config} campuses={navLinks} giveUrl={giveUrl}>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
+      <TrackOnView event="church_viewed" props={churchProps} />
 
       {/* (1) Hero: the center's own photo, name, pastor, times, and what to do next */}
       <section className="bt-ch">
@@ -205,9 +210,9 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 22 }}>
               {virtual
-                ? (website ? <a className="bt-btn" href={website} target="_blank" rel="noopener noreferrer">Join the Online Church</a> : <a className="bt-btn" href="#visit">Join us</a>)
+                ? (website ? <a className="bt-btn" href={website} target="_blank" rel="noopener noreferrer" {...trackAttrs("online_church_joined", { ...churchProps, placement: "center_page" })}>Join the Online Church</a> : <a className="bt-btn" href="#visit">Join us</a>)
                 : <a className="bt-btn" href="#visit">Plan your visit</a>}
-              {!virtual && <a className="bt-btn bt-btn-outline" href={directionsUrl} target="_blank" rel="noopener noreferrer"><IconPin size={17} /> Directions</a>}
+              {!virtual && <a className="bt-btn bt-btn-outline" href={directionsUrl} target="_blank" rel="noopener noreferrer" {...trackAttrs("church_directions_clicked", { ...churchProps, placement: "center_page" })}><IconPin size={17} /> Directions</a>}
               {campus.slug && <MakeMyCenter slug={campus.slug} name={campus.name} />}
             </div>
           </div>
@@ -240,9 +245,9 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
               {!virtual && (campus.address1 || cityLine.trim()) && (
                 <address style={{ fontStyle: "normal" }}>{campus.address1}{campus.address1 && <br />}{cityLine}</address>
               )}
-              {phone && <a href={"tel:" + phone.replace(/[^+\d]/g, "")}><IconPhone size={16} /> {phone}</a>}
-              {email && <a href={"mailto:" + email}><IconMail size={16} /> {email}</a>}
-              {website && <a href={website} target="_blank" rel="noopener noreferrer"><IconGlobe size={16} /> {website.replace(/^https?:\/\/(www\.)?/, "")}</a>}
+              {phone && <a href={"tel:" + phone.replace(/[^+\d]/g, "")} {...trackAttrs("church_contact_clicked", { ...churchProps, method: "phone" })}><IconPhone size={16} /> {phone}</a>}
+              {email && <a href={"mailto:" + email} {...trackAttrs("church_contact_clicked", { ...churchProps, method: "email" })}><IconMail size={16} /> {email}</a>}
+              {website && <a href={website} target="_blank" rel="noopener noreferrer" {...trackAttrs(virtual ? "online_church_joined" : "church_contact_clicked", { ...churchProps, method: "website", placement: "contacts" })}><IconGlobe size={16} /> {website.replace(/^https?:\/\/(www\.)?/, "")}</a>}
             </div>
             <SocialLinks
               facebookUrl={str(content.facebookUrl) || extras?.facebookUrl || null}
@@ -281,7 +286,7 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
           {sermon && (
             <div>
               <div className="bt-eyebrow" style={{ marginBottom: 12 }}>The latest message</div>
-              <MessageCard sermon={sermon} feature />
+              <MessageCard sermon={sermon} feature placement="center_page" churchId={campus.id} />
             </div>
           )}
           <div className="bt-card" style={{ padding: 26, display: "grid", gap: 12, alignContent: "start" }}>

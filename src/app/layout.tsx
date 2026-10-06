@@ -7,6 +7,7 @@ import { isBtPublicSite } from "@/app/[sdSlug]/(public)/(bt)/isBtSite";
 import { requestSiteSlug } from "@/components/public-bt/requestSite";
 import { btSiteUrl, BT_ICONS } from "@/components/public-bt/btSeo";
 import { BT, BT_COPY } from "@/components/public-bt/btSiteContent";
+import { BtAnalytics } from "@/components/public-bt/BtAnalytics";
 
 const roboto = Roboto({
   weight: ["400", "700"],
@@ -45,6 +46,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // base the server resolved at runtime; EnvironmentHelper.init applies it before any
   // client call is configured.
   const apiBase = EnvironmentHelper.Common.MembershipApi.replace(/\/membership\/?$/, "");
+  // Mary Banks analytics on every Bible Teachers route (policy pages, sign-in and the 404 too).
+  const isBt = isBtPublicSite(await requestSiteSlug());
 
   return (
     <html lang="en" className={roboto.className}>
@@ -52,6 +55,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script dangerouslySetInnerHTML={{ __html: "window.__API_BASE__=" + JSON.stringify(apiBase) + ";window.__BT_SIGNIN__=" + JSON.stringify(memberSignInEnabled()) + ";" }} />
         {children}
         <AskMary />
+        {isBt && <BtAnalytics />}
       </body>
     </html>
   );

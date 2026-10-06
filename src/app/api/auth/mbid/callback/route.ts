@@ -86,6 +86,12 @@ export async function GET(req: Request) {
   res.cookies.set(FLOW_COOKIE, "", { path: "/api/auth/mbid", maxAge: 0 });
   // Display-only: lets the header show the member's initial. Not a credential.
   res.cookies.set("bt_member", encodeURIComponent(firstName || "Member"), { path: "/", sameSite: "lax", secure: origin.startsWith("https://"), maxAge: 60 * 60 * 24 * 30 });
+  // Analytics only (lib/analytics.ts): the Mary Banks ID subject, the one id a person has on
+  // every Mary Banks site, and a one-time flag that a sign-in just finished. Not credentials.
+  if (typeof claims.sub === "string" && claims.sub) {
+    res.cookies.set("bt_mbid", claims.sub, { path: "/", sameSite: "lax", secure: origin.startsWith("https://"), maxAge: 60 * 60 * 24 * 30 });
+    if (flow.target !== "admin") res.cookies.set("bt_signed_in", "1", { path: "/", sameSite: "lax", secure: origin.startsWith("https://"), maxAge: 60 * 10 });
+  }
   // Kept for sign-out, so Mary Banks ID can end its own session too.
   res.cookies.set("mbid_hint", idToken, { path: "/api/auth/mbid", httpOnly: true, sameSite: "lax", secure: origin.startsWith("https://"), maxAge: 60 * 60 * 24 * 30 });
   return res;

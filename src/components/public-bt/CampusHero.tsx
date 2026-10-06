@@ -4,6 +4,7 @@
 
 import React from "react";
 import { LiveIndicator } from "./LiveIndicator";
+import { trackAttrs } from "@/lib/analytics";
 
 interface Props {
   campusName: string;
@@ -84,7 +85,7 @@ export const CampusHero: React.FC<Props> = ({
         <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
           <a className="bt-btn" href="#visit">Plan Your Visit</a>
           {giveUrl && (
-            <a className="bt-btn bt-btn-ghost" href={giveUrl} target="_blank" rel="noopener noreferrer">
+            <a className="bt-btn bt-btn-ghost" href={giveUrl} target="_blank" rel="noopener noreferrer" {...trackAttrs("give_started", { method: "payment_link", placement: "center_hero" })}>
               Give
             </a>
           )}

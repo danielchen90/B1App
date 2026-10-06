@@ -7,6 +7,7 @@
 
 import React from "react";
 import { ApiHelper } from "@churchapps/apphelper";
+import { track } from "@/lib/analytics";
 import type { MePerson } from "./MyChurch";
 import type { LocatorCampus } from "../LeafletLocatorMap";
 
@@ -41,6 +42,13 @@ export const ProfileCard: React.FC<Props> = ({ person, household, centers, onSav
     try {
       await ApiHelper.post("/me/person", form, "MembershipApi");
       setStatus("saved");
+      // Which kinds of detail changed, never the values themselves.
+      const changed = FIELDS.map(([k]) => k as string).filter((k) => (form[k] || "") !== ((person?.[k as keyof MePerson] as string) || ""));
+      track("profile_updated", { section: "details", fields: changed, center_changed: (form.campusId || "") !== (person?.campusId || "") });
+      if (form.campusId && form.campusId !== (person?.campusId || "")) {
+        const c = centers.find((x) => x.id === form.campusId);
+        track("center_chosen", { church_id: form.campusId, church_slug: c?.slug || null, church_name: c?.name || null, country: c?.country || null, method: "profile" });
+      }
       setEditing(false);
       onSaved();
     } catch {

@@ -135,10 +135,10 @@ export const BtLanding: React.FC<{ config: ConfigurationInterface }> = async ({ 
               <Link className="bt-link" href="/watch">All messages <IconArrowRight size={15} /></Link>
             </div>
             <div className="bt-msgs">
-              <MessageCard sermon={latest} feature />
+              <MessageCard sermon={latest} feature placement="home_latest" />
               {recent.length > 0 && (
                 <div className="bt-msgs-side">
-                  {recent.map((s) => <MessageCard key={s.videoId} sermon={s} />)}
+                  {recent.map((s) => <MessageCard key={s.videoId} sermon={s} placement="home_recent" />)}
                 </div>
               )}
             </div>

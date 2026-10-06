@@ -8,6 +8,7 @@ import React from "react";
 import type { FeedSermon } from "@/helpers/SermonFeedHelper";
 import { MessageCard } from "./MessageCard";
 import { classifySermon } from "./btSiteContent";
+import { track } from "@/lib/analytics";
 
 export const MessageLibrary: React.FC<{ sermons: FeedSermon[] }> = ({ sermons }) => {
   const [filter, setFilter] = React.useState<{ kind: "series" | "speaker"; value: string } | null>(null);
@@ -30,7 +31,10 @@ export const MessageLibrary: React.FC<{ sermons: FeedSermon[] }> = ({ sermons })
         type="button"
         className="bt-chip"
         aria-pressed={on}
-        onClick={() => setFilter(on ? null : { kind, value })}
+        onClick={() => {
+          setFilter(on ? null : { kind, value });
+          if (!on) track("message_library_filtered", { filter_kind: kind, filter_value: value, result_count: n });
+        }}
         style={on ? { background: "var(--bt-ink)", color: "#fff", boxShadow: "none" } : undefined}
       >
         {value} <span style={{ opacity: 0.6 }}>{n}</span>
@@ -57,7 +61,7 @@ export const MessageLibrary: React.FC<{ sermons: FeedSermon[] }> = ({ sermons })
         </div>
       )}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 26 }}>
-        {shown.map(({ s }) => <MessageCard key={s.videoId} sermon={s} />)}
+        {shown.map(({ s }) => <MessageCard key={s.videoId} sermon={s} placement="library" />)}
       </div>
     </div>
   );

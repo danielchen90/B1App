@@ -8,6 +8,7 @@ import React from "react";
 import type { PublicEvent } from "@/helpers/PublicEventsHelper";
 import { EventCards } from "./EventCards";
 import { useSavedCenter } from "./MyCenter";
+import { track } from "@/lib/analytics";
 
 export const EventsBrowser: React.FC<{ events: PublicEvent[] }> = ({ events }) => {
   const [saved] = useSavedCenter();
@@ -30,7 +31,10 @@ export const EventsBrowser: React.FC<{ events: PublicEvent[] }> = ({ events }) =
                 type="button"
                 className="bt-chip"
                 aria-pressed={on}
-                onClick={() => setFilter(slug || null)}
+                onClick={() => {
+                  setFilter(slug || null);
+                  track("events_filtered", { church_slug: slug || "all", own_center: !!slug && slug === saved });
+                }}
                 style={on ? { background: "var(--bt-ink)", color: "#fff", boxShadow: "none" } : undefined}
               >
                 {name}{slug && slug === saved ? " (your center)" : ""}

@@ -11,6 +11,7 @@ import React from "react";
 import Link from "next/link";
 import type { LocatorCampus } from "./LeafletLocatorMap";
 import { IconPin, IconClock, IconUser, IconArrowRight, IconGlobe } from "./BtIcons";
+import { track } from "@/lib/analytics";
 
 const KEY = "bt.center";
 
@@ -89,13 +90,18 @@ export const MyCenter: React.FC<Props> = ({ centers }) => {
           const km = haversineKm(pos.coords.latitude, pos.coords.longitude, c.lat as number, c.lng as number);
           if (km < bestKm) { best = c; bestKm = km; }
         }
+        track("church_search_performed", { method: "geolocation", scope: "home_card", result_count: physical.length, nearest_church_id: best?.id || null, nearest_km: best ? Math.round(bestKm) : null });
         if (best?.slug) {
           saveCenter(best.slug);
+          track("center_chosen", { church_id: best.id, church_slug: best.slug, church_name: best.name, country: best.country, method: "nearest" });
           setPicking(false);
           if (bestKm > 160) setNote("That's our closest center, about " + Math.round(bestKm * 0.621) + " miles away. The Online Church gathers from anywhere, too.");
         }
       },
-      () => { setLocating(false); setNote("We couldn't get your location. Choose your center from the list instead."); setPicking(true); },
+      () => {
+        setLocating(false); setNote("We couldn't get your location. Choose your center from the list instead."); setPicking(true);
+        track("church_search_failed", { method: "geolocation", scope: "home_card" });
+      },
       { enableHighAccuracy: false, timeout: 9000, maximumAge: 600000 }
     );
   };
@@ -125,7 +131,12 @@ export const MyCenter: React.FC<Props> = ({ centers }) => {
               className="bt-field"
               style={{ width: "auto", minHeight: 48 }}
               value=""
-              onChange={(e) => { if (e.target.value) { saveCenter(e.target.value); setPicking(false); setNote(null); } }}
+              onChange={(e) => {
+                if (!e.target.value) return;
+                const picked = centers.find((c) => c.slug === e.target.value);
+                saveCenter(e.target.value); setPicking(false); setNote(null);
+                track("center_chosen", { church_id: picked?.id || null, church_slug: e.target.value, church_name: picked?.name || null, country: picked?.country || null, method: "list" });
+              }}
             >
               <option value="">Or choose from the list</option>
               {centers.filter((c) => c.slug).map((c) => (
@@ -162,7 +173,11 @@ export const MyCenter: React.FC<Props> = ({ centers }) => {
           {center.leaders && <div className="bt-mc-row"><IconUser size={17} /><span>{center.leaders}</span></div>}
           <div className="bt-mc-row">{center.virtual ? <IconGlobe size={17} /> : <IconPin size={17} />}<span>{center.address}</span></div>
           <div className="bt-mc-actions">
-            <Link className="bt-btn bt-btn-sm" href={center.virtual ? href : "/next-steps?center=" + center.slug + "#visit"}>
+            <Link
+              className="bt-btn bt-btn-sm"
+              href={center.virtual ? href : "/next-steps?center=" + center.slug + "#visit"}
+              onClick={() => { if (center.virtual) track("online_church_joined", { church_id: center.id, church_slug: center.slug || "", placement: "home_card" }); }}
+            >
               {center.virtual ? "Join the Online Church" : "Plan your visit"}
             </Link>
             <Link className="bt-link" href={href}>Center page <IconArrowRight size={15} /></Link>

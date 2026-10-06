@@ -26,6 +26,7 @@ import { SignedOutCard } from "./SignedOutCard";
 import { MessageCard } from "../MessageCard";
 import { saveCenter } from "../MyCenter";
 import { BT_LINKS } from "../btSiteContent";
+import { identify, mbidSubject, track, trackAttrs } from "@/lib/analytics";
 import {
   IconPlay, IconCalendar, IconGift, IconStep, IconHeart, IconUsers, IconHands, IconMail, IconPin, IconClock,
   IconChevronRight, IconBell, IconAward, IconCheck, IconLive
@@ -157,9 +158,30 @@ export const MyChurch: React.FC<Props> = ({ subDomain, churchId, centers, latest
       .then((c) => setAnnouncements(Array.isArray(c?.announcements) ? c!.announcements! : []));
   }, [center?.id, churchId]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Analytics: the member's Mary Banks ID with what My Church knows (role, center, partner).
+  React.useEffect(() => {
+    const sub = mbidSubject();
+    if (!sub || !me) return;
+    const staff = !!(me.staff?.isAdmin || (me.staff?.campuses || []).length > 0);
+    identify({
+      id: sub,
+      email: me.user?.email,
+      name: [me.user?.firstName, me.user?.lastName].filter(Boolean).join(" "),
+      role: staff ? "staff" : "member",
+      is_staff: staff,
+      church_id: me.person?.campusId || null,
+      church_name: me.person?.campusName || null,
+      membership_status: me.person?.membershipStatus || null,
+      partner_tier: me.partner?.tier || null,
+      record_linked: !!me.person
+    });
+  }, [me]);
+
   const claim = async (personId: string, name: string) => {
     try {
       const r: any = await ApiHelper.post("/me/claim", { personId }, "MembershipApi");
+      const claimed = (me?.candidates || []).find((c) => c.personId === personId);
+      track("member_joined", { method: "record_claim", status: r?.linked ? "linked" : "pending_review", church_name: claimed?.campusName || null });
       if (r?.linked) { window.location.reload(); return; }
       setClaimNote("Thanks. That record belongs to another account, so your center's team will check it and link it for you.");
       await reload();
@@ -286,7 +308,7 @@ export const MyChurch: React.FC<Props> = ({ subDomain, churchId, centers, latest
               {center && (
                 <div className="myd-hero-links">
                   <Link href={"/locations/" + center.slug}><IconPin size={14} /> Center page</Link>
-                  {!center.virtual && <a href={"https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(center.address)} target="_blank" rel="noopener noreferrer"><IconStep size={14} /> Directions</a>}
+                  {!center.virtual && <a href={"https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(center.address)} target="_blank" rel="noopener noreferrer" {...trackAttrs("church_directions_clicked", { church_id: center.id, church_slug: center.slug || "", country: center.country, placement: "my_church" })}><IconStep size={14} /> Directions</a>}
                   <Link href={"/give?center=" + encodeURIComponent(center.slug || "") + "#give-now"}><IconGift size={14} /> Give to {center.name}</Link>
                 </div>
               )}
@@ -441,7 +463,7 @@ export const MyChurch: React.FC<Props> = ({ subDomain, churchId, centers, latest
         {latest && (
           <Card>
             <CardHead title="The latest message" href="/watch" linkLabel="All messages" />
-            <MessageCard sermon={latest} />
+            <MessageCard sermon={latest} placement="my_church" />
           </Card>
         )}
         <Card>

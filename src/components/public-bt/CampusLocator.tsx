@@ -13,6 +13,7 @@ import React from "react";
 import dynamic from "next/dynamic";
 import { CampusList } from "./CampusList";
 import type { LocatorCampus } from "./LeafletLocatorMap";
+import { track } from "@/lib/analytics";
 
 const LeafletLocatorMap = dynamic(() => import("./LeafletLocatorMap"), {
   ssr: false,
@@ -84,6 +85,7 @@ export const CampusLocator: React.FC<Props> = ({ campuses, mapHeight = 640 }) =>
       setUserPos({ lat, lng });
       const nearest = stamped.find((c) => typeof c.distanceKm === "number");
       if (nearest && typeof nearest.lat === "number") setActiveId(nearest.id);
+      return nearest;
     },
     [campuses]
   );
@@ -98,17 +100,20 @@ export const CampusLocator: React.FC<Props> = ({ campuses, mapHeight = 640 }) =>
       setGeoError(null);
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          sortByPosition(pos.coords.latitude, pos.coords.longitude);
+          const nearest = sortByPosition(pos.coords.latitude, pos.coords.longitude);
           setLocating(false);
+          const nearestKm = typeof nearest?.distanceKm === "number" ? Math.round(nearest.distanceKm) : null;
+          track("church_search_performed", { method: "geolocation", scope: "locator", automatic: !announceErrors, result_count: campuses.filter((c) => !c.virtual).length, nearest_church_id: nearest?.id || null, nearest_km: nearestKm });
         },
         () => {
           setLocating(false);
+          if (announceErrors) track("church_search_failed", { method: "geolocation", scope: "locator" });
           if (announceErrors) setGeoError("We couldn't get your location, so the list is grouped by nation instead.");
         },
         { enableHighAccuracy: false, timeout: 9000, maximumAge: 600000 }
       );
     },
-    [sortByPosition]
+    [sortByPosition, campuses]
   );
 
   // Silent first attempt on mount, only when the visitor already allowed location for
@@ -154,6 +159,7 @@ export const CampusLocator: React.FC<Props> = ({ campuses, mapHeight = 640 }) =>
             onSelect={(id) => {
               setActiveId(id);
               const c = ordered.find((x) => x.id === id);
+              if (c) track("church_selected", { church_id: c.id, church_slug: c.slug || "", church_name: c.name, country: c.country, placement: "locator_list" });
               if (c && typeof c.lat === "number" && typeof c.lng === "number") setCenterOn({ lat: c.lat, lng: c.lng });
             }}
           />

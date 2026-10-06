@@ -12,6 +12,7 @@
 import React from "react";
 import { ApiHelper } from "@churchapps/apphelper";
 import { readSavedCenter } from "../MyCenter";
+import { track } from "@/lib/analytics";
 
 export type NextStepType = "visit" | "prayer" | "salvation" | "baptism" | "discipleship" | "serve" | "contact";
 
@@ -90,6 +91,8 @@ export const NextStepForm: React.FC<Props> = ({
       }
       await ApiHelper.postAnonymous("/public/" + churchId + "/" + centerId + "/submit", body, "MembershipApi");
       setStatus("done");
+      // The category and center only: never the name, contact details or what was written.
+      track(type === "prayer" ? "prayer_request_submitted" : "next_step_submitted", { category: type, church_id: centerId });
     } catch (err: any) {
       setStatus(/429|too many/i.test((err?.message || "").toString()) ? "rate-limited" : "error");
     }
@@ -103,7 +106,7 @@ export const NextStepForm: React.FC<Props> = ({
   if (!open) {
     return (
       <div className="bt-card" style={{ padding: 22 }}>
-        <button type="button" className="bt-btn" onClick={() => setOpen(true)} aria-expanded={false} aria-controls={id("form")}>{cta}</button>
+        <button type="button" className="bt-btn" onClick={() => { setOpen(true); track("next_step_started", { category: type }); }} aria-expanded={false} aria-controls={id("form")}>{cta}</button>
       </div>
     );
   }

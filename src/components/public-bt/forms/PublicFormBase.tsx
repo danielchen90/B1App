@@ -27,6 +27,7 @@
 
 import React from "react";
 import { ApiHelper } from "@churchapps/apphelper";
+import { track } from "@/lib/analytics";
 
 export interface PublicFormBaseProps {
   churchId: string;
@@ -108,6 +109,8 @@ export const PublicFormBase: React.FC<PublicFormBaseProps> = ({
         { submissionType, name: name.trim(), email: email.trim(), phone: phone.trim() || undefined, message: message.trim(), website },
         "MembershipApi"
       );
+      // Analytics: the category and center only, never the name, contact details or message.
+      track(submissionType === "prayer" ? "prayer_request_submitted" : "next_step_submitted", { category: submissionType, church_id: campusId });
       // Success (or a silently-dropped honeypot bot — indistinguishable by design): thank-you.
       setStatus("done");
     } catch (err: any) {

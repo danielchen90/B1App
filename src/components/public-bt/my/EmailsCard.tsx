@@ -7,6 +7,7 @@
 
 import React from "react";
 import { ApiHelper } from "@churchapps/apphelper";
+import { track } from "@/lib/analytics";
 
 interface Props {
   primary: string;
@@ -50,6 +51,7 @@ export const EmailsCard: React.FC<Props> = ({ primary, verified, onChanged }) =>
       await ApiHelper.post("/me/emails/verify", { email: email.trim(), code: code.trim() }, "MembershipApi");
       setMsg({ kind: "ok", text: email.trim() + " is now on your account." });
       setStep("list"); setEmail(""); setCode("");
+      track("profile_updated", { section: "emails", action: "email_added" });
       onChanged();
     } catch (err: any) {
       setMsg({ kind: "err", text: errorText(String(err?.message || err)) });
@@ -60,6 +62,7 @@ export const EmailsCard: React.FC<Props> = ({ primary, verified, onChanged }) =>
     setBusy(true); setMsg(null);
     try {
       await ApiHelper.delete("/me/emails/" + encodeURIComponent(addr), "MembershipApi");
+      track("profile_updated", { section: "emails", action: "email_removed" });
       onChanged();
     } catch (err: any) {
       setMsg({ kind: "err", text: errorText(String(err?.message || err)) });
