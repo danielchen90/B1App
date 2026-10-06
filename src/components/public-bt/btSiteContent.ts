@@ -66,6 +66,8 @@ export interface BtCampusExtras {
   facebookUrl?: string;
   instagramUrl?: string;
   youtubeUrl?: string;
+  /** The UC… id behind youtubeUrl when that is an @handle, so the site never has to look it up. */
+  youtubeChannelId?: string;
   websiteUrl?: string;
   /** Campus-specific Stripe giving link (org default applies when absent). */
   givingUrl?: string;
@@ -136,6 +138,7 @@ export const BT_CAMPUS_EXTRAS: Record<string, BtCampusExtras> = {
     email: "bibleteachersfortlauderdale@gmail.com",
     facebookUrl: "https://www.facebook.com/btifortlauderdale",
     youtubeUrl: "https://www.youtube.com/@bibleteachersfortlauderdal855",
+    youtubeChannelId: "UCFZqXiT1G8w6xYWSnr7cJdw",
     givingUrl: "https://donate.stripe.com/aEU4j1dGY02H3mwcMM"
   },
   "freeport": {
@@ -173,7 +176,10 @@ export const BT_CAMPUS_EXTRAS: Record<string, BtCampusExtras> = {
     leaders: "Pastor Patty Johnson",
     phone: "+1 (352) 314-0300",
     email: "btileesburg@bibleteachers.org",
-    facebookUrl: "https://www.facebook.com/BibleTeachersInternationalLeesburg"
+    facebookUrl: "https://www.facebook.com/BibleTeachersInternationalLeesburg",
+    // Leesburg is home to Apostle Mary Banks; its services stream on the ministry channel.
+    youtubeUrl: "https://www.youtube.com/@MaryBanksMinistries",
+    youtubeChannelId: "UCH7nMCqkUMwgl7UiqjYbgwQ"
   },
   "miami": {
     ...US,
@@ -238,6 +244,7 @@ export const BT_CAMPUS_EXTRAS: Record<string, BtCampusExtras> = {
     phone: "+1 (832) 559-7885",
     email: "info@btihouston.com",
     youtubeUrl: "https://www.youtube.com/@MichaelThomasMinistries",
+    youtubeChannelId: "UClBJJ43vuzAsLBZ9Br8HG9A",
     givingUrl: "https://donate.stripe.com/7sI01x0pr2kJ6ty7ss"
   },
   "st-ann": { ...JM },
@@ -261,7 +268,8 @@ export const BT_CAMPUS_EXTRAS: Record<string, BtCampusExtras> = {
     leaders: "Pastor Ketha Edmondson",
     phone: "+1 (876) 808-9039",
     email: "btitrenchtown@bibleteachers.org",
-    youtubeUrl: "https://www.youtube.com/@btitrenchtown4014"
+    youtubeUrl: "https://www.youtube.com/@btitrenchtown4014",
+    youtubeChannelId: "UChA3l0CDZOkt4pTlBcaMNRw"
   },
   "trinidad": {
     country: "Trinidad & Tobago",

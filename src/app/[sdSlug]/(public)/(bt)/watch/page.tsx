@@ -1,8 +1,10 @@
 // Watch — /watch (replaces /sermons, which now redirects here).
 //
 // Live first: what's on this week in the viewer's own time zone (ThisWeek, driven by
-// the admin's stream schedule) and a way to the live stream; then the latest message,
-// then the library with series and speaker filters. The site reads the channel's
+// the admin's stream schedule) and a way to the live stream; then the newest message
+// from every worship center streaming on its own channel (with a picker to any center's
+// Watch page, /watch/[slug]); then the ministry's latest message and its library with
+// series and speaker filters. The site reads the channel's
 // public RSS feed (the newest ~15 uploads, no API key); the full archive is linked.
 
 import React from "react";
@@ -18,6 +20,9 @@ import { ThisWeek } from "@/components/public-bt/ThisWeek";
 import { LiveIndicator } from "@/components/public-bt/LiveIndicator";
 import { MessageCard } from "@/components/public-bt/MessageCard";
 import { MessageLibrary } from "@/components/public-bt/MessageLibrary";
+import { CenterLatestGrid } from "@/components/public-bt/CenterLatestGrid";
+import { WatchCenterPicker } from "@/components/public-bt/WatchCenterPicker";
+import { loadActiveCenterLatest, loadCenterChannels } from "@/helpers/CenterChannelHelper";
 import { BT } from "@/components/public-bt/btSiteContent";
 import { IconYouTube, IconLive, IconArrowRight } from "@/components/public-bt/BtIcons";
 import { trackAttrs } from "@/lib/analytics";
@@ -44,6 +49,14 @@ export default async function WatchPage({ params }: { params: Promise<PageParams
     loadVisibleCampuses(churchId),
     loadSermonFeed(BT.youtubeChannelId, 15)
   ]);
+  const [everyCenter, paired] = await Promise.all([
+    loadActiveCenterLatest(churchId, campuses),
+    loadCenterChannels(churchId, campuses)
+  ]);
+  const pickable = paired
+    .filter((p) => p.channel && p.campus.slug)
+    .map((p) => ({ slug: p.campus.slug as string, name: p.campus.name }))
+    .sort((a, b) => a.name.localeCompare(b.name));
   const [latest, ...rest] = sermons;
   const streamKey = config.church?.subDomain || null;
 
@@ -73,10 +86,25 @@ export default async function WatchPage({ params }: { params: Promise<PageParams
         <ThisWeek streamKey={streamKey} />
       </section>
 
-      {latest && (
+      {(everyCenter.length > 0 || pickable.length > 0) && (
         <section className="bt-band">
+          <div className="bt-section">
+            <div className="bt-section-head">
+              <div>
+                <div className="bt-eyebrow">Every worship center</div>
+                <h2 className="bt-h2">The latest from each center</h2>
+              </div>
+              <WatchCenterPicker centers={pickable} />
+            </div>
+            <CenterLatestGrid rows={everyCenter} />
+          </div>
+        </section>
+      )}
+
+      {latest && (
+        <section>
           <div className="bt-section-tight" style={{ maxWidth: 980 }}>
-            <div className="bt-eyebrow" style={{ marginBottom: 14 }}>The latest message</div>
+            <div className="bt-eyebrow" style={{ marginBottom: 14 }}>The latest from {BT.ministry}</div>
             <MessageCard sermon={latest} feature placement="watch_latest" />
           </div>
         </section>
@@ -87,7 +115,7 @@ export default async function WatchPage({ params }: { params: Promise<PageParams
           <div className="bt-section-head">
             <div>
               <div className="bt-eyebrow">The library</div>
-              <h2 className="bt-h2">Recent messages</h2>
+              <h2 className="bt-h2">Recent messages from {BT.ministry}</h2>
             </div>
             <a className="bt-link" href={BT.youtubeUrl + "/videos"} target="_blank" rel="noopener noreferrer">
               Full archive on YouTube <IconArrowRight size={15} />

@@ -10,7 +10,15 @@ import { MessageCard } from "./MessageCard";
 import { classifySermon } from "./btSiteContent";
 import { track } from "@/lib/analytics";
 
-export const MessageLibrary: React.FC<{ sermons: FeedSermon[] }> = ({ sermons }) => {
+interface Props {
+  sermons: FeedSermon[];
+  /** Analytics placement for the cards (library by default). */
+  placement?: string;
+  /** The worship center whose messages these are, if any. */
+  churchId?: string;
+}
+
+export const MessageLibrary: React.FC<Props> = ({ sermons, placement = "library", churchId }) => {
   const [filter, setFilter] = React.useState<{ kind: "series" | "speaker"; value: string } | null>(null);
   const tagged = sermons.map((s) => ({ s, meta: classifySermon(s.title) }));
 
@@ -61,7 +69,7 @@ export const MessageLibrary: React.FC<{ sermons: FeedSermon[] }> = ({ sermons })
         </div>
       )}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 26 }}>
-        {shown.map(({ s }) => <MessageCard key={s.videoId} sermon={s} placement="library" />)}
+        {shown.map(({ s }) => <MessageCard key={s.videoId} sermon={s} placement={placement} churchId={churchId} />)}
       </div>
     </div>
   );

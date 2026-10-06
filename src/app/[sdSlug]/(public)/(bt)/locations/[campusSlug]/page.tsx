@@ -5,7 +5,9 @@
 // the four anonymous public reads in parallel, merges the resolved campusContent with
 // the in-repo enrichment map (service times / contacts / socials from the ministry's
 // published site), and renders in the locked order: hero → visit info → latest sermon →
-// leadership → events → give → forms.
+// leadership → events → give → forms. Messages come from the center's own YouTube
+// channel (CenterChannelHelper): the latest plus the past 10, or the ministry's latest
+// when the center has no channel.
 //
 // PATH NOTE: the "MembershipApi" base already ends in "/membership" — client paths never
 // re-prefix it. The sermon read is on "ContentApi".
@@ -32,9 +34,11 @@ import { TrackOnView } from "@/components/public-bt/BtAnalytics";
 import { trackAttrs } from "@/lib/analytics";
 import { NextStepForm } from "@/components/public-bt/forms/NextStepForm";
 import { loadSermonFeed } from "@/helpers/SermonFeedHelper";
+import { channelFromContent } from "@/helpers/CenterChannelHelper";
+import { MessageLibrary } from "@/components/public-bt/MessageLibrary";
 import { loadPublicEvents } from "@/helpers/PublicEventsHelper";
 import { BT, BT_COPY, getCampusExtras } from "@/components/public-bt/btSiteContent";
-import { IconPhone, IconMail, IconGlobe, IconPin, IconClock, IconUser, IconArrowRight, IconGift } from "@/components/public-bt/BtIcons";
+import { IconPhone, IconMail, IconGlobe, IconPin, IconClock, IconUser, IconArrowRight, IconGift, IconYouTube } from "@/components/public-bt/BtIcons";
 import {
   type CampusContent,
   type ServiceTime,
@@ -132,14 +136,14 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
   const virtual = !!extras?.virtual;
 
   const content = await loadCampusContent(churchId, campus.id);
-  const channel = str(content.sermonYoutubeChannel) || BT.youtubeChannelId;
+  const ownChannel = await channelFromContent(content, campus.slug);
   const [leaders, events, allCampuses, sermons] = await Promise.all([
     loadLeadership(churchId),
     loadPublicEvents(churchId, campus.id),
     loadVisibleCampuses(churchId),
-    loadSermonFeed(channel, 1)
+    loadSermonFeed(ownChannel?.channelId || BT.youtubeChannelId, ownChannel ? 11 : 1)
   ]);
-  const sermon = sermons[0];
+  const [sermon, ...pastSermons] = sermons;
 
   const navLinks = toLocationLinks(allCampuses);
   const giveUrl = str(content.givingUrl) || extras?.givingUrl || BT.giveUrl;
@@ -285,7 +289,7 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
         <div className="bt-two">
           {sermon && (
             <div>
-              <div className="bt-eyebrow" style={{ marginBottom: 12 }}>The latest message</div>
+              <div className="bt-eyebrow" style={{ marginBottom: 12 }}>{ownChannel ? "The latest message" : "The latest from " + BT.ministry}</div>
               <MessageCard sermon={sermon} feature placement="center_page" churchId={campus.id} />
             </div>
           )}
@@ -297,6 +301,22 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
           </div>
         </div>
       </section>
+
+      {/* (5b) The center's past 10 messages from its own channel */}
+      {ownChannel && pastSermons.length > 0 && (
+        <section className="bt-section-tight">
+          <div>
+            <div className="bt-section-head">
+              <div><div className="bt-eyebrow">Past services</div><h2 className="bt-h2">Recent messages from {campus.name}</h2></div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 22px" }}>
+                <Link className="bt-link" href={"/watch/" + campus.slug}>Watch page <IconArrowRight size={15} /></Link>
+                <a className="bt-link" href={ownChannel.channelUrl + "/streams"} target="_blank" rel="noopener noreferrer"><IconYouTube size={15} /> Full archive on YouTube</a>
+              </div>
+            </div>
+            <MessageLibrary sermons={pastSermons} placement="center_page_library" churchId={campus.id} />
+          </div>
+        </section>
+      )}
 
       {leaders.length > 0 && (
         <section className="bt-section-tight">

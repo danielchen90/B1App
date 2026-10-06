@@ -4,6 +4,8 @@ import { EnvironmentHelper } from "@/helpers";
 import { isBtPublicSite } from "../(public)/(bt)/isBtSite";
 import { btSiteUrl } from "@/components/public-bt/btSeo";
 import { isHiddenCampusSlug } from "@/components/public-bt/btSiteContent";
+import { loadCenterChannels } from "@/helpers/CenterChannelHelper";
+import type { PublicCampus } from "@/helpers/PublicCampusHelper";
 
 // The Bible Teachers public pages that are not CMS pages.
 const BT_SITEMAP_PAGES = ["/locations", "/watch", "/events", "/next-steps", "/about", "/give", "/privacy", "/terms", "/cookies"];
@@ -46,8 +48,14 @@ export async function GET(request: NextRequest, context: { params: Promise<{ sdS
       // Older API deploys 404 here too and we keep whatever urls we already gathered.
       const campusesResponse = await fetch(membershipApi + "/public/" + church.id + "/campuses", { next: { revalidate: 3600, tags: [sdSlug] } } as RequestInit);
       if (campusesResponse.ok) {
-        const campuses: { slug?: string | null }[] = await campusesResponse.json();
-        campuses.forEach((c) => { if (c.slug && !isHiddenCampusSlug(c.slug)) urls.add("/locations/" + c.slug); });
+        const campuses: PublicCampus[] = await campusesResponse.json();
+        const visible = campuses.filter((c) => c.slug && !isHiddenCampusSlug(c.slug));
+        visible.forEach((c) => urls.add("/locations/" + c.slug));
+        // Centers with their own YouTube channel have their own Watch page.
+        if (isBtPublicSite(sdSlug)) {
+          const paired = await loadCenterChannels(church.id, visible);
+          paired.forEach((p) => { if (p.channel) urls.add("/watch/" + p.campus.slug); });
+        }
       }
     }
   } catch { /* fall back to home page only */ }

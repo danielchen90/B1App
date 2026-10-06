@@ -1,6 +1,6 @@
 // Server helper for the ministry's sermon archive — reads the public YouTube RSS feed
 // for the channel (no API key, no quota) and returns the latest full-length messages.
-// Shorts are filtered by their "#shorts" title tag. Revalidates every 30 minutes via
+// Shorts are filtered by their /shorts/ link (or a "#shorts" title tag). Revalidates every 30 minutes via
 // Next's fetch cache; any failure degrades to [] so the pages render without the grid.
 
 import { cache } from "react";
@@ -42,7 +42,7 @@ export const loadSermonFeed = cache(async (channelId: string, limit = 12): Promi
       const publishedAt = entry.match(/<published>([^<]+)<\/published>/)?.[1] ?? "";
       if (!videoId) continue;
       const title = decode(rawTitle);
-      if (/#shorts/i.test(title)) continue; // full messages only
+      if (/#shorts/i.test(title) || /<link rel="alternate" href="[^"]*\/shorts\//.test(entry)) continue; // full messages only
       sermons.push({
         videoId,
         title,

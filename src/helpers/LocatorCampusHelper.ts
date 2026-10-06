@@ -44,7 +44,7 @@ function formatServiceTimes(times: ServiceTime[]): string {
 }
 
 /** Resolved public content for one campus. Cached per-request; degrades to {} on any error. */
-const loadCampusContent = cache(async (churchId: string, campusId: string): Promise<any> => {
+export const loadCampusContent = cache(async (churchId: string, campusId: string): Promise<any> => {
   if (!churchId || !campusId) return {};
   try {
     const data = await ApiHelper.getAnonymous(
@@ -62,7 +62,7 @@ const loadCampusContent = cache(async (churchId: string, campusId: string): Prom
  * added in the 2026-09 redesign). Resolves to null when the API predates it, so the
  * per-campus reads above take over.
  */
-const loadAllCampusContent = cache(async (churchId: string): Promise<Record<string, any> | null> => {
+export const loadAllCampusContent = cache(async (churchId: string): Promise<Record<string, any> | null> => {
   try {
     const data = await ApiHelper.getAnonymous("/campusContent/public/" + churchId + "/all", "MembershipApi");
     return data && typeof data === "object" && !Array.isArray(data) ? (data as Record<string, any>) : null;
