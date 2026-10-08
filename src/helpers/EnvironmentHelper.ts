@@ -1,6 +1,7 @@
 import { ApiHelper } from "@churchapps/apphelper";
 import { CommonEnvironmentHelper } from "@churchapps/apphelper";
 import { Locale } from "@churchapps/apphelper";
+import { applyPreferredLanguage } from "./LanguagePreference";
 
 export class EnvironmentHelper {
   static Common = CommonEnvironmentHelper;
@@ -63,8 +64,12 @@ export class EnvironmentHelper {
       const port = process.env.PORT || "3301";
       baseUrl = `http://127.0.0.1:${port}`;
     }
+    const backends = [baseUrl + `/locales/{{lng}}.json?v=1`, baseUrl + `/apphelper/locales/{{lng}}.json`];
     try {
-      await Locale.init([baseUrl + `/locales/{{lng}}.json?v=1`, baseUrl + `/apphelper/locales/{{lng}}.json`]);
+      await Locale.init(backends);
+      // Browser only: a ?lang= (or remembered) choice wins over the browser language, and
+      // <html lang/dir> follows the language actually shown.
+      await applyPreferredLanguage(backends);
     } catch (err) {
       // Never let locale loading take down the server — fall back to untranslated keys.
       console.error("Locale init failed (continuing with defaults):", err);
