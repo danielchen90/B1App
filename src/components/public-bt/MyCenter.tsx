@@ -118,7 +118,7 @@ export const MyCenter: React.FC<Props> = ({ centers }) => {
             <div className="bt-eyebrow">Your worship center</div>
             <h2 className="bt-h3" style={{ marginTop: 6 }}>Find the center nearest you</h2>
             <p className="bt-muted-text" style={{ marginTop: 4 }}>
-              {`${centers.filter((c) => !c.virtual).length} centers across the United States, the Caribbean and Canada, and an Online Church that gathers from anywhere.`}
+              {`${centers.filter((c) => !c.virtual).length} centers across the United States, the Caribbean and Canada, and the Online Church and Global Church, which gather from anywhere.`}
             </p>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
@@ -178,7 +178,7 @@ export const MyCenter: React.FC<Props> = ({ centers }) => {
               href={center.virtual ? href : "/next-steps?center=" + center.slug + "#visit"}
               onClick={() => { if (center.virtual) track("online_church_joined", { church_id: center.id, church_slug: center.slug || "", placement: "home_card" }); }}
             >
-              {center.virtual ? "Join the Online Church" : "Plan your visit"}
+              {center.virtual ? "Join the " + center.name : "Plan your visit"}
             </Link>
             <Link className="bt-link" href={href}>Center page <IconArrowRight size={15} /></Link>
             <button type="button" className="bt-mc-change" onClick={() => setPicking(true)}>Change center</button>

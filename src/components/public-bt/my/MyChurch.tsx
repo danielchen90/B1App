@@ -291,7 +291,7 @@ export const MyChurch: React.FC<Props> = ({ subDomain, churchId, centers, latest
               <div className="myd-hero-actions">
                 {center ? (
                   <Link className="myd-gold" href={center.virtual ? "/locations/" + center.slug : "/next-steps?center=" + center.slug + "#visit"}>
-                    <IconCalendar size={16} /> {center.virtual ? "Join the Online Church" : "Plan my visit"}
+                    <IconCalendar size={16} /> {center.virtual ? "Join the " + center.name : "Plan my visit"}
                   </Link>
                 ) : (
                   <Link className="myd-gold" href="/my/profile"><IconPin size={16} /> Choose my center</Link>

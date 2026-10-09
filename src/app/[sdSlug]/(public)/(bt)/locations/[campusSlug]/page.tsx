@@ -158,11 +158,11 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
   const phone = str(content.phone) || extras?.phone;
   const email = str(content.email) || extras?.email;
   const website = extras?.websiteUrl;
-  const welcome = str(content.welcomeNote) ||
+  const welcome = str(content.welcomeNote) || extras?.welcome ||
     (virtual
       ? BT_COPY.onlineBlurb
       : "Welcome home. Whoever you are and wherever you're from, there's a seat for you at " + campus.name + ". Come and be taught of the Lord.");
-  const firstVisit = str(content.whatToExpect) || BT_COPY.whatToExpect;
+  const firstVisit = str(content.whatToExpect) || extras?.whatToExpect || BT_COPY.whatToExpect;
 
   const cityLine = [campus.city, campus.state].filter(Boolean).join(", ") + (campus.zip ? " " + campus.zip : "");
   const directionsUrl = "https://www.google.com/maps/dir/?api=1&destination=" +
@@ -200,7 +200,7 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
         <div className="bt-ch-in">
           <div>
             <div style={{ minHeight: 28, marginBottom: 4 }}><LiveIndicator streamKey={config.church?.subDomain || null} /></div>
-            <div className="bt-eyebrow">{(extras?.flag ? extras.flag + " " : "") + (virtual ? "Online Church" : (extras?.country || "Worship center"))}</div>
+            <div className="bt-eyebrow">{(extras?.flag ? extras.flag + " " : "") + (virtual ? "Online, join from anywhere" : (extras?.country || "Worship center"))}</div>
             <h1 className="bt-display" style={{ fontSize: "clamp(2.4rem, 5vw, 3.6rem)", marginTop: 10 }}>{campus.name}</h1>
             <p className="bt-lede" style={{ marginTop: 12 }}>{welcome}</p>
             <div className="bt-ch-facts">
@@ -214,7 +214,7 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 22 }}>
               {virtual
-                ? (website ? <a className="bt-btn" href={website} target="_blank" rel="noopener noreferrer" {...trackAttrs("online_church_joined", { ...churchProps, placement: "center_page" })}>Join the Online Church</a> : <a className="bt-btn" href="#visit">Join us</a>)
+                ? (website ? <a className="bt-btn" href={website} target="_blank" rel="noopener noreferrer" {...trackAttrs("online_church_joined", { ...churchProps, placement: "center_page" })}>{"Join the " + campus.name}</a> : <a className="bt-btn" href="#visit">Join us</a>)
                 : <a className="bt-btn" href="#visit">Plan your visit</a>}
               {!virtual && <a className="bt-btn bt-btn-outline" href={directionsUrl} target="_blank" rel="noopener noreferrer" {...trackAttrs("church_directions_clicked", { ...churchProps, placement: "center_page" })}><IconPin size={17} /> Directions</a>}
               {campus.slug && <MakeMyCenter slug={campus.slug} name={campus.name} />}
@@ -236,7 +236,7 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
                 ))}
               </ul>
             ) : (
-              <p>Send the team a note for service times and they&rsquo;ll help you plan a visit.</p>
+              <p>{extras?.timesNote || "Send the team a note for service times and they\u2019ll help you plan a visit."}</p>
             )}
           </div>
           <div className="bt-card">

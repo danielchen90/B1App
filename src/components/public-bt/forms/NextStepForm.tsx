@@ -61,7 +61,7 @@ export const NextStepForm: React.FC<Props> = ({
     const fromQuery = new URLSearchParams(window.location.search).get("center");
     const slug = fromQuery || readSavedCenter();
     const hit = (centers.length === 1 ? centers[0] : undefined) || centers.find((c) => c.slug === slug) ||
-      (type === "prayer" || type === "salvation" ? centers.find((c) => c.virtual) : undefined);
+      (type === "prayer" || type === "salvation" ? centers.find((c) => c.slug === "online-church") || centers.find((c) => c.virtual) : undefined);
     if (hit) setCenterId(hit.id);
   }, [centers, type]);
 

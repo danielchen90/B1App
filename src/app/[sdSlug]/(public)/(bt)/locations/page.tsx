@@ -49,7 +49,7 @@ export default async function LocationsPage({ params }: { params: Promise<PagePa
       <BtPageHead
         eyebrow="Locations"
         title="Find your worship center"
-        lede={`${locatorCampuses.filter((c) => !c.virtual).length} worship centers across ${BT_NATION_COUNT} nations, and an Online Church that gathers from anywhere. Share your location and the list puts the nearest first.`}
+        lede={`${locatorCampuses.filter((c) => !c.virtual).length} worship centers across ${BT_NATION_COUNT} nations, and the Online Church and Global Church, which gather from anywhere. Share your location and the list puts the nearest first.`}
       />
 
       {/* The locator */}

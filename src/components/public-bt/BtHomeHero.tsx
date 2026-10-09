@@ -122,7 +122,7 @@ export const BtHomeHero: React.FC<Props> = ({ centers, physicalCount, nations, s
               Come and be <em>taught of the Lord.</em>
             </h1>
             <p className="bth-lede bt-rise-3">
-              {`Lift your hands, open your Bible, and worship with us. ${physicalCount} worship center${physicalCount === 1 ? "" : "s"} in ${nations} nation${nations === 1 ? "" : "s"} and an Online Church, one family around the same Word. There’s a seat saved for you.`}
+              {`Lift your hands, open your Bible, and worship with us. ${physicalCount} worship center${physicalCount === 1 ? "" : "s"} in ${nations} nation${nations === 1 ? "" : "s"}, the Online Church and the Global Church, one family around the same Word. There’s a seat saved for you.`}
             </p>
             <div className="bth-cta bt-rise-3">
               <Link className="bt-btn" href="/watch"><IconPlay size={18} /> Worship with us online</Link>
