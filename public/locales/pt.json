@@ -1106,5 +1106,37 @@
     "editProfile": "Editar Perfil",
     "logout": "Sair",
     "profile": "Perfil"
+  },
+  "chatSafety": {
+    "report": "Denunciar",
+    "block": "Bloquear",
+    "unblock": "Desbloquear",
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "messageOptions": "Opções da mensagem",
+    "reportTitle": "Denunciar esta mensagem",
+    "reportPrompt": "Por que você está denunciando? A equipe da igreja analisa cada denúncia.",
+    "reason": {
+      "offensive": "Ofensiva ou de ódio",
+      "harassment": "Assédio",
+      "spam": "Spam",
+      "other": "Outra coisa"
+    },
+    "noteOptional": "Adicione uma nota (opcional)",
+    "noteRequired": "Conte o que está errado",
+    "reportThanks": "Obrigado. Sua denúncia foi enviada à equipe da igreja, que vai analisá-la.",
+    "reportFailed": "Não foi possível enviar a denúncia. Tente novamente.",
+    "reportLimited": "Você enviou muitas denúncias em pouco tempo. Tente novamente mais tarde.",
+    "blockTitle": "Bloquear {}?",
+    "thisPerson": "esta pessoa",
+    "blockExplain": "Você não verá mais as mensagens dessa pessoa nos chats de grupo, e ela não poderá enviar mensagens privadas para você. Ela não é avisada.",
+    "blockExplainDevice": "As mensagens dessa pessoa ficarão ocultas neste chat neste dispositivo.",
+    "blockFailed": "Não funcionou. Tente novamente.",
+    "youBlocked": "Você bloqueou {}. As mensagens dessa pessoa estão ocultas.",
+    "hostBlock": "Bloquear nesta transmissão",
+    "hostBlocked": "{} não pode mais escrever nesta transmissão.",
+    "hostBlockFailed": "Não foi possível bloquear este remetente.",
+    "messageRejected": "Sua mensagem não foi enviada porque contém linguagem que não é permitida aqui.",
+    "senderBlocked": "Você não pode mais escrever neste chat."
   }
 }

@@ -9,6 +9,8 @@ import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import BlockIcon from "@mui/icons-material/Block";
+import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
 import EmojiEmotionsOutlinedIcon from "@mui/icons-material/EmojiEmotionsOutlined";
 import { Emojis } from "@/components/video/chat";
 import { ApiHelper, Locale, PersonHelper, SocketHelper, SubscriptionManager, UserHelper } from "@churchapps/apphelper";
@@ -19,6 +21,8 @@ import { ConfigurationInterface } from "@/helpers/ConfigHelper";
 import UserContext from "@/context/UserContext";
 import { mobileTheme } from "../mobileTheme";
 import { getInitials } from "../util";
+import { ChatSafetyHelper } from "@/helpers/ChatSafetyHelper";
+import { BlockPersonDialog, ReportMessageDialog } from "@/components/chatSafety/ChatSafetyDialogs";
 
 interface Props {
   id: string;
@@ -50,12 +54,22 @@ export const MessageConversation = ({ id, config }: Props) => {
   const [confirmDelete, setConfirmDelete] = React.useState<MessageInterface | null>(null);
   const [emojiAnchor, setEmojiAnchor] = React.useState<HTMLElement | null>(null);
   const [viewportHeight, setViewportHeight] = React.useState<number | null>(null);
+  // Report / Block (App Store guideline 1.2).
+  const [reportMessage, setReportMessage] = React.useState<MessageInterface | null>(null);
+  const [blockOpen, setBlockOpen] = React.useState(false);
+  const [blockVersion, setBlockVersion] = React.useState(0);
 
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   const myPersonId = userContext?.person?.id || UserHelper.currentUserChurch?.person?.id || "";
   const myDisplayName = userContext?.person?.name?.display || UserHelper.currentUserChurch?.person?.name?.display || "";
+
+  React.useEffect(() => {
+    ChatSafetyHelper.loadMemberBlocks();
+    return ChatSafetyHelper.subscribe(() => setBlockVersion((v) => v + 1));
+  }, []);
+  const isBlocked = React.useMemo(() => ChatSafetyHelper.isPersonBlocked(id), [id, blockVersion]);
 
   const { data: personData } = useQuery<PersonInterface | null>({
     queryKey: ["community-person", id],
@@ -233,8 +247,8 @@ export const MessageConversation = ({ id, config }: Props) => {
   const messages: MessageInterface[] | null = React.useMemo(() => {
     if (!conversationId) return myPersonId ? [] : null;
     if (serverMessages === undefined) return null;
-    return [...serverMessages, ...pending];
-  }, [conversationId, myPersonId, serverMessages, pending]);
+    return [...serverMessages.filter((m) => !ChatSafetyHelper.isPersonBlocked(m.personId)), ...pending];
+  }, [conversationId, myPersonId, serverMessages, pending, blockVersion]);
 
   const loadMessages = React.useCallback(async () => {
     await refetchMessages();
@@ -426,6 +440,7 @@ export const MessageConversation = ({ id, config }: Props) => {
     const bubbleName = m.displayName || m.person?.name?.display || "";
     const isPersisted = !!m.id && !m.id.startsWith("temp-");
     const showActions = mine && isPersisted;
+    const showReport = !mine && isPersisted;
 
     return (
       <Box
@@ -484,6 +499,16 @@ export const MessageConversation = ({ id, config }: Props) => {
           )}
           <span dangerouslySetInnerHTML={{ __html: ChatHelper.insertLinks(m.content || "") }} />
         </Box>
+        {showReport && (
+          <IconButton
+            size="small"
+            aria-label={Locale.label("chatSafety.report")}
+            onClick={() => setReportMessage(m)}
+            sx={{ color: tc.textMuted, p: "4px" }}
+          >
+            <FlagOutlinedIcon sx={{ fontSize: 16 }} />
+          </IconButton>
+        )}
       </Box>
     );
   };
@@ -566,6 +591,17 @@ export const MessageConversation = ({ id, config }: Props) => {
         >
           {name}
         </Typography>
+        {!!id && !!myPersonId && id !== myPersonId && !isBlocked && (
+          <IconButton
+            aria-label={Locale.label("chatSafety.block")}
+            title={Locale.label("chatSafety.block")}
+            onClick={() => setBlockOpen(true)}
+            sx={{ color: tc.textMuted }}
+            size="small"
+          >
+            <BlockIcon />
+          </IconButton>
+        )}
         <IconButton
           aria-label={Locale.label("mobile.details.newConversation")}
           onClick={() => router.push("/mobile/messages/new")}
@@ -629,76 +665,105 @@ export const MessageConversation = ({ id, config }: Props) => {
         </Box>
       )}
 
-      <Box
-        sx={{
-          flexShrink: 0,
-          width: "100%",
-          minWidth: 0,
-          bgcolor: tc.surface,
-          borderTop: `1px solid ${tc.border}`,
-          px: "10px",
-          pt: "10px",
-          pb: "calc(10px + env(safe-area-inset-bottom))",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px"
-        }}
-      >
-        <IconButton
-          aria-label={Locale.label("mobile.details.openEmojiPicker")}
-          onClick={(e) => setEmojiAnchor(e.currentTarget)}
-          sx={{ flexShrink: 0, color: tc.textMuted, width: 36, height: 36 }}
-        >
-          <EmojiEmotionsOutlinedIcon sx={{ fontSize: 22 }} />
-        </IconButton>
-        <TextField
-          inputRef={inputRef}
-          multiline
-          maxRows={4}
-          placeholder={Locale.label("mobile.details.typeMessage")}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              handleSend();
-            }
-          }}
-          size="small"
-          sx={{
-            flex: 1,
-            minWidth: 0,
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "22px",
-              bgcolor: tc.background,
-              fontSize: 14,
-              px: "12px",
-              py: "8px"
-            },
-            "& .MuiOutlinedInput-notchedOutline": { borderColor: tc.border }
-          }}
-        />
-        <IconButton
-          aria-label={Locale.label("mobile.details.send")}
-          onClick={handleSend}
-          disabled={sending || !text.trim()}
+      {isBlocked ? (
+        <Box
           sx={{
             flexShrink: 0,
-            bgcolor: tc.primary,
-            color: tc.onPrimary,
-            "&:hover": { bgcolor: tc.primary },
-            "&.Mui-disabled": { bgcolor: tc.border, color: tc.textSecondary },
-            width: 40,
-            height: 40
+            bgcolor: tc.surface,
+            borderTop: `1px solid ${tc.border}`,
+            px: `${mobileTheme.spacing.md}px`,
+            py: "12px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "8px"
           }}
         >
-          {sending ? (
-            <CircularProgress size={18} sx={{ color: tc.onPrimary }} />
-          ) : (
-            <SendIcon sx={{ fontSize: 20 }} />
-          )}
-        </IconButton>
-      </Box>
+          <Typography sx={{ fontSize: 13, color: tc.textMuted }}>
+            {Locale.label("chatSafety.youBlocked").replace("{}", name)}
+          </Typography>
+          <Button
+            size="small"
+            onClick={async () => {
+              try { await ChatSafetyHelper.unblockPerson(id); } catch { setError(Locale.label("chatSafety.blockFailed")); }
+            }}
+            sx={{ textTransform: "none" }}
+          >
+            {Locale.label("chatSafety.unblock")}
+          </Button>
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            flexShrink: 0,
+            width: "100%",
+            minWidth: 0,
+            bgcolor: tc.surface,
+            borderTop: `1px solid ${tc.border}`,
+            px: "10px",
+            pt: "10px",
+            pb: "calc(10px + env(safe-area-inset-bottom))",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px"
+          }}
+        >
+          <IconButton
+            aria-label={Locale.label("mobile.details.openEmojiPicker")}
+            onClick={(e) => setEmojiAnchor(e.currentTarget)}
+            sx={{ flexShrink: 0, color: tc.textMuted, width: 36, height: 36 }}
+          >
+            <EmojiEmotionsOutlinedIcon sx={{ fontSize: 22 }} />
+          </IconButton>
+          <TextField
+            inputRef={inputRef}
+            multiline
+            maxRows={4}
+            placeholder={Locale.label("mobile.details.typeMessage")}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+            size="small"
+            sx={{
+              flex: 1,
+              minWidth: 0,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "22px",
+                bgcolor: tc.background,
+                fontSize: 14,
+                px: "12px",
+                py: "8px"
+              },
+              "& .MuiOutlinedInput-notchedOutline": { borderColor: tc.border }
+            }}
+          />
+          <IconButton
+            aria-label={Locale.label("mobile.details.send")}
+            onClick={handleSend}
+            disabled={sending || !text.trim()}
+            sx={{
+              flexShrink: 0,
+              bgcolor: tc.primary,
+              color: tc.onPrimary,
+              "&:hover": { bgcolor: tc.primary },
+              "&.Mui-disabled": { bgcolor: tc.border, color: tc.textSecondary },
+              width: 40,
+              height: 40
+            }}
+          >
+            {sending ? (
+              <CircularProgress size={18} sx={{ color: tc.onPrimary }} />
+            ) : (
+              <SendIcon sx={{ fontSize: 20 }} />
+            )}
+          </IconButton>
+        </Box>
+      )}
 
       <Popover
         anchorEl={emojiAnchor}
@@ -745,6 +810,14 @@ export const MessageConversation = ({ id, config }: Props) => {
           {Locale.label("mobile.details.delete")}
         </MenuItem>
       </Menu>
+
+      <ReportMessageDialog open={!!reportMessage} messageId={reportMessage?.id} onClose={() => setReportMessage(null)} />
+      <BlockPersonDialog
+        open={blockOpen}
+        name={name}
+        onConfirm={async () => { await ChatSafetyHelper.blockPerson(id); }}
+        onClose={() => setBlockOpen(false)}
+      />
 
       <Dialog open={!!confirmDelete} onClose={() => setConfirmDelete(null)}>
         <DialogTitle>{Locale.label("mobile.details.confirmDeleteTitle")}</DialogTitle>

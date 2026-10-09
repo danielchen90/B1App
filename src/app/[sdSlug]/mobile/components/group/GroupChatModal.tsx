@@ -24,6 +24,8 @@ import { ApiHelper, Locale, PersonHelper, SocketHelper, SubscriptionManager, Use
 import { SubscriptionToggle, SUBSCRIPTION_MESSAGE_TYPE } from "@churchapps/apphelper";
 import type { PersonInterface } from "@churchapps/helpers";
 import { mobileTheme } from "../mobileTheme";
+import { ChatSafetyHelper } from "@/helpers/ChatSafetyHelper";
+import { BlockPersonDialog, ReportMessageDialog } from "@/components/chatSafety/ChatSafetyDialogs";
 
 export type ChatSubTab = "discussions" | "announcements";
 
@@ -74,6 +76,11 @@ export const GroupChatModal = ({
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const [menuAnchor, setMenuAnchor] = React.useState<{ el: HTMLElement; message: Message } | null>(null);
   const [confirmDelete, setConfirmDelete] = React.useState<Message | null>(null);
+  // Report / Block on other people's messages (App Store guideline 1.2).
+  const [otherMenu, setOtherMenu] = React.useState<{ el: HTMLElement; message: Message } | null>(null);
+  const [reportMessage, setReportMessage] = React.useState<Message | null>(null);
+  const [blockTarget, setBlockTarget] = React.useState<Message | null>(null);
+  const [blockVersion, setBlockVersion] = React.useState(0);
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
 
   const currentContentType: ContentType = subTab === "announcements" ? "groupAnnouncement" : "group";
@@ -82,6 +89,12 @@ export const GroupChatModal = ({
   React.useEffect(() => {
     if (open) setSubTab(initialSubTab);
   }, [open, initialSubTab]);
+
+  React.useEffect(() => {
+    if (!open) return;
+    ChatSafetyHelper.loadMemberBlocks();
+    return ChatSafetyHelper.subscribe(() => setBlockVersion((v) => v + 1));
+  }, [open]);
 
   const loadAnnouncementsPreflight = React.useCallback(async () => {
     if (!groupId || !open) return;
@@ -186,8 +199,8 @@ export const GroupChatModal = ({
   // Hide subscription marker rows from the rendered thread — they're an internal
   // signal for NotificationHelper, not user-facing chat.
   const messages = React.useMemo(
-    () => allMessages.filter((m) => m.messageType !== SUBSCRIPTION_MESSAGE_TYPE),
-    [allMessages]
+    () => allMessages.filter((m) => m.messageType !== SUBSCRIPTION_MESSAGE_TYPE && !ChatSafetyHelper.isPersonBlocked(m.personId)),
+    [allMessages, blockVersion]
   );
 
   const conversationId = conversations[0]?.id;
@@ -408,6 +421,7 @@ export const GroupChatModal = ({
         const showAvatar = !isMine && (!next || next.personId !== m.personId);
         const photo = p ? (() => { try { return PersonHelper.getPhotoUrl(p); } catch { return ""; } })() : "";
         const showActions = isMine && !!m.id;
+        const showSafety = !isMine && !!m.id;
         return (
           <Box
             key={m.id || `m-${i}`}
@@ -493,6 +507,16 @@ export const GroupChatModal = ({
                 {formatRelative(m.timeSent)}
               </Typography>
             </Box>
+            {showSafety && (
+              <IconButton
+                size="small"
+                aria-label={Locale.label("chatSafety.messageOptions")}
+                onClick={(e) => setOtherMenu({ el: e.currentTarget, message: m })}
+                sx={{ color: tc.textMuted, p: "4px", alignSelf: "center" }}
+              >
+                <Icon sx={{ fontSize: 18 }}>more_vert</Icon>
+              </IconButton>
+            )}
           </Box>
         );
       })}
@@ -678,6 +702,31 @@ export const GroupChatModal = ({
           {Locale.label("mobile.group.delete")}
         </MenuItem>
       </Menu>
+      <Menu
+        anchorEl={otherMenu?.el || null}
+        open={!!otherMenu}
+        onClose={() => setOtherMenu(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+      >
+        <MenuItem onClick={() => { setReportMessage(otherMenu?.message || null); setOtherMenu(null); }}>
+          <Icon sx={{ fontSize: 18, mr: 1, color: tc.textMuted }}>flag</Icon>
+          {Locale.label("chatSafety.report")}
+        </MenuItem>
+        {!!otherMenu?.message?.personId && (
+          <MenuItem onClick={() => { setBlockTarget(otherMenu?.message || null); setOtherMenu(null); }}>
+            <Icon sx={{ fontSize: 18, mr: 1, color: tc.textMuted }}>block</Icon>
+            {Locale.label("chatSafety.block")}
+          </MenuItem>
+        )}
+      </Menu>
+      <ReportMessageDialog open={!!reportMessage} messageId={reportMessage?.id} onClose={() => setReportMessage(null)} />
+      <BlockPersonDialog
+        open={!!blockTarget}
+        name={blockTarget?.personId ? people[blockTarget.personId]?.name?.display : undefined}
+        onConfirm={async () => { if (blockTarget?.personId) await ChatSafetyHelper.blockPerson(blockTarget.personId); }}
+        onClose={() => setBlockTarget(null)}
+      />
       <Dialog open={!!confirmDelete} onClose={() => setConfirmDelete(null)}>
         <DialogTitle>{Locale.label("mobile.group.confirmDeleteTitle")}</DialogTitle>
         <DialogContent>

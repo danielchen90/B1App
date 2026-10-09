@@ -1106,5 +1106,37 @@
     "editProfile": "Modifier le profil",
     "logout": "Se déconnecter",
     "profile": "Profil"
+  },
+  "chatSafety": {
+    "report": "Signaler",
+    "block": "Bloquer",
+    "unblock": "Débloquer",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "messageOptions": "Options du message",
+    "reportTitle": "Signaler ce message",
+    "reportPrompt": "Pourquoi le signalez-vous ? L'équipe de l'église examine chaque signalement.",
+    "reason": {
+      "offensive": "Offensant ou haineux",
+      "harassment": "Harcèlement",
+      "spam": "Spam",
+      "other": "Autre chose"
+    },
+    "noteOptional": "Ajouter une note (facultatif)",
+    "noteRequired": "Dites-nous ce qui ne va pas",
+    "reportThanks": "Merci. Votre signalement a été envoyé à l'équipe de l'église, qui va l'examiner.",
+    "reportFailed": "Le signalement n'a pas pu être envoyé. Veuillez réessayer.",
+    "reportLimited": "Vous avez envoyé beaucoup de signalements en peu de temps. Veuillez réessayer plus tard.",
+    "blockTitle": "Bloquer {} ?",
+    "thisPerson": "cette personne",
+    "blockExplain": "Vous ne verrez plus ses messages dans les discussions de groupe, et cette personne ne pourra plus vous envoyer de messages privés. Elle n'en est pas informée.",
+    "blockExplainDevice": "Ses messages seront masqués dans cette discussion sur cet appareil.",
+    "blockFailed": "Cela n'a pas fonctionné. Veuillez réessayer.",
+    "youBlocked": "Vous avez bloqué {}. Ses messages sont masqués.",
+    "hostBlock": "Bloquer pour cette diffusion",
+    "hostBlocked": "{} ne peut plus écrire dans cette diffusion.",
+    "hostBlockFailed": "Impossible de bloquer cet expéditeur.",
+    "messageRejected": "Votre message n'a pas été envoyé car il contient des propos non autorisés ici.",
+    "senderBlocked": "Vous ne pouvez plus écrire dans cette discussion."
   }
 }

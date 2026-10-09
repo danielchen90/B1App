@@ -1106,5 +1106,37 @@
     "editProfile": "Edit Profile",
     "logout": "Logout",
     "profile": "Profile"
+  },
+  "chatSafety": {
+    "report": "Report",
+    "block": "Block",
+    "unblock": "Unblock",
+    "cancel": "Cancel",
+    "close": "Close",
+    "messageOptions": "Message options",
+    "reportTitle": "Report this message",
+    "reportPrompt": "Why are you reporting it? The church team reviews every report.",
+    "reason": {
+      "offensive": "Offensive or hateful",
+      "harassment": "Harassment",
+      "spam": "Spam",
+      "other": "Something else"
+    },
+    "noteOptional": "Add a note (optional)",
+    "noteRequired": "Tell us what is wrong",
+    "reportThanks": "Thank you. Your report was sent to the church team, who will review it.",
+    "reportFailed": "The report could not be sent. Please try again.",
+    "reportLimited": "You have sent many reports in a short time. Please try again later.",
+    "blockTitle": "Block {}?",
+    "thisPerson": "this person",
+    "blockExplain": "You will no longer see their messages in group chats, and they will not be able to send you private messages. They are not told.",
+    "blockExplainDevice": "Their messages will be hidden from this chat on this device.",
+    "blockFailed": "That did not work. Please try again.",
+    "youBlocked": "You blocked {}. Their messages are hidden.",
+    "hostBlock": "Block from this stream",
+    "hostBlocked": "{} can no longer post in this stream.",
+    "hostBlockFailed": "Could not block this sender.",
+    "messageRejected": "Your message was not sent because it contains language that is not allowed here.",
+    "senderBlocked": "You can no longer post in this chat."
   }
 }

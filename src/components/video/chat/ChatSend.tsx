@@ -13,6 +13,7 @@ interface Props { conversation: ConversationInterface }
 export const ChatSend: React.FC<Props> = (props) => {
   const [message, setMessage] = React.useState("");
   const [showEmojis, setShowEmojis] = React.useState(false);
+  const [notice, setNotice] = React.useState<string | null>(null);
 
   const handleSendMessage = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -26,8 +27,14 @@ export const ChatSend: React.FC<Props> = (props) => {
   const sendMessage = () => {
     const { firstName, lastName } = ChatHelper.current.user;
     const msg: MessageInterface = { churchId: ChatConfigHelper.current.churchId, content: message.trim(), conversationId: props.conversation.id, displayName: `${firstName} ${lastName}`, messageType: "message" };
-    if (UserHelper.user) ApiHelper.post("/messages/send", [msg], "MessagingApi");
-    else ApiHelper.postAnonymous("/messages/send", [msg], "MessagingApi");
+    const sent = UserHelper.user ? ApiHelper.post("/messages/send", [msg], "MessagingApi") : ApiHelper.postAnonymous("/messages/send", [msg], "MessagingApi");
+    setNotice(null);
+    // The server refuses slurs/explicit words (400) and senders a host blocked from this stream (403).
+    Promise.resolve(sent).catch((e: any) => {
+      const text = String(e?.message || "");
+      if (text.includes("message_rejected")) setNotice(Locale.label("chatSafety.messageRejected"));
+      else if (text.includes("blocked")) setNotice(Locale.label("chatSafety.senderBlocked"));
+    });
     setMessage("");
   };
 
@@ -63,6 +70,7 @@ export const ChatSend: React.FC<Props> = (props) => {
         </FormControl>
 
       </div>
+      {notice && <div className="chatSendNotice" role="alert" style={{ fontSize: 12, color: "#b3261e", margin: "2px 6px" }}>{notice}</div>}
     </div>
   );
 };
