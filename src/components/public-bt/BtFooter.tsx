@@ -100,6 +100,9 @@ export const BtFooter: React.FC<Props> = ({ campuses = [], churchName }) => {
             <p style={{ color: "var(--bt-ondark-muted)", fontSize: "0.95rem", lineHeight: 1.7, marginBottom: 16 }}>
               Services and discipleship classes stream every week on the ministry&rsquo;s channel.
             </p>
+            <a href="mailto:info@mbmonline.global" style={{ ...footLink, marginTop: -8, marginBottom: 14 }}>
+              info@mbmonline.global
+            </a>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
               <a className="bt-btn bt-btn-ghost" href={BT.youtubeUrl} target="_blank" rel="noopener noreferrer" style={{ padding: "10px 18px", fontSize: "0.9rem" }}>
                 <IconYouTube size={17} /> YouTube

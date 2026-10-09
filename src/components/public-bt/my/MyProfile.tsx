@@ -11,6 +11,16 @@ import { ProfileCard } from "./ProfileCard";
 import { EmailsCard } from "./EmailsCard";
 import { SignedOutCard } from "./SignedOutCard";
 
+// Shared Mary Banks ID deletion page (explains what is erased on every site, confirms on
+// Mary Banks ID, then returns here).
+const DELETE_ID_URL = "https://ecosystem.mbmonline.global/account/delete/";
+
+function deleteIdHref(): string {
+  if (typeof window === "undefined") return DELETE_ID_URL;
+  const lang = (document.documentElement.lang || "en").slice(0, 2).toLowerCase();
+  return `${DELETE_ID_URL}?return=${encodeURIComponent(window.location.href)}&lang=${encodeURIComponent(lang)}`;
+}
+
 export const MyProfile: React.FC<{ subDomain: string; centers: LocatorCampus[] }> = ({ subDomain, centers }) => {
   const { session, me, loaded, reload } = useMyChurch(subDomain);
   if (session.status === "signed-out" || session.status === "error") return <SignedOutCard returnUrl="/my/profile" />;
@@ -27,6 +37,16 @@ export const MyProfile: React.FC<{ subDomain: string; centers: LocatorCampus[] }
           <EmailsCard primary={session.status === "ready" ? session.email : ""} verified={me?.verifiedEmails || []} onChanged={reload} />
         </div>
       )}
+      <p style={{ marginTop: 8, fontSize: "0.9rem", color: "var(--bt-body)" }}>
+        <a
+          href={DELETE_ID_URL}
+          onClick={(e) => { e.preventDefault(); window.location.href = deleteIdHref(); }}
+          style={{ color: "#b91c1c", fontWeight: 600, textDecoration: "underline" }}
+        >
+          Delete my Mary Banks ID
+        </a>
+        {" "}Permanently erases your Mary Banks ID and your account on every Mary Banks site.
+      </p>
     </MyFrame>
   );
 };
