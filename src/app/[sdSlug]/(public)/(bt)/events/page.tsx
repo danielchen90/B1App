@@ -16,6 +16,7 @@ import { BtPageHead } from "@/components/public-bt/BtPageHead";
 import { EventsBrowser } from "@/components/public-bt/EventsBrowser";
 import { ThisWeek } from "@/components/public-bt/ThisWeek";
 import { BT } from "@/components/public-bt/btSiteContent";
+import { MinistryEvents, loadMinistryEvents } from "@/components/public-bt/events/MinistryEvents";
 
 type PageParams = { sdSlug: string };
 
@@ -33,7 +34,7 @@ export default async function EventsPage({ params }: { params: Promise<PageParam
   const { sdSlug } = await params;
   const config = await loadBtConfig(sdSlug);
   const churchId = config.church?.id || "";
-  const [campuses, events] = await Promise.all([loadVisibleCampuses(churchId), loadPublicEvents(churchId)]);
+  const [campuses, events, ministryEvents] = await Promise.all([loadVisibleCampuses(churchId), loadPublicEvents(churchId), loadMinistryEvents()]);
 
   return (
     <BtShell config={config} campuses={toLocationLinks(campuses)}>
@@ -43,6 +44,7 @@ export default async function EventsPage({ params }: { params: Promise<PageParam
         lede="Conferences, revivals, classes and gatherings across the worship centers and the ministry."
       />
       <section className="bt-section">
+        <MinistryEvents events={ministryEvents} />
         {events.length > 0 ? (
           <EventsBrowser events={events} />
         ) : (
