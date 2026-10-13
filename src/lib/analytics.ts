@@ -1,5 +1,5 @@
 // Mary Banks analytics (one PostHog project for every Mary Banks site). The hosted
-// script (https://ecosystem.mbmonline.global/analytics.js, loaded by BtAnalytics) owns
+// script (https://ecosystem.marybanks.net/analytics.js, loaded by BtAnalytics) owns
 // PostHog itself; this helper only queues calls on window.mbaq until it has loaded.
 // Event and property names follow ~/mb-ecosystem/ANALYTICS.md. Never put prayer text,
 // messages, notes or passwords in properties: ids, titles, counts and categories only.

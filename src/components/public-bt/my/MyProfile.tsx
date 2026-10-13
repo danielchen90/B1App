@@ -13,7 +13,7 @@ import { SignedOutCard } from "./SignedOutCard";
 
 // Shared Mary Banks ID deletion page (explains what is erased on every site, confirms on
 // Mary Banks ID, then returns here).
-const DELETE_ID_URL = "https://ecosystem.mbmonline.global/account/delete/";
+const DELETE_ID_URL = "https://ecosystem.marybanks.net/account/delete/";
 
 function deleteIdHref(): string {
   if (typeof window === "undefined") return DELETE_ID_URL;

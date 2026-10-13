@@ -3,7 +3,7 @@
 // Bible Teachers sticky top bar, in the Mary Banks family look: white, a hairline
 // under it, the mark on the left, the five-item menu, then the actions (Give and
 // Sign in). The Mary Banks sites switcher is the hosted one every Mary Banks site
-// loads (ecosystem.mbmonline.global); it sits fixed in the top corner, and the bar
+// loads (ecosystem.marybanks.net); it sits fixed in the top corner, and the bar
 // leaves it room at its end. Under 960px the menu folds into the
 // sidebar behind the hamburger. Give always goes to the site's own Give page, which
 // offers the ministry and every center, rather than straight out to a payment page.
@@ -91,7 +91,7 @@ export const BtHeader: React.FC<Props> = ({ campuses, giveUrl }) => {
       </header>
 
       {/* The nine-dot Mary Banks sites switcher, hosted once for every site. */}
-      <Script src="https://ecosystem.mbmonline.global/switcher.js" data-current="worship-centers" strategy="afterInteractive" />
+      <Script src="https://ecosystem.marybanks.net/switcher.js" data-current="worship-centers" strategy="afterInteractive" />
 
       <BtSidebar open={menuOpen} onClose={() => setMenuOpen(false)} campuses={campuses} giveUrl={giveUrl} />
     </>

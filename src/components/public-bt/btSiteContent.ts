@@ -218,14 +218,14 @@ export const BT_CAMPUS_EXTRAS: Record<string, BtCampusExtras> = {
     email: "info@btionlinechurch.com",
     websiteUrl: "https://www.btionlinechurch.com"
   },
-  // The Global Church (globalchurch.mbmonline.global): its own online location, separate from the
+  // The Global Church (globalchurch.marybanks.net): its own online location, separate from the
   // Online Church. People who join the Global Church there become members of this location in Huro.
   "global-church": {
     country: "Online",
     flag: "🌐",
     virtual: true,
     leaders: "Apostle Mary Banks, Apostle Michael Thomas, Apostle Kareem Flowers, Bishop Daniel Chen",
-    websiteUrl: "https://globalchurch.mbmonline.global",
+    websiteUrl: "https://globalchurch.marybanks.net",
     welcome: "A church you can join from anywhere on earth. Hear every sermon in your own language as it is preached, study with believers from every nation, and become a member online.",
     whatToExpect: "Join the live service from your phone or computer and choose your language: the message is interpreted as it is preached, with captions and a chat in your own tongue. Small E-Groups meet through the week, and you can join the church as a member on the Global Church site.",
     timesNote: "See the services and E-Group times on the Global Church site, shown in your own time zone."
@@ -360,10 +360,10 @@ export const BT_STEPS = [
 ] as const;
 
 export const BT_LINKS = {
-  gtc: "https://mbmonline.global",
-  growthPaths: "https://mbmonline.global/growth-paths",
-  partners: "https://partners.mbmonline.global",
-  faithLibrary: "https://new.mbfaithlibrary.com"
+  gtc: "https://training.marybanks.net",
+  growthPaths: "https://training.marybanks.net/growth-paths",
+  partners: "https://partners.marybanks.net",
+  faithLibrary: "https://library.marybanks.net"
 } as const;
 
 // ── Sermon titles → speaker + series ─────────────────────────────────────────────

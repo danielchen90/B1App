@@ -1,7 +1,7 @@
 "use client";
 
 // Mary Banks analytics on the Bible Teachers site: loads the shared script every Mary
-// Banks site loads (ecosystem.mbmonline.global/analytics.js) and connects it to this
+// Banks site loads (ecosystem.marybanks.net/analytics.js) and connects it to this
 // site's own pieces:
 //   consent   the site already asks through the Ask Mary banner (which also gates Google
 //             Analytics), so the script runs with data-consent="external" and gets the
@@ -18,7 +18,7 @@ import Script from "next/script";
 import { identify, mbidSubject, resetAnalytics, setAnalyticsConsent, track } from "@/lib/analytics";
 import { ASK_MARY_CONSENT_EVENT, readAskMaryConsent, type AskMaryConsent } from "@/components/askMary/useAskMaryConsent";
 
-const SRC = process.env.NEXT_PUBLIC_MB_ANALYTICS_SRC || "https://ecosystem.mbmonline.global/analytics.js";
+const SRC = process.env.NEXT_PUBLIC_MB_ANALYTICS_SRC || "https://ecosystem.marybanks.net/analytics.js";
 const IDENTIFIED_KEY = "bt.mbid";
 
 const readCookie = (name: string): string | null => {

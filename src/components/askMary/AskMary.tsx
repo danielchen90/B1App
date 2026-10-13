@@ -7,12 +7,12 @@ import type { AskMaryConsent } from "./useAskMaryConsent";
 
 /**
  * Ask Mary — the Mary Banks Ministries assistant, hosted by the Global
- * Training Center (mbmonline.global) and embedded here as a script. This site
+ * Training Center (training.marybanks.net) and embedded here as a script. This site
  * has no shared sign-in yet, so Mary runs in guest mode; a visitor who follows
  * her into GTC or the Faith Library and signs in keeps the conversation.
  */
 
-const ASK_MARY_URL = process.env.NEXT_PUBLIC_ASK_MARY_URL || "https://mbmonline.global";
+const ASK_MARY_URL = process.env.NEXT_PUBLIC_ASK_MARY_URL || "https://training.marybanks.net";
 const SITE_ID = "huro";
 
 type AskMaryGlobal = {

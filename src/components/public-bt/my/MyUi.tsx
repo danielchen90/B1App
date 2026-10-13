@@ -94,7 +94,7 @@ export const MyRail: React.FC<{ centerSlug?: string | null }> = ({ centerSlug })
     { href: "/my/profile", label: "My details", icon: IconUser }
   ];
   const secondary: RailItem[] = [
-    { href: "https://id.mbmonline.global/realms/marybanks/account", label: "Mary Banks ID", icon: IconSettings, external: true },
+    { href: "https://id.marybanks.net/realms/marybanks/account", label: "Mary Banks ID", icon: IconSettings, external: true },
     { href: "/next-steps#contact", label: "Help", icon: IconHelp }
   ];
   const here = (i: RailItem) => !i.external && (i.exact ? pathname.endsWith(i.href) : pathname.endsWith(i.href) || pathname.includes(i.href + "/"));

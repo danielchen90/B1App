@@ -127,7 +127,7 @@ const nextConfig = {
       // other church keeps the stock redirect into the mobile member screens.
       {
         source: "/my",
-        has: [{ type: "host", value: "^(?!(?:bti|church|bibleteachers|www\\.bibleteachers)\\.).*$" }],
+        has: [{ type: "host", value: "^(?!(?:bti|church|churches|events|bibleteachers|www\\.bibleteachers)\\.).*$" }],
         destination: "/mobile",
         permanent: false
       },

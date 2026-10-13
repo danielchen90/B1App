@@ -1,16 +1,16 @@
 /**
  * Ask Mary policies — the privacy policy, terms of use and cookie policy are
  * one text for every Mary Banks Ministries site, served by GTC
- * (mbmonline.global) from `GET /api/ask-mary/v1/policies/:slug?locale=xx`.
+ * (training.marybanks.net) from `GET /api/ask-mary/v1/policies/:slug?locale=xx`.
  * See lib/ask-mary/README.md in the GTC repo ("Consent, policies, and the
  * growth-path invitation") for the contract.
  *
  * Server-only: call from server components. Every failure is swallowed and
  * returns null so a policy outage never takes a page down; the page then
- * points the reader at the canonical copy on mbmonline.global.
+ * points the reader at the canonical copy on training.marybanks.net.
  */
 
-export const ASK_MARY_ORIGIN = (process.env.NEXT_PUBLIC_ASK_MARY_URL || "https://mbmonline.global").replace(/\/+$/, "");
+export const ASK_MARY_ORIGIN = (process.env.NEXT_PUBLIC_ASK_MARY_URL || "https://training.marybanks.net").replace(/\/+$/, "");
 
 export const POLICY_SLUGS = ["privacy", "terms", "cookies"] as const;
 export type PolicySlug = (typeof POLICY_SLUGS)[number];

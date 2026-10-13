@@ -43,7 +43,9 @@ const isInternalOrSubdomainHost = (host: string): boolean => {
   );
 };
 
-const membershipLookupBase = (): string | null => {
+const EVENTS_HOST = "events.marybanks.net";
+
+const membershipLookupBase =(): string | null => {
   const base = process.env.NEXT_PUBLIC_API_BASE?.replace(/\/+$/, "");
   if (!base) return null;
   return `${base}/membership/domains/public/lookup`;
@@ -60,6 +62,14 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   // Custom domain: strip a leading "www." so www + apex resolve to one church.
   const apex = host.replace(/^www\./, "");
+
+  // events.marybanks.net is the address HURO event emails use for /e/<slug>; it is the
+  // same Bible Teachers site (a domains row maps it to the church), and its bare root
+  // opens the events list instead of the church home page.
+  if (apex === EVENTS_HOST && request.nextUrl.pathname === "/") {
+    return NextResponse.redirect(`https://${EVENTS_HOST}/events`, 307);
+  }
+
   const lookupBase = membershipLookupBase();
   if (!lookupBase) return NextResponse.next(); // no API base configured → fail safe
 
