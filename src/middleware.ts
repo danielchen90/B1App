@@ -45,6 +45,9 @@ const isInternalOrSubdomainHost = (host: string): boolean => {
 
 const EVENTS_HOST = "events.marybanks.net";
 
+// The site moved from church.chensolutions.com to churches.marybanks.net (2026-10-13).
+const MOVED_HOSTS: Record<string, string> = { "church.chensolutions.com": "churches.marybanks.net" };
+
 const membershipLookupBase =(): string | null => {
   const base = process.env.NEXT_PUBLIC_API_BASE?.replace(/\/+$/, "");
   if (!base) return null;
@@ -66,6 +69,11 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // events.marybanks.net is the address HURO event emails use for /e/<slug>; it is the
   // same Bible Teachers site (a domains row maps it to the church), and its bare root
   // opens the events list instead of the church home page.
+  const movedTo = MOVED_HOSTS[apex];
+  if (movedTo) {
+    return NextResponse.redirect(`https://${movedTo}${request.nextUrl.pathname}${request.nextUrl.search}`, 308);
+  }
+
   if (apex === EVENTS_HOST && request.nextUrl.pathname === "/") {
     return NextResponse.redirect(`https://${EVENTS_HOST}/events`, 307);
   }
