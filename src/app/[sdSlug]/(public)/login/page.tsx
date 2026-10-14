@@ -18,6 +18,13 @@ export default async function LoginPage({ params, searchParams }: { params: Para
   const q = await searchParams;
   const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) || "";
 
+  // Member sign-in switched off (BT_MEMBER_SIGNIN): the site is read-only for
+  // visitors, so its login page sends them home. Staff sign in through B1Admin.
+  if (isBtPublicSite(sdSlug) && !memberSignInEnabled()) {
+    if (one(q.mbid_error)) return <MbidError reason={one(q.mbid_error)} />;
+    redirect("/");
+  }
+
   if (isBtPublicSite(sdSlug) && memberSignInEnabled()) {
     if (one(q.mbid_error)) return <MbidError reason={one(q.mbid_error)} />;
     if (!one(q.jwt)) {

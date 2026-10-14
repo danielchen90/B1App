@@ -12,6 +12,7 @@ import React from "react";
 import { NonAuthDonationWrapper } from "@churchapps/apphelper/website";
 import { useSavedCenter } from "./MyCenter";
 import { track } from "@/lib/analytics";
+import { memberSignInEnabledInBrowser } from "@/lib/memberSignIn";
 
 export interface GiveFund { id: string; name: string }
 
@@ -110,7 +111,8 @@ export const GiveEmbed: React.FC<Props> = ({ churchId, funds, centers }) => {
         />
       </div>
       <p className="bt-muted-text" style={{ fontSize: "0.9rem" }}>
-        Every gift is processed securely by Stripe. Sign in with your Mary Banks ID to see your giving history, manage recurring gifts and download a year-end statement in My Church.
+        Every gift is processed securely by Stripe.
+        {mounted && memberSignInEnabledInBrowser() && " Sign in with your Mary Banks ID to see your giving history, manage recurring gifts and download a year-end statement in My Church."}
       </p>
     </div>
   );

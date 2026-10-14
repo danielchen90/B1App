@@ -3,6 +3,7 @@
 // Google, sd=<church subdomain> (defaults from the host).
 
 import { NextResponse } from "next/server";
+import { memberSignInEnabled } from "@/lib/memberSignIn";
 import { FLOW_COOKIE, MBID_CLIENT_ID, MBID_ISSUER, pkceChallenge, publicOrigin, randomToken, safeReturn, sdFromHost, type MbidFlow } from "@/lib/mbid";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +19,8 @@ export async function GET(req: Request) {
     returnUrl: safeReturn(url.searchParams.get("returnUrl")),
     target: url.searchParams.get("target") === "admin" ? "admin" : "site"
   };
+  // With member sign-in off only staff sign in here (on their way to B1Admin).
+  if (flow.target !== "admin" && !memberSignInEnabled()) return NextResponse.redirect(origin + "/", 302);
 
   const auth = new URL(MBID_ISSUER + "/protocol/openid-connect/auth");
   auth.searchParams.set("client_id", MBID_CLIENT_ID);

@@ -1,3 +1,4 @@
+import { memberSignInEnabled } from "@/lib/memberSignIn";
 // Finish a Mary Banks ID sign-in: check the state, exchange the code (server side,
 // with the client secret and the PKCE verifier), ask the church API to verify the
 // ID token and return a short-lived ChurchApps login token, then let the existing
@@ -33,6 +34,8 @@ export async function GET(req: Request) {
   if (url.searchParams.get("error")) return fail(origin, url.searchParams.get("error") === "access_denied" ? "cancelled" : "provider");
   if (!flow || !url.searchParams.get("code") || url.searchParams.get("state") !== flow.state) return fail(origin, "session_lost");
   if (!MBID_CLIENT_SECRET) return fail(origin, "not_configured");
+  // Member sign-in off: a member flow started before the switch goes home, signed out.
+  if (flow.target !== "admin" && !memberSignInEnabled()) return NextResponse.redirect(origin + "/", 302);
 
   // 1. Code -> tokens.
   let idToken = "";

@@ -1,7 +1,7 @@
 // My giving — /my/giving. Part of My Church; signed-in only.
 
 import React from "react";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { memberSignInEnabled } from "@/lib/memberSignIn";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
 }
 
 export default async function Page({ params }: { params: Promise<PageParams> }) {
-  if (!memberSignInEnabled()) notFound();
+  if (!memberSignInEnabled()) redirect("/");
   await EnvironmentHelper.initServerSide();
   const { sdSlug } = await params;
   const config = await loadBtConfig(sdSlug);

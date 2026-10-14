@@ -2,7 +2,7 @@
 // Global Training Center dashboards. Signed-in only (Mary Banks ID).
 
 import React from "react";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { memberSignInEnabled } from "@/lib/memberSignIn";
 import type { Metadata } from "next";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
@@ -26,8 +26,8 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
 }
 
 export default async function MyChurchPage({ params }: { params: Promise<PageParams> }) {
-  // Hidden until member sign-in is switched on for this deployment.
-  if (!memberSignInEnabled()) notFound();
+  // Off until member sign-in is switched on for this deployment: visitors go home.
+  if (!memberSignInEnabled()) redirect("/");
   await EnvironmentHelper.initServerSide();
   const { sdSlug } = await params;
   const config = await loadBtConfig(sdSlug);
