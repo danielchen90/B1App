@@ -17,7 +17,7 @@ import crypto from "node:crypto";
 export const MBID_ISSUER = (process.env.MBID_ISSUER || "https://id.marybanks.net/realms/marybanks").replace(/\/+$/, "");
 export const MBID_CLIENT_ID = process.env.MBID_CLIENT_ID || "huro-app";
 export const MBID_CLIENT_SECRET = process.env.MBID_CLIENT_SECRET || "";
-export const ADMIN_URL = (process.env.B1ADMIN_URL || "https://admin.huro.church").replace(/\/+$/, "");
+export const ADMIN_URL = (process.env.B1ADMIN_URL || "https://admin.marybanks.net").replace(/\/+$/, "");
 export const FLOW_COOKIE = "mbid_flow";
 
 export interface MbidFlow {
