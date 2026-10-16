@@ -38,9 +38,9 @@ const FAMILY = [
   { label: "Global Training Center", href: "https://training.marybanks.net" },
   { label: "Global Church", href: "https://globalchurch.marybanks.net" },
   { label: "Prophecy Timeline", href: "https://timeline.marybanks.net" },
-  { label: "Bible Theater", href: "https://theater.marybanks.net" },
+  { label: "Bible Theater", href: "https://bibletheater.com" },
   { label: "City of Faith", href: "https://city.marybanks.net" },
-  { label: "Lifesavers", href: "https://lifesavers.marybanks.net" },
+  { label: "Lifesavers", href: "https://lifesavers.org" },
   { label: "The Bible Teacher", href: "https://app.thebibleteacher.com" },
   { label: "MBM Tools", href: "https://tools.marybanks.net" },
   { label: "Give", href: "https://marybanks.net/give" }
