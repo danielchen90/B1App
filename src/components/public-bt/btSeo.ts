@@ -2,14 +2,13 @@
 // ministry's own icons, layered on the stock MetaHelper output.
 //
 // The public origin comes from BT_SITE_URL (a runtime server variable on the B1App
-// service). Today that is https://churches.marybanks.net; at the bibleteachers.com
-// cutover change BT_SITE_URL to https://bibleteachers.com and canonical links, og:url,
-// the sitemap and robots.txt all follow without a code change.
+// service), https://bibleteachers.com since 2026-10-16; canonical links, og:url, the
+// sitemap and robots.txt all follow it.
 
 import type { Metadata } from "next";
 import { BT } from "./btSiteContent";
 
-const FALLBACK_SITE_URL = "https://churches.marybanks.net";
+const FALLBACK_SITE_URL = "https://bibleteachers.com";
 
 /** The site's public origin, no trailing slash. */
 export const btSiteUrl = (): string => {

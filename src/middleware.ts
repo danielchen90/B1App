@@ -65,8 +65,12 @@ const DOMAIN_MISS_TTL_MS = 60 * 1000;
 // Bible Teachers routes that depend on the visitor (sign-in, My Church, sign-out) are never shared-cached.
 const BT_PRIVATE_PATHS = /^\/(my|login|logout|register|guest-register|mobile|admin|member)(\/|$)/i;
 
-// The site moved from church.chensolutions.com to churches.marybanks.net (2026-10-13).
-const MOVED_HOSTS: Record<string, string> = { "church.chensolutions.com": "churches.marybanks.net" };
+// The site moved from church.chensolutions.com to churches.marybanks.net (2026-10-13), then to
+// its permanent home bibleteachers.com (2026-10-16).
+const MOVED_HOSTS: Record<string, string> = {
+  "church.chensolutions.com": "bibleteachers.com",
+  "churches.marybanks.net": "bibleteachers.com"
+};
 
 const membershipLookupBase =(): string | null => {
   const base = process.env.NEXT_PUBLIC_API_BASE?.replace(/\/+$/, "");
