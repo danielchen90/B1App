@@ -1,7 +1,8 @@
 "use client";
 import type { AppearanceInterface } from "@churchapps/apphelper";
 import type { SermonInterface } from "@churchapps/helpers";
-import { EnvironmentHelper, StreamConfigInterface } from ".";
+import { EnvironmentHelper } from "./EnvironmentHelper";
+import type { StreamConfigInterface } from "./interfaces";
 import { StreamingServiceHelper } from "./StreamingServiceHelper";
 
 export interface ColorsInterface { primary: string, contrast: string, header: string }

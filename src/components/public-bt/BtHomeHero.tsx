@@ -5,24 +5,37 @@
 //
 // Pure CSS animation (no timers), so it renders on the server and costs nothing in the
 // browser. The cycle is 24s: each slide is on top for 8s and cross-fades for ~1.5s.
-// The slides are <img> elements: the first is visible from the first paint and fetched
-// at high priority (it is the page's largest image); the others wait at opacity 0 and
-// each fades in over the one before. prefers-reduced-motion shows the first photograph, still.
+// The slides are <img> elements: the first is in the server HTML, visible from the first
+// paint and fetched at high priority (it is the page's largest image); the others are
+// added after the page loads (HeroLateSlides) and each fades in over the one before.
+// prefers-reduced-motion shows the first photograph, still.
 
 import React from "react";
 import { preload } from "react-dom";
 import Link from "next/link";
 import type { LocatorCampus } from "./LeafletLocatorMap";
-import { LiveIndicator } from "./LiveIndicator";
+import { LiveIndicator } from "./LiveIndicatorLazy";
 import { MyCenter } from "./MyCenter";
 import { HomeMemberCard } from "./HomeMemberCard";
 import { IconPlay, IconPin } from "./BtIcons";
+import { HeroLateSlides } from "./HeroLateSlides";
 
 const SLIDES = [
   { src: "/bt/hero-praise.jpg", label: "Worship", pos: "70% 40%" },
   { src: "/bt/hero-word.jpg", label: "The Word", pos: "60% 50%" },
   { src: "/bt/hero-choir.jpg", label: "Praise", pos: "65% 35%" }
 ];
+
+// WebP copies at two widths next to each JPEG (public/bt/<name>-960.webp, -1440.webp).
+// Phones get the 960 copy: under the mobile shade the photo is mostly covered, and it is
+// a third of the JPEG's bytes. The JPEG stays as the fallback src.
+const srcSetOf = (src: string) => {
+  const base = src.replace(/\.jpg$/, "");
+  return `${base}-960.webp 960w, ${base}-1440.webp 1440w`;
+};
+// On phones the photo is drawn about 1.8x the screen width (object-fit: cover on a tall hero);
+// 540px lets a 2x phone take the 960 copy.
+const SIZES = "(max-width: 760px) 540px, 100vw";
 
 const CYCLE = 24;
 const STEP = CYCLE / SLIDES.length;
@@ -42,7 +55,9 @@ const CSS = `
   background:
     linear-gradient(90deg, rgba(20,14,8,.92) 0%, rgba(20,14,8,.74) 34%, rgba(20,14,8,.28) 64%, rgba(20,14,8,.12) 100%),
     linear-gradient(180deg, rgba(20,14,8,.35) 0%, rgba(20,14,8,0) 26%, rgba(20,14,8,0) 62%, rgba(20,14,8,.7) 100%); }
-.bth-glow { position: absolute; z-index: -1; top: -30%; left: 18%; width: 60vw; height: 110%; pointer-events: none;
+/* Sized from fixed lengths, not the hero's height: the hero grows when the web fonts swap in,
+   and a percentage-sized glow moved with it (a layout shift on every first visit). */
+.bth-glow { position: absolute; z-index: -1; top: -220px; left: 18%; width: 60vw; height: 1000px; pointer-events: none; contain: strict;
   background: radial-gradient(closest-side, rgba(240,191,76,.28), rgba(240,191,76,0));
   transform: rotate(-18deg); filter: blur(10px); animation: bth-breathe 9s ease-in-out infinite alternate; }
 @keyframes bth-breathe { from { opacity: .55; } to { opacity: 1; } }
@@ -101,26 +116,28 @@ export const BtHomeHero: React.FC<Props> = ({ centers, physicalCount, nations, s
   const delay = (i: number) => (i === 0 ? "0s" : `${i * STEP - CYCLE * 0.05}s`);
   // The progress bars under the captions keep the original mid-cycle offsets.
   const capDelay = (i: number) => (i === 0 ? "0s" : `-${CYCLE - i * STEP}s`);
-  preload(SLIDES[0].src, { as: "image", fetchPriority: "high" });
+  preload(SLIDES[0].src, { as: "image", fetchPriority: "high", imageSrcSet: srcSetOf(SLIDES[0].src), imageSizes: SIZES });
 
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <section className="bth" aria-label="Welcome">
-        {SLIDES.map((s, i) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            key={s.src}
-            src={s.src}
-            alt=""
-            aria-hidden
-            className={"bth-slide" + (i === 0 ? " first" : "")}
-            fetchPriority={i === 0 ? "high" : "low"}
-            loading={i === 0 ? "eager" : "lazy"}
-            decoding={i === 0 ? "sync" : "async"}
-            style={{ objectPosition: s.pos, animationDelay: `${delay(i)}, ${delay(i)}` }}
-          />
-        ))}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={SLIDES[0].src}
+          srcSet={srcSetOf(SLIDES[0].src)}
+          sizes={SIZES}
+          width={1440}
+          height={800}
+          alt=""
+          aria-hidden
+          className="bth-slide first"
+          fetchPriority="high"
+          loading="eager"
+          decoding="sync"
+          style={{ objectPosition: SLIDES[0].pos, animationDelay: "0s, 0s" }}
+        />
+        <HeroLateSlides slides={SLIDES.slice(1).map((s, j) => ({ src: s.src, srcSet: srcSetOf(s.src), sizes: SIZES, pos: s.pos, delay: Number(delay(j + 1).replace("s", "")) }))} />
         <div className="bth-shade" aria-hidden />
         <div className="bth-glow" aria-hidden />
 

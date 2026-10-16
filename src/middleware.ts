@@ -7,7 +7,9 @@ import { isBtPublicSite } from "@/app/[sdSlug]/(public)/(bt)/isBtSite";
 const BT_NOINDEX_PATHS = /^\/(groups|volunteer|guest-register|votd|bible|register)(\/|$)/i;
 const BT_REDIRECTS: { test: RegExp; to: (host: string) => string }[] = [
   { test: /^\/donate\/?$/i, to: () => "https://marybanks.net/give" },
-  { test: /^\/stream(\/.*)?$/i, to: (host) => `https://${host}/watch` }
+  { test: /^\/stream(\/.*)?$/i, to: (host) => `https://${host}/watch` },
+  // The home page's internal route (next.config rewrites "/" to it); never its own address.
+  { test: /^\/bt-home\/?$/i, to: (host) => `https://${host}/` }
 ];
 
 /**
@@ -54,6 +56,14 @@ const isInternalOrSubdomainHost = (host: string): boolean => {
 
 const EVENTS_HOST = "events.marybanks.net";
 
+// Custom domain -> church subdomain answers, kept in memory for a few minutes.
+const DOMAIN_CACHE = new Map<string, { subDomain: string | undefined; until: number }>();
+const DOMAIN_TTL_MS = 5 * 60 * 1000;
+const DOMAIN_MISS_TTL_MS = 60 * 1000;
+
+// Bible Teachers routes that depend on the visitor (sign-in, My Church, sign-out) are never shared-cached.
+const BT_PRIVATE_PATHS = /^\/(my|login|logout|register|guest-register|mobile|admin|member)(\/|$)/i;
+
 // The site moved from church.chensolutions.com to churches.marybanks.net (2026-10-13).
 const MOVED_HOSTS: Record<string, string> = { "church.chensolutions.com": "churches.marybanks.net" };
 
@@ -91,17 +101,24 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   if (!lookupBase) return NextResponse.next(); // no API base configured → fail safe
 
   let subDomain: string | undefined;
-  try {
-    // Hard cap the lookup so a slow/unreachable Api can never hang a request
-    // (this runs on the hot path for every non-huro host). Timeout → fail safe.
-    const res = await fetch(`${lookupBase}/${encodeURIComponent(apex)}`, { signal: AbortSignal.timeout(2500) });
-    if (res.ok) {
-      const data = (await res.json()) as { subDomain?: string } | null;
-      subDomain = data?.subDomain || undefined;
+  const cached = DOMAIN_CACHE.get(apex);
+  if (cached && cached.until > Date.now()) {
+    subDomain = cached.subDomain;
+  } else {
+    try {
+      // Hard cap the lookup so a slow/unreachable Api can never hang a request
+      // (this runs on the hot path for every non-huro host). Timeout → fail safe.
+      const res = await fetch(`${lookupBase}/${encodeURIComponent(apex)}`, { signal: AbortSignal.timeout(2500) });
+      if (res.ok) {
+        const data = (await res.json()) as { subDomain?: string } | null;
+        subDomain = data?.subDomain || undefined;
+        // Remember the answer (found or not) so page loads skip the round trip to the Api.
+        DOMAIN_CACHE.set(apex, { subDomain, until: Date.now() + (subDomain ? DOMAIN_TTL_MS : DOMAIN_MISS_TTL_MS) });
+      }
+    } catch {
+      // Network/API error → fall through; never crash the request.
+      return NextResponse.next();
     }
-  } catch {
-    // Network/API error → fall through; never crash the request.
-    return NextResponse.next();
   }
 
   // Unknown custom domain / no match → fall through to the default/not-found.
@@ -126,6 +143,11 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   requestHeaders.set("x-site", `${subDomain}.huro.church`);
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   if (bt && BT_NOINDEX_PATHS.test(request.nextUrl.pathname)) response.headers.set("X-Robots-Tag", "noindex, follow");
+  // The public pages are the same for every visitor (no cookies or session are read on the
+  // server; sign-in state is drawn in the browser), so shared caches may keep them briefly.
+  if (bt && request.method === "GET" && !BT_PRIVATE_PATHS.test(request.nextUrl.pathname)) {
+    response.headers.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
+  }
   return response;
 }
 

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { InstallPromptHelper } from "@/helpers";
+import { InstallPromptHelper } from "@/helpers/InstallPromptHelper";
 
 export function PwaRegister(): null {
   useEffect(() => {

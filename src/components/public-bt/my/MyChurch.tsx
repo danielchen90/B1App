@@ -16,6 +16,7 @@
 import React from "react";
 import Link from "next/link";
 import { ApiHelper } from "@churchapps/apphelper";
+import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import type { LocatorCampus } from "../LeafletLocatorMap";
 import type { PublicEvent } from "@/helpers/PublicEventsHelper";
 import type { FeedSermon } from "@/helpers/SermonFeedHelper";
@@ -31,6 +32,9 @@ import {
   IconPlay, IconCalendar, IconGift, IconStep, IconHeart, IconUsers, IconHands, IconMail, IconPin, IconClock,
   IconChevronRight, IconBell, IconAward, IconCheck, IconLive
 } from "../BtIcons";
+
+// Point the API helpers at this site's API before any call (see BtClientLayout).
+if (typeof window !== "undefined") EnvironmentHelper.init();
 
 export interface MePerson {
   id: string; firstName?: string; lastName?: string; displayName?: string; photo?: string | null;

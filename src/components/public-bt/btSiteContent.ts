@@ -362,7 +362,7 @@ export const BT_STEPS = [
 export const BT_LINKS = {
   gtc: "https://training.marybanks.net",
   growthPaths: "https://training.marybanks.net/growth-paths",
-  partners: "https://partners.marybanks.net",
+  partners: "https://marybanks.net/give",
   faithLibrary: "https://library.marybanks.net"
 } as const;
 

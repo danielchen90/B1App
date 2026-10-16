@@ -7,6 +7,10 @@
 
 import React from "react";
 import { ApiHelper, UserHelper } from "@churchapps/apphelper";
+import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
+
+// Point the API helpers at this site's API before any call (see BtClientLayout).
+if (typeof window !== "undefined") EnvironmentHelper.init();
 
 export type SessionState =
   | { status: "loading" }

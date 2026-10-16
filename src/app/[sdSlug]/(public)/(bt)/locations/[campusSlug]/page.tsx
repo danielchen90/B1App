@@ -26,7 +26,7 @@ import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../../btPage
 import { BtShell } from "@/components/public-bt/BtShell";
 import { SocialLinks } from "@/components/public-bt/SocialLinks";
 import { LeadershipGrid, type PublicLeader } from "@/components/public-bt/LeadershipGrid";
-import { LiveIndicator } from "@/components/public-bt/LiveIndicator";
+import { LiveIndicator } from "@/components/public-bt/LiveIndicatorLazy";
 import { MessageCard } from "@/components/public-bt/MessageCard";
 import { EventCards } from "@/components/public-bt/EventCards";
 import { PhotoGallery } from "@/components/public-bt/PhotoGallery";
@@ -44,7 +44,8 @@ import {
   type CampusContent,
   type ServiceTime,
   type ExtraLink,
-  HIDDEN
+  HIDDEN,
+  firstPhoto
 } from "@/components/public-bt/campusContentTypes";
 
 type PageParams = { sdSlug: string; campusSlug: string };
@@ -145,7 +146,9 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const place = centerPlace(campus, extras?.country || "");
   const title = virtual ? btTitle(BT.name + " " + campus.name) : btTitle(BT.name + " Church in " + place);
   const description = centerDescription(campus, content);
-  return btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/locations/" + (campus.slug || campusSlug));
+  // Share card: the center's own photo (hero image, else first gallery photo) when it has one.
+  const photo = firstPhoto(content);
+  return btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/locations/" + (campus.slug || campusSlug), { image: photo, imageAlt: campus.name + " worship center" });
 }
 
 export default async function CampusDetailPage({ params }: { params: Promise<PageParams> }) {

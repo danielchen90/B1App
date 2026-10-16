@@ -91,7 +91,7 @@ export const BtHeader: React.FC<Props> = ({ campuses, giveUrl }) => {
       </header>
 
       {/* The nine-dot Mary Banks sites switcher, hosted once for every site. */}
-      <Script src="https://ecosystem.marybanks.net/switcher.js" data-current="worship-centers" strategy="afterInteractive" />
+      <Script src="https://ecosystem.marybanks.net/switcher.js" data-current="worship-centers" strategy="lazyOnload" />
 
       <BtSidebar open={menuOpen} onClose={() => setMenuOpen(false)} campuses={campuses} giveUrl={giveUrl} />
     </>

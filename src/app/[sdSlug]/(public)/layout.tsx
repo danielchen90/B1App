@@ -5,10 +5,10 @@ import "@/styles/streaming.css";
 import "@/styles/buttons.css";
 import "@/styles/sidebar.css";
 import "@/styles/master-detail.css";
-import ClientLayout from "@/app/ClientLayout";
+import BtClientLayout from "@/components/public-bt/BtClientLayout";
 import { PwaRegister } from "../mobile/PwaRegister";
 import { loadChurchAppearance } from "../mobile/loadChurchAppearance";
-import { isBtPublicSite } from "./(bt)/isBtSite";
+import { isBtPublicSite, btDisplayName } from "./(bt)/isBtSite";
 
 type LayoutParams = Promise<{ sdSlug: string }>;
 
@@ -24,9 +24,9 @@ export default async function PublicLayout({
   const { sdSlug } = await params;
   const { churchName } = await loadChurchAppearance(sdSlug);
 
-  const appTitle = (churchName && churchName.trim()) || sdSlug || "Church";
   // Bible Teachers ships its own mark; other churches get the generated app icon.
   const isBt = isBtPublicSite(sdSlug);
+  const appTitle = ((isBt ? btDisplayName(churchName) : churchName) || "").trim() || sdSlug || "Church";
   const iconUrl = isBt ? "/bt/icon-192.png" : "/mobile/icon/192";
   const iconUrl512 = isBt ? "/bt/icon-512.png" : "/mobile/icon/512";
 
@@ -42,9 +42,13 @@ export default async function PublicLayout({
       <meta name="apple-mobile-web-app-title" content={appTitle} />
       <link rel="preconnect" href="https://content.churchapps.org" />
       <link rel="preconnect" href="https://content.lessons.church" />
-      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+      {/* The stock screens' icon font; the Bible Teachers pages draw their own SVG icons (StockProviders adds it where needed). */}
+      {!isBt && <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />}
       <PwaRegister />
-      <ClientLayout>{children}</ClientLayout>
+      {/* No stock ChurchApps providers here (MUI theme, user/locale/error context): the routes
+          that use them add <StockProviders> in their own layout, and the stock home wraps itself,
+          so their bundles stay off the Bible Teachers pages. */}
+      <BtClientLayout>{children}</BtClientLayout>
     </>
   );
 }

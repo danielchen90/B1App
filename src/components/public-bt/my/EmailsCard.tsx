@@ -7,7 +7,11 @@
 
 import React from "react";
 import { ApiHelper } from "@churchapps/apphelper";
+import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { track } from "@/lib/analytics";
+
+// Point the API helpers at this site's API before any call (see BtClientLayout).
+if (typeof window !== "undefined") EnvironmentHelper.init();
 
 interface Props {
   primary: string;

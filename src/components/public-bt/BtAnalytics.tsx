@@ -95,5 +95,5 @@ export const BtAnalytics: React.FC = () => {
     return () => document.removeEventListener("click", onClick, true);
   }, []);
 
-  return <Script src={SRC} data-site="worship-centers" data-consent="external" strategy="afterInteractive" />;
+  return <Script src={SRC} data-site="worship-centers" data-consent="external" strategy="lazyOnload" />;
 };

@@ -56,16 +56,22 @@ export const BT_ICONS: Metadata["icons"] = {
 
 /**
  * Adds the BT canonical URL, og:url / site name / image, a large Twitter card and
- * the ministry icons to a page's metadata. `path` is the public path ("/about").
+ * the ministry icons to a page's metadata. `path` is the public path ("/about");
+ * `opts.image` is the page's own share photo (absolute or site-relative), when it has one.
  */
-export function btSeo(meta: Metadata, path: string): Metadata {
+export function btSeo(meta: Metadata, path: string, opts: { image?: string | null; imageAlt?: string } = {}): Metadata {
   const base = btSiteUrl();
   const url = base + (path === "/" ? "/" : path.replace(/\/+$/, ""));
   const og = (meta.openGraph || {}) as NonNullable<Metadata["openGraph"]>;
   // The stock fallback image is ChurchApps' own card; use the ministry's instead.
   const ogImages = (og as any).images as { url?: string }[] | undefined;
   const stockImage = !ogImages?.length || String(ogImages[0]?.url || "").includes("content.churchapps.org/40/");
-  const images = stockImage ? [{ url: base + BT_OG_IMAGE, width: 1200, height: 630, alt: BT.name }] : ogImages;
+  // A page's own photograph (a worship center's campus photo) wins over the shared card.
+  const own = (opts.image || "").trim();
+  const ownUrl = own ? (/^https?:\/\//.test(own) ? own : base + (own.startsWith("/") ? own : "/" + own)) : "";
+  const images = ownUrl
+    ? [{ url: ownUrl, alt: opts.imageAlt || BT.name }]
+    : stockImage ? [{ url: base + BT_OG_IMAGE, width: 1200, height: 630, alt: BT.name }] : ogImages;
   const title = typeof meta.title === "string" ? meta.title : BT.name;
   const description = meta.description || undefined;
   return {

@@ -119,7 +119,7 @@ export const LeafletLocatorMap: React.FC<Props> = ({ campuses, activeId, onActiv
           className: "bt-map-cluster",
           html: `<div style="width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;
                    background:radial-gradient(circle at 35% 30%, #F0BF4C, #B8912A 60%, #8A6A14);
-                   border:2px solid #1B1B22;color:#171204;font-weight:800;font-family:Outfit,system-ui,sans-serif;
+                   border:2px solid #1B1B22;color:#171204;font-weight:800;font-family:var(--bt-body-font,system-ui,sans-serif);
                    box-shadow:0 4px 14px rgba(18,16,11,.35);">${c.getChildCount()}</div>`,
           iconSize: [40, 40],
           iconAnchor: [20, 20]
@@ -156,7 +156,7 @@ export const LeafletLocatorMap: React.FC<Props> = ({ campuses, activeId, onActiv
         : "";
       marker.bindPopup(
         `<div style="min-width:180px">
-           <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.15rem;font-weight:600;margin-bottom:2px;">${c.flag} ${c.name}</div>
+           <div style="font-family:var(--bt-display-font,Georgia,serif);font-size:1.15rem;font-weight:600;margin-bottom:2px;">${c.flag} ${c.name}</div>
            ${c.address ? `<div style="color:#B3A78B;font-size:.85rem;">${c.address}</div>` : ""}
            ${c.serviceTimesLabel ? `<div style="color:#B3A78B;font-size:.8rem;margin-top:4px;">${c.serviceTimesLabel}</div>` : ""}
            <div style="margin-top:8px;">${link}</div>

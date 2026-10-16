@@ -20,6 +20,7 @@ const fmtDate = (iso: string): string => {
 const CSS = `
 .bt-msg { display: grid; gap: 12px; align-content: start; }
 .bt-msg-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: var(--bt-radius-lg); overflow: hidden; background: #111 center / cover no-repeat; border: 0; padding: 0; cursor: pointer; display: block; }
+.bt-msg-thumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .bt-msg-frame::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,.35)); }
 .bt-msg-play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1; width: 72px; height: 72px; border-radius: 50%; background: rgba(255,255,255,.94); display: grid; place-items: center; box-shadow: 0 10px 30px rgba(0,0,0,.35); transition: transform .15s; }
 .bt-msg-frame:hover .bt-msg-play { transform: translate(-50%, -50%) scale(1.06); }
@@ -42,6 +43,18 @@ interface Props {
 
 export const MessageCard: React.FC<Props> = ({ sermon, feature = false, placement, churchId }) => {
   const [playing, setPlaying] = React.useState(false);
+  // The thumbnail loads when the card comes near the screen (loading="lazy" alone starts
+  // phones' downloads a few screens early, competing with the hero photograph).
+  const frameRef = React.useRef<HTMLButtonElement | null>(null);
+  const [near, setNear] = React.useState(false);
+  React.useEffect(() => {
+    const el = frameRef.current;
+    if (!el || near) return;
+    if (typeof IntersectionObserver === "undefined") { setNear(true); return; }
+    const io = new IntersectionObserver((entries) => { if (entries.some((e) => e.isIntersecting)) { setNear(true); io.disconnect(); } }, { rootMargin: "300px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [near]);
   const meta = classifySermon(sermon.title);
   const thumb = feature ? `https://i.ytimg.com/vi/${sermon.videoId}/sddefault.jpg` : sermon.thumbnail;
 
@@ -60,6 +73,7 @@ export const MessageCard: React.FC<Props> = ({ sermon, feature = false, placemen
       ) : (
         <button
           type="button"
+          ref={frameRef}
           className="bt-msg-frame"
           aria-label={"Play " + sermon.title}
           onClick={() => {
@@ -67,8 +81,18 @@ export const MessageCard: React.FC<Props> = ({ sermon, feature = false, placemen
             const where = placement || (feature ? "latest" : "library");
             track("sermon_played", { video_id: sermon.videoId, video_title: sermon.title, series: meta.series || null, speaker: meta.speaker || null, church_id: churchId || null, placement: where });
           }}
-          style={{ backgroundImage: `url('${thumb}'), url('${sermon.thumbnail}')` }}
         >
+          {/* A lazy <img> (not a CSS background) so thumbnails below the fold wait their turn;
+              sddefault is missing on some videos, so fall back to hqdefault. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {near && <img
+            className="bt-msg-thumb"
+            src={thumb}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            onError={(e) => { const img = e.currentTarget; if (img.src !== sermon.thumbnail) img.src = sermon.thumbnail; }}
+          />}
           <span className="bt-msg-play" aria-hidden>
             <svg width={feature ? 26 : 18} height={feature ? 26 : 18} viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="#1B1B22" /></svg>
           </span>

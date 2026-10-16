@@ -13,12 +13,13 @@
 // All vars scoped to `.bt-root` (never :root) so nothing leaks into the Huro admin.
 
 import React from "react";
+import { Cormorant_Garamond, Outfit } from "next/font/google";
 
-const GOOGLE_FONTS_URL =
-  "https://fonts.googleapis.com/css2" +
-  "?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600" +
-  "&family=Outfit:wght@400;500;600;700" +
-  "&display=swap";
+// Self-hosted through next/font (no render-blocking Google Fonts stylesheet, and metric-
+// matched fallbacks so the text does not jump when the fonts arrive). The family names
+// stay in the stacks so inline styles naming 'Outfit' still resolve.
+const display = Cormorant_Garamond({ weight: ["500", "600", "700"], style: ["normal", "italic"], subsets: ["latin"], display: "swap", preload: false });
+const body = Outfit({ subsets: ["latin"], display: "swap" });
 
 const BT_VARS = [
   // ground + surfaces (Faith Library values)
@@ -49,9 +50,9 @@ const BT_VARS = [
   "--bt-maxw: 1200px;",
   "--bt-shadow: 0 1px 2px rgba(24,24,32,.04), 0 18px 40px -26px rgba(24,24,32,.28);",
   // type
-  "--bt-display-font: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;",
-  "--bt-eyebrow-font: 'Outfit', system-ui, sans-serif;",
-  "--bt-body-font: 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;",
+  "--bt-display-font: " + display.style.fontFamily + ", 'Cormorant Garamond', Georgia, 'Times New Roman', serif;",
+  "--bt-eyebrow-font: " + body.style.fontFamily + ", 'Outfit', system-ui, sans-serif;",
+  "--bt-body-font: " + body.style.fontFamily + ", 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;",
   // kept for older components that still read these
   "--bt-bg: var(--bt-ivory);",
   "--bt-surface: var(--bt-paper);",
@@ -175,9 +176,6 @@ a.bt-chip:hover, button.bt-chip:hover { box-shadow: inset 0 0 0 1.5px var(--bt-g
  */
 export const BtTheme: React.FC = () => (
   <>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-    <link rel="stylesheet" href={GOOGLE_FONTS_URL} />
     <style dangerouslySetInnerHTML={{ __html: BT_CSS }} />
   </>
 );

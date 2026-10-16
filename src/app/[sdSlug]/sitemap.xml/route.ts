@@ -1,3 +1,4 @@
+import { loadSermonFeed } from "@/helpers/SermonFeedHelper";
 import { NextRequest } from "next/server";
 import { ApiHelper } from "@churchapps/apphelper";
 import { EnvironmentHelper } from "@/helpers";
@@ -56,7 +57,9 @@ export async function GET(request: NextRequest, context: { params: Promise<{ sdS
         // Centers with their own YouTube channel have their own Watch page.
         if (isBtPublicSite(sdSlug)) {
           const paired = await loadCenterChannels(church.id, visible);
-          paired.forEach((p) => { if (p.channel) urls.add("/watch/" + p.campus.slug); });
+          // Only channels with full-length messages (an empty feed's page is noindex).
+          const withVideos = await Promise.all(paired.map(async (p) => (p.channel && (await loadSermonFeed(p.channel.channelId, 15)).length > 0 ? p : null)));
+          withVideos.forEach((p) => { if (p) urls.add("/watch/" + p.campus.slug); });
         }
       }
 

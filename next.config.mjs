@@ -167,8 +167,27 @@ const nextConfig = {
       }
     ];
 
+    // Bible Teachers tenants: "/" is the BT home route (its own page, so the stock CMS home's
+    // client bundles stay off it). Same subdomain list as isBtSite.ts.
+    const btSubs = ((process.env.NEXT_PUBLIC_BT_SUBDOMAINS || "").trim()
+      ? process.env.NEXT_PUBLIC_BT_SUBDOMAINS.split(",").map((x) => x.trim().toLowerCase()).filter(Boolean)
+      : ["bibleteachers", "bti", "church", "chensolutions"]).map((x) => x.replace(/[^a-z0-9-]/g, "")).join("|");
+    const btHomeRules = [
+      {
+        source: "/",
+        has: [{ type: "header", key: "x-site", value: `(?<subdomain>${btSubs})\\..*` }],
+        destination: "/:subdomain/bt-home"
+      },
+      {
+        source: "/",
+        has: [{ type: "host", value: `(?<subdomain>${btSubs})\\..*` }],
+        destination: "/:subdomain/bt-home"
+      }
+    ];
+
     return [
       ...railwayRules,
+      ...btHomeRules,
       {
         source: "/",
         has: [{ type: "header", key: "x-site", value: "(?<subdomain>.*?)\\..*" }],

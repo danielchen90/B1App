@@ -12,7 +12,10 @@ import { BtAnalytics } from "@/components/public-bt/BtAnalytics";
 const roboto = Roboto({
   weight: ["400", "700"],
   subsets: ["latin"],
-  display: "swap"
+  display: "swap",
+  // Not preloaded: the Bible Teachers pages (most of this site's traffic) set their own
+  // fonts, and a preload here competed with their first photograph on phones.
+  preload: false
 });
 
 export async function generateMetadata(): Promise<Metadata> {

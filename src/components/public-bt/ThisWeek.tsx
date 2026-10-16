@@ -8,7 +8,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { EnvironmentHelper } from "@/helpers";
+import { browserContentApi } from "@/lib/btApiBase";
 import { BT_RHYTHM } from "./btSiteContent";
 import { IconArrowRight } from "./BtIcons";
 
@@ -45,12 +45,8 @@ const fmtCountdown = (ms: number): string => {
   return "in " + days + (days === 1 ? " day" : " days");
 };
 
-// The church's own content API (EnvironmentHelper applies the page's API base in the
-// browser; see app/layout.tsx).
-const contentApiBase = (): string => {
-  EnvironmentHelper.init();
-  return EnvironmentHelper.Common.ContentApi;
-};
+// The church's own content API (the page's API base; see app/layout.tsx).
+const contentApiBase = (): string => browserContentApi();
 
 const CSS = `
 .bt-tw { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }

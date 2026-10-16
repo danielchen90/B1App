@@ -42,7 +42,10 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const meta = btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/watch/" + campus.slug);
   // A center without its own channel shows the ministry's feed (the same as /watch): keep it out of search.
   const own = await loadCenterChannel(config.church?.id || "", campus);
-  return own ? meta : { ...meta, robots: { index: false, follow: true } };
+  // A channel with no full-length messages yet (only Shorts, or nothing public) has an
+  // empty page: keep it out of search until its feed has videos (same call as the page).
+  const hasVideos = own ? (await loadSermonFeed(own.channelId, 15)).length > 0 : false;
+  return own && hasVideos ? meta : { ...meta, robots: { index: false, follow: true } };
 }
 
 export default async function CenterWatchPage({ params }: { params: Promise<PageParams> }) {

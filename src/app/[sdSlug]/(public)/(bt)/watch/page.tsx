@@ -18,7 +18,7 @@ import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../btPageDat
 import { BtShell } from "@/components/public-bt/BtShell";
 import { BtPageHead } from "@/components/public-bt/BtPageHead";
 import { ThisWeek } from "@/components/public-bt/ThisWeek";
-import { LiveIndicator } from "@/components/public-bt/LiveIndicator";
+import { LiveIndicator } from "@/components/public-bt/LiveIndicatorLazy";
 import { MessageCard } from "@/components/public-bt/MessageCard";
 import { MessageLibrary } from "@/components/public-bt/MessageLibrary";
 import { CenterLatestGrid } from "@/components/public-bt/CenterLatestGrid";

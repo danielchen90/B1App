@@ -3,7 +3,7 @@
 // heroImage when authored; otherwise the shared worship photograph sunk into the ink.
 
 import React from "react";
-import { LiveIndicator } from "./LiveIndicator";
+import { LiveIndicator } from "./LiveIndicatorLazy";
 import { trackAttrs } from "@/lib/analytics";
 
 interface Props {

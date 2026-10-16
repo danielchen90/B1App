@@ -11,8 +11,12 @@
 
 import React from "react";
 import { ApiHelper } from "@churchapps/apphelper";
+import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { readSavedCenter } from "../MyCenter";
 import { track } from "@/lib/analytics";
+
+// Point the API helpers at this site's API before any call (see BtClientLayout).
+if (typeof window !== "undefined") EnvironmentHelper.init();
 
 export type NextStepType = "visit" | "prayer" | "salvation" | "baptism" | "discipleship" | "serve" | "contact";
 

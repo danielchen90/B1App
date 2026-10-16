@@ -11,7 +11,7 @@
 // this is a display badge, not the full LiveStream interaction container.
 
 import React, { useEffect, useState } from "react";
-import { EnvironmentHelper } from "@/helpers";
+import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { StreamingServiceHelper } from "@/helpers/StreamingServiceHelper";
 import type { StreamConfigInterface, StreamingServiceExtendedInterface } from "@/helpers";
 

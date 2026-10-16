@@ -1,14 +1,10 @@
 import { PageInterface } from "@/helpers/interfaces";
 import { ConfigHelper } from "@/helpers/ConfigHelper";
-import { Theme } from "@/components/Theme";
-import { PageLayout } from "@/components/PageLayout";
-import { ChurchJsonLd } from "@/components/seo/ChurchJsonLd";
 import { Metadata } from "next";
 import { MetaHelper } from "@/helpers/MetaHelper";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
-import "@/styles/vendor/animations.css";
-import { Animate } from "@churchapps/apphelper/website";
 import { redirect } from "next/navigation";
+import { StockHome } from "./StockHome";
 import { isBtPublicSite } from "./(bt)/isBtSite";
 import { BtLanding, buildBtMetadata } from "./(bt)/BtLanding";
 
@@ -52,11 +48,6 @@ export default async function Home({ params }: { params: Promise<PageParams> }) 
   if (!props.pageData?.url) {
     redirect("/mobile");
   } else {
-    return (<>
-      <Theme config={props.config} />
-      <ChurchJsonLd config={props.config} />
-      <PageLayout config={props.config} pageData={props.pageData} />
-      <Animate />
-    </>);
+    return <StockHome config={props.config} pageData={props.pageData} />;
   }
 }

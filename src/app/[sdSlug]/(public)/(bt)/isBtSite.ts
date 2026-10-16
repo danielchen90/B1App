@@ -25,3 +25,12 @@ export function isBtPublicSite(sdSlug: string | undefined | null): boolean {
     : DEFAULT_BT_SUBDOMAINS;
   return list.includes(sdSlug.toLowerCase());
 }
+
+/**
+ * The church's public display name on the Bible Teachers site: the record is named
+ * "Bible Teachers International Inc" (the legal entity), which reads badly in titles, the
+ * footer and the home-screen app name. Legal pages spell the entity out themselves.
+ */
+export function btDisplayName(name: string | undefined | null): string {
+  return String(name || "").replace(/,?\s+Inc\.?\s*$/i, "").trim();
+}

@@ -1,11 +1,11 @@
-import { isBtPublicSite } from "./[sdSlug]/(public)/(bt)/isBtSite";
+import { isBtPublicSite, btDisplayName } from "./[sdSlug]/(public)/(bt)/isBtSite";
 import { loadChurchAppearance } from "./[sdSlug]/mobile/loadChurchAppearance";
 
 export async function buildManifest(sdSlug: string) {
   const { churchName, primaryColor } = await loadChurchAppearance(sdSlug);
   const themeColor = primaryColor || "#0D47A1";
-  const safeName = (churchName && churchName.trim()) || sdSlug || "Church";
   const isBt = isBtPublicSite(sdSlug);
+  const safeName = ((isBt ? btDisplayName(churchName) : churchName) || "").trim() || sdSlug || "Church";
   const shortName = isBt ? "Bible Teachers" : safeName.length > 12 ? safeName.substring(0, 12) : safeName;
   const icon192 = isBt ? "/bt/icon-192.png" : "/mobile/icon/192";
   const icon512 = isBt ? "/bt/icon-512.png" : "/mobile/icon/512";

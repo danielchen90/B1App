@@ -4,6 +4,7 @@ import type { AppearanceInterface } from "@churchapps/apphelper";
 import { GlobalStyleInterface, PageInterface } from "./interfaces";
 import { cache, startTransition } from "react";
 import { revalidate } from "@/app/actions";
+import { isBtPublicSite, btDisplayName } from "@/app/[sdSlug]/(public)/(bt)/isBtSite";
 
 export interface ColorsInterface { primary: string, contrast: string, header: string }
 export interface LogoInterface { url: string, image: string }
@@ -59,7 +60,9 @@ export class ConfigHelper {
     // This prevents showing the donate tab when no payment gateway is set up
     const allowDonations = gatewayConfigured?.configured === true;
 
-    const result: ConfigurationInterface = { appearance: appearance, church: church, navLinks: tabs, allowDonations, hasWebsite: Boolean(homePage?.url), globalStyles, homePage, appTheme };
+    // Bible Teachers: show the ministry name without the legal "Inc" (titles, footer, alt text).
+    const shownChurch = isBtPublicSite(keyName) && church?.name ? { ...church, name: btDisplayName(church.name) } : church;
+    const result: ConfigurationInterface = { appearance: appearance, church: shownChurch, navLinks: tabs, allowDonations, hasWebsite: Boolean(homePage?.url), globalStyles, homePage, appTheme };
     result.keyName = keyName;
     return result;
   });
