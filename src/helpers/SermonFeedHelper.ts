@@ -34,8 +34,13 @@ export const loadSermonFeed = cache(async (channelId: string, limit = 12): Promi
   return fromRss.length ? fromRss : loadFromDataApi(channelId, limit);
 });
 
+// globalchurch.site has lapsed (it is a for-sale page now); older descriptions still point to it.
+const globalChurchLink = (_: string, path = ""): string =>
+  /^\/prayer\b/i.test(path) ? "https://globalchurch.marybanks.net/prayer" : "https://globalchurch.marybanks.net";
+
 const cleanDescription = (raw: string): string =>
-  decode(raw).replace(/\s+/g, " ").replace(/\u2014/g, ",")
+  decode(raw).replace(/(?:https?:\/\/)?(?:www\.)?globalchurch\.site(\/[^\s"<]*)?/gi, globalChurchLink)
+    .replace(/\s+/g, " ").replace(/\u2014/g, ",")
     .replace(/\bDr\.?\s+Mary\s+Banks\b/g, "Apostle Mary Banks").replace(/\s*\(?\bKJV\b\)?/g, "").trim().slice(0, 300);
 
 /** ISO 8601 duration ("PT1H2M3S") in seconds. */
