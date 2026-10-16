@@ -10,7 +10,8 @@ import React from "react";
 import type { Metadata } from "next";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
-import { btSeo, btTitle, btDescription } from "@/components/public-bt/btSeo";
+import { btSeo, btTitle, btDescription, btSiteUrl } from "@/components/public-bt/btSeo";
+import { JsonLd } from "@/components/public-bt/BtJsonLd";
 import { loadLocatorCampuses } from "@/helpers/LocatorCampusHelper";
 import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../btPageData";
 import { BtShell } from "@/components/public-bt/BtShell";
@@ -46,6 +47,14 @@ export default async function LocationsPage({ params }: { params: Promise<PagePa
 
   return (
     <BtShell config={config} campuses={navLinks}>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: BT.name + " worship centers",
+          itemListElement: navLinks.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.name, url: btSiteUrl() + "/locations/" + c.slug }))
+        }}
+      />
       <BtPageHead
         eyebrow="Locations"
         title="Find your worship center"
