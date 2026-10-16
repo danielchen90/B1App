@@ -58,6 +58,14 @@ const nextConfig = {
       // package in one "vendor" chunk (about 5 MB of script on every page) and let
       // stylesheets into script chunks, which Next then ran as JavaScript.
 
+      // Stripe: the package's main entry injects js.stripe.com (about 275 KB) the moment any
+      // bundle that imports it loads, which put Stripe on every page. The "pure" entry has the
+      // same API and only fetches Stripe when loadStripe() is called (the giving forms).
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        "@stripe/stripe-js$": path.join(__dirname, "node_modules", "@stripe", "stripe-js", "pure", "index.mjs")
+      };
+
       // Handle cropperjs CSS import issue
       const cropperCssPath = "react-cropper/node_modules/cropperjs/dist/cropper.css";
       let resolvedPath;

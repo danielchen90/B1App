@@ -5,8 +5,9 @@
 //
 // Pure CSS animation (no timers), so it renders on the server and costs nothing in the
 // browser. The cycle is 24s: each slide is on top for 8s and cross-fades for ~1.5s.
-// DOM order is last-slide-first so the slide that is fading out always sits above the
-// one fading in. prefers-reduced-motion shows the first photograph, still.
+// The slides are <img> elements: the first is visible from the first paint and fetched
+// at high priority (it is the page's largest image); the others wait at opacity 0 and
+// each fades in over the one before. prefers-reduced-motion shows the first photograph, still.
 
 import React from "react";
 import { preload } from "react-dom";
@@ -29,9 +30,13 @@ const STEP = CYCLE / SLIDES.length;
 const CSS = `
 .bth { position: relative; overflow: hidden; background: #140F0A; color: #fff; isolation: isolate;
   min-height: clamp(540px, 78vh, 760px); display: flex; align-items: center; }
-.bth-slide { position: absolute; inset: 0; z-index: -3; background: center / cover no-repeat;
-  animation: bth-fade ${CYCLE}s linear infinite, bth-drift ${CYCLE}s ease-out infinite; will-change: opacity, transform; }
+.bth-slide { position: absolute; inset: 0; z-index: -3; width: 100%; height: 100%; object-fit: cover; display: block;
+  opacity: 0; animation: bth-in ${CYCLE}s linear infinite, bth-drift ${CYCLE}s ease-out infinite; will-change: opacity, transform; }
+/* The first photograph is on screen from the first paint (it is the page's largest image);
+   the others wait at opacity 0 and fade in on their turn (positive delays). */
+.bth-slide.first { opacity: 1; animation-name: bth-fade, bth-drift; }
 @keyframes bth-fade { 0% { opacity: 1; } 33.3% { opacity: 1; } 40% { opacity: 0; } 95% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes bth-in { 0% { opacity: 0; } 5% { opacity: 1; } 38.3% { opacity: 1; } 45% { opacity: 0; } 100% { opacity: 0; } }
 @keyframes bth-drift { 0% { transform: scale(1.12) translate3d(0, 0, 0); } 40% { transform: scale(1.02) translate3d(-1%, -1%, 0); } 95% { transform: scale(1.12); } 100% { transform: scale(1.12); } }
 .bth-shade { position: absolute; inset: 0; z-index: -2;
   background:
@@ -92,21 +97,28 @@ interface Props {
 }
 
 export const BtHomeHero: React.FC<Props> = ({ centers, physicalCount, nations, streamKey }) => {
-  // Slide i is on top from i*STEP seconds into the cycle; negative delays start them mid-cycle.
-  const delay = (i: number) => (i === 0 ? "0s" : `-${CYCLE - i * STEP}s`);
-  // The slides are CSS backgrounds, found late; fetch them with the document instead.
-  SLIDES.forEach((s, i) => preload(s.src, { as: "image", fetchPriority: i === 0 ? "high" : "low" }));
+  // Slide i is on top from i*STEP seconds into the cycle; it starts fading in 1.2s before that.
+  const delay = (i: number) => (i === 0 ? "0s" : `${i * STEP - CYCLE * 0.05}s`);
+  // The progress bars under the captions keep the original mid-cycle offsets.
+  const capDelay = (i: number) => (i === 0 ? "0s" : `-${CYCLE - i * STEP}s`);
+  preload(SLIDES[0].src, { as: "image", fetchPriority: "high" });
 
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <section className="bth" aria-label="Welcome">
-        {[...SLIDES].map((s, i) => ({ ...s, i })).reverse().map((s) => (
-          <div
+        {SLIDES.map((s, i) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             key={s.src}
-            className={"bth-slide" + (s.i === 0 ? " first" : "")}
+            src={s.src}
+            alt=""
             aria-hidden
-            style={{ backgroundImage: `url(${s.src})`, backgroundPosition: s.pos, animationDelay: `${delay(s.i)}, ${delay(s.i)}` }}
+            className={"bth-slide" + (i === 0 ? " first" : "")}
+            fetchPriority={i === 0 ? "high" : "low"}
+            loading={i === 0 ? "eager" : "lazy"}
+            decoding={i === 0 ? "sync" : "async"}
+            style={{ objectPosition: s.pos, animationDelay: `${delay(i)}, ${delay(i)}` }}
           />
         ))}
         <div className="bth-shade" aria-hidden />
@@ -137,9 +149,9 @@ export const BtHomeHero: React.FC<Props> = ({ centers, physicalCount, nations, s
 
         <div className="bth-caps" aria-hidden>
           {SLIDES.map((s, i) => (
-            <div key={s.label} className="bth-cap" style={{ animationDelay: delay(i) }}>
+            <div key={s.label} className="bth-cap" style={{ animationDelay: capDelay(i) }}>
               {s.label}
-              <i style={{ animationDelay: delay(i) }} />
+              <i style={{ animationDelay: capDelay(i) }} />
             </div>
           ))}
         </div>

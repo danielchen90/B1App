@@ -43,7 +43,7 @@ interface Props {
 export const MessageCard: React.FC<Props> = ({ sermon, feature = false, placement, churchId }) => {
   const [playing, setPlaying] = React.useState(false);
   const meta = classifySermon(sermon.title);
-  const thumb = feature ? `https://i.ytimg.com/vi/${sermon.videoId}/maxresdefault.jpg` : sermon.thumbnail;
+  const thumb = feature ? `https://i.ytimg.com/vi/${sermon.videoId}/sddefault.jpg` : sermon.thumbnail;
 
   return (
     <div className={"bt-msg" + (feature ? "" : " bt-msg-small")}>

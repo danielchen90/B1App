@@ -30,15 +30,33 @@ const LEGAL = [
   { label: "Cookies", href: "/cookies" }
 ];
 
+// The Mary Banks Ministries family: plain server-rendered links so every sister site is
+// reachable (and crawlable) from every page.
+const FAMILY = [
+  { label: "Mary Banks Ministries", href: "https://marybanks.net" },
+  { label: "Faith Library", href: "https://library.marybanks.net" },
+  { label: "Global Training Center", href: "https://training.marybanks.net" },
+  { label: "Global Church", href: "https://globalchurch.marybanks.net" },
+  { label: "Prophecy Timeline", href: "https://timeline.marybanks.net" },
+  { label: "Bible Theater", href: "https://theater.marybanks.net" },
+  { label: "City of Faith", href: "https://city.marybanks.net" },
+  { label: "Lifesavers", href: "https://lifesavers.marybanks.net" },
+  { label: "The Bible Teacher", href: "https://app.thebibleteacher.com" },
+  { label: "MBM Tools", href: "https://tools.marybanks.net" },
+  { label: "Give", href: "https://marybanks.net/give" }
+];
+
 const colHead: React.CSSProperties = {
-  fontFamily: "var(--bt-eyebrow-font)", fontWeight: 600, fontSize: "0.72rem",
-  letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--bt-gold-bright)",
+  fontFamily: "var(--bt-eyebrow-font)",
+  fontWeight: 600,
+  fontSize: "0.72rem",
+  letterSpacing: "0.16em",
+  textTransform: "uppercase",
+  color: "var(--bt-gold-bright)",
   marginBottom: 18
 };
 
-const footLink: React.CSSProperties = {
-  display: "block", padding: "5px 0", color: "var(--bt-ondark-muted)", fontSize: "0.95rem"
-};
+const footLink: React.CSSProperties = { display: "block", padding: "5px 0", color: "var(--bt-ondark-muted)", fontSize: "0.95rem" };
 
 export const BtFooter: React.FC<Props> = ({ campuses = [], churchName }) => {
   const highlight = campuses.filter((c) => c.slug).slice(0, 6);
@@ -114,11 +132,23 @@ export const BtFooter: React.FC<Props> = ({ campuses = [], churchName }) => {
           </div>
         </div>
 
+        <nav aria-label="Mary Banks Ministries sites" style={{ marginTop: 48, display: "flex", flexWrap: "wrap", gap: "6px 20px", fontSize: "0.88rem" }}>
+          {FAMILY.map((f) => (
+            <a key={f.href} href={f.href} style={{ color: "var(--bt-ondark-muted)" }}>{f.label}</a>
+          ))}
+        </nav>
+
         <div
           style={{
-            marginTop: 56, paddingTop: 22, borderTop: "1px solid var(--bt-line-dark)",
-            display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 12,
-            color: "var(--bt-ondark-muted)", fontSize: "0.85rem"
+            marginTop: 24,
+            paddingTop: 22,
+            borderTop: "1px solid var(--bt-line-dark)",
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            gap: 12,
+            color: "var(--bt-ondark-muted)",
+            fontSize: "0.85rem"
           }}
         >
           <span>

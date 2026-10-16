@@ -12,8 +12,8 @@
 // "/public/:churchId/campuses" (NOT "/membership/public/...", which would double the
 // segment and 404). Reached URL = <base>/membership/public/:churchId/campuses.
 
-import { ApiHelper } from "@churchapps/apphelper";
 import { cache } from "react";
+import { getAnonymousCached } from "./cachedGet";
 
 // Mirror of the API's PublicCampusDTO (forks/Api .../PublicDto.ts). Address keys
 // are the intentional public exception (a campus is a public physical location);
@@ -39,10 +39,7 @@ export interface PublicCampus {
 export const loadPublicCampuses = cache(async (churchId: string): Promise<PublicCampus[]> => {
   if (!churchId) return [];
   try {
-    const data = await ApiHelper.getAnonymous(
-      "/public/" + churchId + "/campuses",
-      "MembershipApi"
-    );
+    const data = await getAnonymousCached("/public/" + churchId + "/campuses", "MembershipApi", 300);
     return Array.isArray(data) ? (data as PublicCampus[]) : [];
   } catch {
     return [];

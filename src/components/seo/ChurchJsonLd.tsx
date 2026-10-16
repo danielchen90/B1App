@@ -1,17 +1,28 @@
 import React from "react";
 import { ConfigurationInterface } from "@/helpers/ConfigHelper";
+import { isBtPublicSite } from "@/app/[sdSlug]/(public)/(bt)/isBtSite";
+import { JsonLd, btOrganizationNode } from "@/components/public-bt/BtJsonLd";
 
 interface Props { config: ConfigurationInterface; }
+
+/** The church's public address: its own site for Bible Teachers, else its ChurchApps subdomain. */
+const churchUrl = (config: ConfigurationInterface): string =>
+  "https://" + (config.church?.subDomain || config.keyName) + ".huro.church";
 
 export function ChurchJsonLd({ config }: Props) {
   const church = config.church;
   if (!church?.name) return null;
 
+  // Bible Teachers International has its own organization node on its own domain.
+  if (isBtPublicSite(church.subDomain || config.keyName)) {
+    return <JsonLd data={{ "@context": "https://schema.org", ...btOrganizationNode() }} />;
+  }
+
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Church",
     name: church.name,
-    url: "https://" + (church.subDomain || config.keyName) + ".huro.church"
+    url: churchUrl(config)
   };
 
   const logo = config.appearance?.logoLight || config.appearance?.logoDark;
@@ -28,5 +39,5 @@ export function ChurchJsonLd({ config }: Props) {
     };
   }
 
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />;
+  return <JsonLd data={data} />;
 }

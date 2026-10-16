@@ -11,7 +11,8 @@ import React from "react";
 import type { Metadata } from "next";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
-import { btSeo } from "@/components/public-bt/btSeo";
+import { btSeo, btTitle, btDescription } from "@/components/public-bt/btSeo";
+import { JsonLd, btVideoListGraph } from "@/components/public-bt/BtJsonLd";
 import { loadSermonFeed } from "@/helpers/SermonFeedHelper";
 import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../btPageData";
 import { BtShell } from "@/components/public-bt/BtShell";
@@ -32,11 +33,11 @@ type PageParams = { sdSlug: string };
 export async function generateMetadata({ params }: { params: Promise<PageParams> }): Promise<Metadata> {
   const { sdSlug } = await params;
   const config = await loadBtConfig(sdSlug);
-  const churchName = config.church?.name || BT.name;
-  const title = "Watch | " + churchName;
-  const description =
+  const title = btTitle("Watch Sermons Live and On Demand");
+  const description = btDescription(
     "Watch live and on demand: Sunday Morning Live, Tuesday and Friday Night Discipleship and live prayer with " +
-    BT.founder + " and the " + churchName + " teaching ministry.";
+    BT.founder + " and the " + BT.name + " teaching ministry."
+  );
   return btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/watch");
 }
 
@@ -62,6 +63,7 @@ export default async function WatchPage({ params }: { params: Promise<PageParams
 
   return (
     <BtShell config={config} campuses={toLocationLinks(campuses)}>
+      {sermons.length > 0 && <JsonLd data={btVideoListGraph("/watch", "Recent messages from " + BT.ministry, sermons)} />}
       <BtPageHead
         eyebrow="Watch"
         title="Sit under the Word, live or on demand."

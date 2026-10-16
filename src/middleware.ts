@@ -1,5 +1,14 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { isBtPublicSite } from "@/app/[sdSlug]/(public)/(bt)/isBtSite";
+
+// Bible Teachers public site: leftover stock ChurchApps pages that are not part of the
+// ministry's site stay reachable for members but out of search, and two old addresses move.
+const BT_NOINDEX_PATHS = /^\/(groups|volunteer|guest-register|votd|bible|register)(\/|$)/i;
+const BT_REDIRECTS: { test: RegExp; to: (host: string) => string }[] = [
+  { test: /^\/donate\/?$/i, to: () => "https://marybanks.net/give" },
+  { test: /^\/stream(\/.*)?$/i, to: (host) => `https://${host}/watch` }
+];
 
 /**
  * Custom-domain resolution middleware (Phase 19, TEN-01).
@@ -75,7 +84,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   }
 
   if (apex === EVENTS_HOST && request.nextUrl.pathname === "/") {
-    return NextResponse.redirect(`https://${EVENTS_HOST}/events`, 307);
+    return NextResponse.redirect(`https://${EVENTS_HOST}/events`, 308);
   }
 
   const lookupBase = membershipLookupBase();
@@ -106,9 +115,18 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // directly does NOT work: the static host rewrite re-fires on the rewritten path.
   // Scoping that host rewrite instead breaks Railway's "/" healthcheck (proven by
   // deploy), so we reuse the existing x-site seam and leave next.config untouched.
+  const bt = isBtPublicSite(subDomain);
+  if (bt) {
+    const path = request.nextUrl.pathname;
+    const moved = BT_REDIRECTS.find((r) => r.test.test(path));
+    if (moved) return NextResponse.redirect(moved.to(host), 308);
+  }
+
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-site", `${subDomain}.huro.church`);
-  return NextResponse.next({ request: { headers: requestHeaders } });
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  if (bt && BT_NOINDEX_PATHS.test(request.nextUrl.pathname)) response.headers.set("X-Robots-Tag", "noindex, follow");
+  return response;
 }
 
 // Only run on page routes; skip Next internals, the API, the manifest/sw, and

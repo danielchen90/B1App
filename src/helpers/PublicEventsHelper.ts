@@ -6,8 +6,8 @@
 // campus id, name and slug. Never throws: an older API (404) or any failure resolves
 // to [] and the events sections simply hide.
 
-import { ApiHelper } from "@churchapps/apphelper";
 import { cache } from "react";
+import { getAnonymousCached } from "./cachedGet";
 
 export interface PublicEvent {
   id: string;
@@ -55,7 +55,7 @@ export const loadPublicEvents = cache(async (churchId: string, campusId?: string
   if (!churchId) return [];
   try {
     const q = campusId ? "?campusId=" + encodeURIComponent(campusId) : "";
-    const data = await ApiHelper.getAnonymous("/events/public/" + churchId + q, "ContentApi");
+    const data = await getAnonymousCached("/events/public/" + churchId + q, "ContentApi", 60);
     if (!Array.isArray(data)) return [];
     const now = Date.now();
     return collapseRepeats((data as PublicEvent[])

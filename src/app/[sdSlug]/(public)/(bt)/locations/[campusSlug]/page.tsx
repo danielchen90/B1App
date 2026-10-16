@@ -19,7 +19,8 @@ import { notFound, redirect } from "next/navigation";
 import { ApiHelper } from "@churchapps/apphelper";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
-import { btSeo } from "@/components/public-bt/btSeo";
+import { btSeo, btTitle, btDescription } from "@/components/public-bt/btSeo";
+import { JsonLd, btChurchGraph, usStateAbbr } from "@/components/public-bt/BtJsonLd";
 import type { PublicCampus } from "@/helpers/PublicCampusHelper";
 import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../../btPageData";
 import { BtShell } from "@/components/public-bt/BtShell";
@@ -99,23 +100,51 @@ const loadLeadership = cache(async (churchId: string): Promise<PublicLeader[]> =
 const str = (v: string | typeof HIDDEN | undefined): string => (v && v !== HIDDEN ? v : "");
 const list = <T,>(v: T[] | typeof HIDDEN | undefined): T[] => (Array.isArray(v) ? v : []);
 
+/** "Fort Lauderdale, FL", "Mississauga, ON", "Half Way Tree, Jamaica": the center's name plus its region. */
+const centerPlace = (campus: PublicCampus, country: string): string => {
+  const US_SUFFIX = /\s+(Alabama|Florida|Georgia|Louisiana|Mississippi|Texas)$/i;
+  const name = campus.name.replace(US_SUFFIX, "").trim();
+  if (country === "United States") return name + (campus.state ? ", " + usStateAbbr(campus.state) : "");
+  if (country === "Canada") return name + (campus.state ? ", " + (/^ontario$/i.test(campus.state) ? "ON" : campus.state) : "");
+  if (!country || country === "Online" || country.toLowerCase().startsWith(name.toLowerCase())) return country && country !== "Online" ? country : name;
+  return name + ", " + country;
+};
+
+const timesSummary = (times: ServiceTime[]): string =>
+  times.slice(0, 2).map((t) => t.day + " " + t.time.replace(/\s*(ET|EST|EDT)$/i, "") + (t.label ? " " + t.label.replace(/^(?!Bible\b)./, (c) => c.toLowerCase()) : "")).join(", ");
+
+/** The center's search description (also its structured-data description), at most 160 characters. */
+const centerDescription = (campus: PublicCampus, content: CampusContent): string => {
+  const extras = getCampusExtras(campus.slug);
+  const virtual = !!extras?.virtual;
+  const place = centerPlace(campus, extras?.country || "");
+  const apiTimes = list<ServiceTime>(content.serviceTimes);
+  const times = apiTimes.length > 0 ? apiTimes : (extras?.serviceTimes || []);
+  const welcome = str(content.welcomeNote);
+  if (welcome) return btDescription(welcome);
+  const lead = virtual
+    ? "Join the " + BT.name + " " + campus.name + " from anywhere" + (times.length ? ": " + timesSummary(times) : "") + "."
+    : "Worship with " + BT.name + " in " + place + (times.length ? ": " + timesSummary(times) : "") + ".";
+  const tails = virtual ? [" Live services, discipleship and prayer.", " Join us live."] : [" Directions and how to plan your visit.", " Plan your visit."];
+  const fit = tails.map((t) => lead + t).find((d) => d.length <= 160);
+  return btDescription(fit || lead);
+};
+
 export async function generateMetadata({ params }: { params: Promise<PageParams> }): Promise<Metadata> {
   const { sdSlug, campusSlug } = await params;
   const config = await loadBtConfig(sdSlug);
   const churchId = config.church?.id || "";
   const resolved = await resolveCampusBySlug(churchId, campusSlug);
-  const churchName = config.church?.name || BT.name;
 
-  if (!resolved) return { ...MetaHelper.getMetaData("Worship center not found | " + churchName, churchName, churchName, config.appearance), robots: { index: false } };
+  if (!resolved) return { ...MetaHelper.getMetaData(btTitle("Worship center not found"), BT.name, BT.name, config.appearance), robots: { index: false } };
 
   const campus = resolved.campus;
+  const extras = getCampusExtras(campus.slug);
   const content = await loadCampusContent(churchId, campus.id);
-  const title = campus.name + " | " + churchName;
-  const locality = [campus.city, campus.state].filter(Boolean).join(", ");
-  const description =
-    str(content.welcomeNote) ||
-    ("Visit the " + campus.name.replace(/^the\s+/i, "") + " worship center" + (locality ? " in " + locality : "") +
-      ". Service times, directions, the latest message, and how to plan your visit.");
+  const virtual = !!extras?.virtual;
+  const place = centerPlace(campus, extras?.country || "");
+  const title = virtual ? btTitle(BT.name + " " + campus.name) : btTitle(BT.name + " Church in " + place);
+  const description = centerDescription(campus, content);
   return btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/locations/" + (campus.slug || campusSlug));
 }
 
@@ -194,6 +223,27 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
     <BtShell config={config} campuses={navLinks} giveUrl={giveUrl}>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <TrackOnView event="church_viewed" props={churchProps} />
+      <JsonLd
+        data={btChurchGraph({
+          slug: campus.slug || campusSlug,
+          name: campus.name,
+          description: centerDescription(campus, content),
+          address1: campus.address1,
+          city: campus.city,
+          state: campus.state,
+          zip: campus.zip,
+          country: extras?.country,
+          latitude: campus.latitude,
+          longitude: campus.longitude,
+          phone,
+          email,
+          image: photos[0],
+          website,
+          virtual,
+          serviceTimes,
+          sameAs: [str(content.facebookUrl) || extras?.facebookUrl, str(content.instagramUrl) || extras?.instagramUrl, str(content.youtubeUrl) || extras?.youtubeUrl].filter((u): u is string => !!u)
+        })}
+      />
 
       {/* (1) Hero: the center's own photo, name, pastor, times, and what to do next */}
       <section className="bt-ch">

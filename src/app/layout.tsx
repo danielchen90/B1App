@@ -5,8 +5,8 @@ import { memberSignInEnabled } from "@/lib/memberSignIn";
 import type { Metadata } from "next";
 import { isBtPublicSite } from "@/app/[sdSlug]/(public)/(bt)/isBtSite";
 import { requestSiteSlug } from "@/components/public-bt/requestSite";
-import { btSiteUrl, BT_ICONS } from "@/components/public-bt/btSeo";
-import { BT, BT_COPY } from "@/components/public-bt/btSiteContent";
+import { btSiteUrl, BT_ICONS, BT_SITE_NAME, BT_SITE_BRAND } from "@/components/public-bt/btSeo";
+import { BT_COPY } from "@/components/public-bt/btSiteContent";
 import { BtAnalytics } from "@/components/public-bt/BtAnalytics";
 
 const roboto = Roboto({
@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   if (isBtPublicSite(await requestSiteSlug())) {
     return {
       metadataBase: new URL(btSiteUrl()),
-      title: { default: BT.name, template: "%s | " + BT.name },
+      title: { default: BT_SITE_NAME, template: "%s | " + BT_SITE_BRAND },
       description: BT_COPY.heroSub,
       icons: BT_ICONS
     };

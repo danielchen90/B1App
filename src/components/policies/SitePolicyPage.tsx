@@ -10,8 +10,7 @@ import type { PolicySlug } from "@/helpers/AskMaryPolicies";
 import { isBtPublicSite } from "@/app/[sdSlug]/(public)/(bt)/isBtSite";
 import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "@/app/[sdSlug]/(public)/(bt)/btPageData";
 import { BtShell } from "@/components/public-bt/BtShell";
-import { btSeo } from "@/components/public-bt/btSeo";
-import { BT } from "@/components/public-bt/btSiteContent";
+import { btSeo, btTitle } from "@/components/public-bt/btSeo";
 import { btConfigSlug } from "@/components/public-bt/requestSite";
 
 const TITLES: Record<PolicySlug, string> = { privacy: "Privacy Policy", terms: "Terms of Use", cookies: "Cookie Policy" };
@@ -23,8 +22,7 @@ const DESCRIPTIONS: Record<PolicySlug, string> = {
 
 export async function sitePolicyMetadata(sdSlug: string, slug: PolicySlug): Promise<Metadata> {
   if (!isBtPublicSite(sdSlug)) return { title: TITLES[slug] };
-  const config = await loadBtConfig(btConfigSlug(sdSlug));
-  const title = TITLES[slug] + " | " + (config.church?.name || BT.name);
+  const title = btTitle(TITLES[slug]);
   return btSeo({ title, description: DESCRIPTIONS[slug], openGraph: { type: "website", title, description: DESCRIPTIONS[slug] } }, "/" + slug);
 }
 

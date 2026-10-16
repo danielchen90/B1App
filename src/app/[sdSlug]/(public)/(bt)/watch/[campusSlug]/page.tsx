@@ -11,7 +11,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
-import { btSeo } from "@/components/public-bt/btSeo";
+import { btSeo, btTitle, btDescription } from "@/components/public-bt/btSeo";
+import { JsonLd, btVideoListGraph } from "@/components/public-bt/BtJsonLd";
 import { loadSermonFeed } from "@/helpers/SermonFeedHelper";
 import { loadCenterChannel } from "@/helpers/CenterChannelHelper";
 import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../../btPageData";
@@ -34,12 +35,14 @@ const findCampus = async (churchId: string, slug: string) => {
 export async function generateMetadata({ params }: { params: Promise<PageParams> }): Promise<Metadata> {
   const { sdSlug, campusSlug } = await params;
   const config = await loadBtConfig(sdSlug);
-  const churchName = config.church?.name || BT.name;
   const { campus } = await findCampus(config.church?.id || "", campusSlug);
-  if (!campus) return { ...MetaHelper.getMetaData("Watch | " + churchName, churchName, churchName, config.appearance), robots: { index: false } };
-  const title = "Watch " + campus.name + " | " + churchName;
-  const description = "The latest messages from " + campus.name + ", streamed every week. Watch live or catch up on recent services.";
-  return btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/watch/" + campus.slug);
+  if (!campus) return { ...MetaHelper.getMetaData(btTitle("Watch"), BT.name, BT.name, config.appearance), robots: { index: false } };
+  const title = btTitle("Watch " + campus.name + ": Services and Sermons");
+  const description = btDescription("The latest messages from " + BT.name + " " + campus.name + ", streamed every week. Watch live or catch up on recent services and sermons.");
+  const meta = btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/watch/" + campus.slug);
+  // A center without its own channel shows the ministry's feed (the same as /watch): keep it out of search.
+  const own = await loadCenterChannel(config.church?.id || "", campus);
+  return own ? meta : { ...meta, robots: { index: false, follow: true } };
 }
 
 export default async function CenterWatchPage({ params }: { params: Promise<PageParams> }) {
@@ -60,6 +63,7 @@ export default async function CenterWatchPage({ params }: { params: Promise<Page
 
   return (
     <BtShell config={config} campuses={toLocationLinks(campuses)}>
+      {own && sermons.length > 0 && <JsonLd data={btVideoListGraph("/watch/" + campus.slug, "Recent messages from " + campus.name, sermons)} />}
       <BtPageHead
         eyebrow={(flag ? flag + " " : "") + "Watch " + campus.name}
         title={own ? "Messages from " + campus.name + "." : "Watch with " + campus.name + "."}

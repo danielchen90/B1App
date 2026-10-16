@@ -78,5 +78,5 @@ export function AskMary() {
     window.AskMary?.setContext?.(contextFor(pathname));
   }, [pathname]);
 
-  return <Script src={`${ASK_MARY_URL}/ask-mary/embed.js`} strategy="afterInteractive" onReady={configure} />;
+  return <Script src={`${ASK_MARY_URL}/ask-mary/embed.js`} strategy="lazyOnload" onReady={configure} />;
 }

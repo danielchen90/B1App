@@ -18,7 +18,8 @@ import Link from "next/link";
 import { ApiHelper } from "@churchapps/apphelper";
 import type { ConfigurationInterface } from "@/helpers/ConfigHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
-import { btSeo } from "@/components/public-bt/btSeo";
+import { btSeo, btTitle, btDescription } from "@/components/public-bt/btSeo";
+import { BtSiteJsonLd } from "@/components/public-bt/BtJsonLd";
 import { loadSermonFeed, type FeedSermon } from "@/helpers/SermonFeedHelper";
 import { loadLocatorCampuses } from "@/helpers/LocatorCampusHelper";
 import { loadPublicEvents } from "@/helpers/PublicEventsHelper";
@@ -28,7 +29,7 @@ import { BtHomeHero } from "@/components/public-bt/BtHomeHero";
 import { ThisWeek } from "@/components/public-bt/ThisWeek";
 import { MessageCard } from "@/components/public-bt/MessageCard";
 import { EventCards } from "@/components/public-bt/EventCards";
-import { BT, BT_COPY, BT_STEPS, BT_COUNTRY_ORDER, BT_LINKS } from "@/components/public-bt/btSiteContent";
+import { BT, BT_STEPS, BT_COUNTRY_ORDER, BT_LINKS, BT_NATION_COUNT } from "@/components/public-bt/btSiteContent";
 import { IconArrowRight, IconPin, IconGift, IconHeart } from "@/components/public-bt/BtIcons";
 
 
@@ -65,10 +66,11 @@ export const loadBtLandingData = cache(async (config: ConfigurationInterface) =>
 });
 
 export async function buildBtMetadata(config: ConfigurationInterface): Promise<Metadata> {
-  const churchName = config.church?.name || BT.name;
-  const { content } = await loadBtLandingData(config);
-  const description = content.mission || BT_COPY.heroSub;
-  return btSeo(MetaHelper.getMetaData(churchName + " | " + BT.tagline, description, description, config.appearance), "/");
+  const description = btDescription(
+    BT.name + " worship centers in " + BT_NATION_COUNT + " nations: the US, the Caribbean and Canada, plus online. Find a church near you, watch live, plan a visit."
+  );
+  const title = btTitle(BT.name + " Churches in " + BT_NATION_COUNT + " Nations");
+  return btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/");
 }
 
 const CSS = `
@@ -106,6 +108,7 @@ export const BtLanding: React.FC<{ config: ConfigurationInterface }> = async ({ 
 
   return (
     <BtShell config={config} campuses={navLinks}>
+      <BtSiteJsonLd />
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
       {/* ══ HERO: worship photography, the welcome, then your center + My Church on the dock ══ */}

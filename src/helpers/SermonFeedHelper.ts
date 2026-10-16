@@ -10,6 +10,8 @@ export interface FeedSermon {
   title: string;
   publishedAt: string;
   thumbnail: string;
+  /** The first part of the video's description (structured data). */
+  description?: string;
 }
 
 const decode = (s: string): string =>
@@ -42,12 +44,16 @@ export const loadSermonFeed = cache(async (channelId: string, limit = 12): Promi
       const publishedAt = entry.match(/<published>([^<]+)<\/published>/)?.[1] ?? "";
       if (!videoId) continue;
       const title = decode(rawTitle);
+      const rawDesc = entry.match(/<media:description>([\s\S]*?)<\/media:description>/)?.[1] ?? "";
+      const description = decode(rawDesc).replace(/\s+/g, " ").replace(/\u2014/g, ",")
+        .replace(/\bDr\.?\s+Mary\s+Banks\b/g, "Apostle Mary Banks").replace(/\s*\(?\bKJV\b\)?/g, "").trim().slice(0, 300);
       if (/#shorts/i.test(title) || /<link rel="alternate" href="[^"]*\/shorts\//.test(entry)) continue; // full messages only
       sermons.push({
         videoId,
         title,
         publishedAt,
-        thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+        thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+        ...(description ? { description } : {})
       });
     }
     sermons.sort((a, b) => (b.publishedAt || "").localeCompare(a.publishedAt || ""));

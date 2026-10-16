@@ -17,7 +17,11 @@ export const loadBtConfig = cache(async (sdSlug: string): Promise<ConfigurationI
 /** Public campuses minus internal test rows. */
 export const loadVisibleCampuses = cache(async (churchId: string): Promise<PublicCampus[]> => {
   const campuses = await loadPublicCampuses(churchId);
-  return campuses.filter((c) => !isHiddenCampusSlug(c.slug));
+  // Trim stray spaces in the admin-entered address fields ("Mississauga , Ontario").
+  const tidy = (v: string | null) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim() : v);
+  return campuses
+    .filter((c) => !isHiddenCampusSlug(c.slug))
+    .map((c) => ({ ...c, name: tidy(c.name) || c.name, address1: tidy(c.address1), city: tidy(c.city), state: tidy(c.state), zip: tidy(c.zip) }));
 });
 
 export const toLocationLinks = (campuses: { slug: string | null; name: string }[]): LocationLink[] =>

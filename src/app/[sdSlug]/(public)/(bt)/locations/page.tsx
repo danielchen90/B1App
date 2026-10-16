@@ -10,7 +10,7 @@ import React from "react";
 import type { Metadata } from "next";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
-import { btSeo } from "@/components/public-bt/btSeo";
+import { btSeo, btTitle, btDescription } from "@/components/public-bt/btSeo";
 import { loadLocatorCampuses } from "@/helpers/LocatorCampusHelper";
 import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../btPageData";
 import { BtShell } from "@/components/public-bt/BtShell";
@@ -23,11 +23,11 @@ type PageParams = { sdSlug: string };
 export async function generateMetadata({ params }: { params: Promise<PageParams> }): Promise<Metadata> {
   const { sdSlug } = await params;
   const config = await loadBtConfig(sdSlug);
-  const churchName = config.church?.name || BT.name;
-  const title = "Locations | " + churchName;
-  const description =
-    "Here are all BTI locations. Find the " + churchName + " worship center nearest you across " + BT_NATION_COUNT +
-    " nations in the United States, the Caribbean, and Canada. Service times, directions, and contacts for every center.";
+  const title = btTitle("Find a " + BT.name + " Church");
+  const description = btDescription(
+    "Find the " + BT.name + " church nearest you in " + BT_NATION_COUNT +
+    " nations: the United States, the Caribbean and Canada, plus online. Service times, directions and contacts."
+  );
   return btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/locations");
 }
 

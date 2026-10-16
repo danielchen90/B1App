@@ -8,7 +8,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
-import { btSeo } from "@/components/public-bt/btSeo";
+import { btSeo, btTitle, btDescription } from "@/components/public-bt/btSeo";
+import { JsonLd, btEventNode } from "@/components/public-bt/BtJsonLd";
 import { loadPublicEvents } from "@/helpers/PublicEventsHelper";
 import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../btPageData";
 import { BtShell } from "@/components/public-bt/BtShell";
@@ -21,12 +22,15 @@ import { MinistryEvents, loadMinistryEvents } from "@/components/public-bt/event
 type PageParams = { sdSlug: string };
 
 export async function generateMetadata({ params }: { params: Promise<PageParams> }): Promise<Metadata> {
+  await EnvironmentHelper.initServerSide();
   const { sdSlug } = await params;
   const config = await loadBtConfig(sdSlug);
-  const churchName = config.church?.name || BT.name;
-  const title = "Events | " + churchName;
-  const description = "Conferences, revivals, classes and gatherings at every " + churchName + " worship center.";
-  return btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/events");
+  const title = btTitle("Events and Conferences");
+  const description = btDescription("Conferences, revivals, classes and gatherings at every " + BT.name + " worship center and across " + BT.ministry + ".");
+  const meta = btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/events");
+  // Until something is published the page is only the weekly rhythm: keep it out of search.
+  const [events, ministryEvents] = await Promise.all([loadPublicEvents(config.church?.id || ""), loadMinistryEvents()]);
+  return events.length || ministryEvents.length ? meta : { ...meta, robots: { index: false, follow: true } };
 }
 
 export default async function EventsPage({ params }: { params: Promise<PageParams> }) {
@@ -38,6 +42,9 @@ export default async function EventsPage({ params }: { params: Promise<PageParam
 
   return (
     <BtShell config={config} campuses={toLocationLinks(campuses)}>
+      {ministryEvents.length > 0 && (
+        <JsonLd data={{ "@context": "https://schema.org", "@graph": ministryEvents.map((e) => btEventNode({ ...e, description: e.subtitle || e.title })) }} />
+      )}
       <BtPageHead
         eyebrow="Events"
         title="What's coming up"

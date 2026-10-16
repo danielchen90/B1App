@@ -8,7 +8,9 @@ import { loadCenterChannels } from "@/helpers/CenterChannelHelper";
 import type { PublicCampus } from "@/helpers/PublicCampusHelper";
 
 // The Bible Teachers public pages that are not CMS pages.
-const BT_SITEMAP_PAGES = ["/locations", "/watch", "/events", "/next-steps", "/about", "/give", "/privacy", "/terms", "/cookies"];
+const BT_SITEMAP_PAGES = [
+  "/locations", "/watch", "/next-steps", "/about", "/give", "/privacy", "/terms", "/cookies"
+];
 
 interface SitemapPage { url?: string; title?: string; }
 
@@ -56,6 +58,20 @@ export async function GET(request: NextRequest, context: { params: Promise<{ sdS
           const paired = await loadCenterChannels(church.id, visible);
           paired.forEach((p) => { if (p.channel) urls.add("/watch/" + p.campus.slug); });
         }
+      }
+
+      // Events: /events is listed only while something is published (it is noindex when empty),
+      // plus every published HURO event page (/e/<slug>).
+      if (isBtPublicSite(sdSlug)) {
+        const [crmRes, calRes] = await Promise.all([
+          fetch(membershipApi + "/crm/public/events", { next: { revalidate: 300 } } as RequestInit).catch((): null => null),
+          fetch(contentApi + "/events/public/" + church.id, { next: { revalidate: 300 } } as RequestInit).catch((): null => null)
+        ]);
+        const crm: { slug?: string }[] = crmRes?.ok ? await crmRes.json().catch((): unknown[] => []) : [];
+        const cal: { start?: string; end?: string }[] = calRes?.ok ? await calRes.json().catch((): unknown[] => []) : [];
+        const upcomingCal = Array.isArray(cal) && cal.some((e) => e?.start && new Date(e.end || e.start).getTime() >= Date.now());
+        if ((Array.isArray(crm) && crm.length) || upcomingCal) urls.add("/events");
+        if (Array.isArray(crm)) crm.forEach((e) => { if (e?.slug) urls.add("/e/" + encodeURIComponent(e.slug)); });
       }
     }
   } catch { /* fall back to home page only */ }

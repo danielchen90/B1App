@@ -8,7 +8,9 @@ import { notFound } from "next/navigation";
 import { ApiHelper } from "@churchapps/apphelper";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
-import { btSeo } from "@/components/public-bt/btSeo";
+import { btSeo, btTitle, btDescription } from "@/components/public-bt/btSeo";
+import { JsonLd, btEventNode, breadcrumbs } from "@/components/public-bt/BtJsonLd";
+import { BT } from "@/components/public-bt/btSiteContent";
 import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../../btPageData";
 import { BtShell } from "@/components/public-bt/BtShell";
 import { EventRegisterForm, type EventQuestion } from "@/components/public-bt/events/EventRegisterForm";
@@ -31,14 +33,32 @@ async function loadEvent(slug: string): Promise<PublicEvent | null> {
   }
 }
 
+/** True once the event has finished (its end, or its start when no end is set). */
+const hasEnded = (ev: PublicEvent): boolean => {
+  const at = ev.endsAt || ev.startsAt;
+  return !!at && new Date(at).getTime() < Date.now();
+};
+
+const eventDescription = (ev: PublicEvent): string => {
+  const lead = ev.page?.intro || ev.subtitle || "";
+  const when = ev.startsAt
+    ? new Date(ev.startsAt).toLocaleDateString("en-US", { timeZone: ev.timezone, weekday: "long", month: "long", day: "numeric", year: "numeric" })
+    : "";
+  const fallback = ev.title + ": a " + (ev.kindLabel || "event").toLowerCase() + " with " + BT.name + (when ? " on " + when : "") + ". Free to attend, register online.";
+  return btDescription(lead.length >= 70 ? lead : (lead ? lead + " " : "") + fallback);
+};
+
 export async function generateMetadata({ params }: { params: Promise<PageParams> }): Promise<Metadata> {
   await EnvironmentHelper.initServerSide();
   const { sdSlug, slug } = await params;
   const [config, ev] = await Promise.all([loadBtConfig(sdSlug), loadEvent(slug)]);
   if (!ev) return {};
-  const description = ev.page?.intro || ev.subtitle || ev.title;
-  const meta = btSeo(MetaHelper.getMetaData(ev.title, description, description, config.appearance), "/e/" + ev.slug);
-  if (ev.imageUrl) meta.openGraph = { ...(meta.openGraph || {}), images: [{ url: ev.imageUrl }] };
+  const description = eventDescription(ev);
+  const meta = btSeo(MetaHelper.getMetaData(btTitle(ev.title), description, description, config.appearance), "/e/" + ev.slug);
+  if (ev.imageUrl) {
+    meta.openGraph = { ...(meta.openGraph || {}), images: [{ url: ev.imageUrl, alt: ev.title }] };
+    meta.twitter = { ...(meta.twitter || {}), images: [ev.imageUrl] };
+  }
   return meta;
 }
 
@@ -62,14 +82,26 @@ export default async function EventPage({ params }: { params: Promise<PageParams
   const campuses = await loadVisibleCampuses(config.church?.id || "");
   const p = ev.page;
   const topics = p?.topics?.length ? p.topics : ev.topics;
+  // A finished event keeps its page (people share the link), shown as completed.
+  const ended = hasEnded(ev);
+  const registrationOpen = ev.registrationOpen && !ended;
 
   return (
     <BtShell config={config} campuses={toLocationLinks(campuses)}>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@graph": [
+            btEventNode({ ...ev, description: eventDescription(ev), registrationOpen }),
+            breadcrumbs([{ name: "Home", path: "/" }, { name: "Events", path: "/events" }, { name: ev.title, path: "/e/" + ev.slug }])
+          ]
+        }}
+      />
       <section className="bt-section">
         <div className="ev-hero">
           <div>
-            <div className="bt-eyebrow">{ev.kindLabel}</div>
+            <div className="bt-eyebrow">{ended ? "Past " + ev.kindLabel.toLowerCase() : ev.kindLabel}</div>
             <h1 className="bt-display" style={{ marginTop: 12 }}>{ev.title}</h1>
             {(p?.headline || ev.subtitle) && <p className="bt-lede" style={{ marginTop: 14 }}>{p?.headline && p.headline !== ev.title ? p.headline : ev.subtitle}</p>}
             <div style={{ marginTop: 22, display: "grid", gap: 10 }}>
@@ -79,7 +111,7 @@ export default async function EventPage({ params }: { params: Promise<PageParams
               {ev.languages && <p style={{ color: "var(--bt-body)" }}>Languages: {ev.languages}</p>}
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 24 }}>
-              {ev.registrationOpen && <a className="bt-btn" href="#register">Register</a>}
+              {registrationOpen && <a className="bt-btn" href="#register">Register</a>}
               {ev.flyerUrl && <a className="bt-btn bt-btn-outline" href={ev.flyerUrl} target="_blank" rel="noopener noreferrer" download>Download the flyer</a>}
             </div>
           </div>
@@ -126,12 +158,12 @@ export default async function EventPage({ params }: { params: Promise<PageParams
             {p?.closing && <p className="bt-lede">{p.closing}</p>}
           </div>
           <div className="ev-sticky">
-            {ev.registrationOpen ? (
+            {registrationOpen ? (
               <EventRegisterForm slug={ev.slug} title={ev.title} roles={ev.roles} questions={ev.questions} languages={ev.languages} />
             ) : (
               <div className="bt-card" style={{ padding: "24px 22px" }}>
-                <h2 className="bt-h3">{ev.full ? "This event is full" : "Registration is closed"}</h2>
-                <p style={{ marginTop: 8 }}>{ev.full ? "Every place has been taken. " : ""}Watch for the next one on our events page.</p>
+                <h2 className="bt-h3">{ended ? "This event has ended" : ev.full ? "This event is full" : "Registration is closed"}</h2>
+                <p style={{ marginTop: 8 }}>{ended ? "Thank you to everyone who took part. " : ev.full ? "Every place has been taken. " : ""}Watch for the next one on our events page.</p>
                 <p style={{ marginTop: 14 }}><a className="bt-btn bt-btn-sm" href="/events">See events</a></p>
               </div>
             )}

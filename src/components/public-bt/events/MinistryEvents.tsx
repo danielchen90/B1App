@@ -4,14 +4,14 @@
 
 import React from "react";
 import Link from "next/link";
-import { ApiHelper } from "@churchapps/apphelper";
+import { getAnonymousCached } from "@/helpers/cachedGet";
 import { LocalEventTime } from "./LocalEventTime";
 
 interface Item { slug: string; kindLabel: string; title: string; subtitle: string | null; startsAt: string; endsAt: string | null; timezone: string; location: string | null; imageUrl: string | null; registrationOpen: boolean }
 
 export async function loadMinistryEvents(): Promise<Item[]> {
   try {
-    const data = await ApiHelper.getAnonymous("/crm/public/events", "MembershipApi");
+    const data = await getAnonymousCached("/crm/public/events", "MembershipApi", 60);
     return Array.isArray(data) ? (data as Item[]) : [];
   } catch {
     return [];

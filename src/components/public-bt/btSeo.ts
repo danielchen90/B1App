@@ -19,6 +19,31 @@ export const btSiteUrl = (): string => {
 
 export const BT_OG_IMAGE = "/bt/og.jpg";
 
+/** Brand suffix on every page title, and the og:site_name. */
+export const BT_SITE_BRAND = "Worship Centers";
+export const BT_SITE_NAME = "Bible Teachers International Worship Centers";
+
+/** "<page> | Worship Centers", dropping the suffix when the whole title would pass 65 characters. */
+export const btTitle = (page: string): string => {
+  const full = page + " | " + BT_SITE_BRAND;
+  return full.length <= 65 ? full : page;
+};
+
+/** Trim a description to at most `max` characters on a word boundary. */
+export const btDescription = (text: string, max = 160): string => {
+  const clean = (text || "").replace(/\s+/g, " ").replace(/\u2014/g, ",").trim();
+  if (clean.length <= max) return clean;
+  const cut = clean.slice(0, max - 1);
+  const at = cut.lastIndexOf(" ");
+  return (at > 80 ? cut.slice(0, at) : cut).replace(/[,;:.\s]+$/, "") + "\u2026";
+};
+
+// Shared identity across the Mary Banks Ministries sites (fixed @ids).
+export const MBM_ORG_ID = "https://marybanks.net/#organization";
+export const APOSTLE_ID = "https://marybanks.net/#apostle-mary-banks";
+export const APOSTLE_REF = { "@type": "Person", "@id": APOSTLE_ID, name: "Apostle Mary Banks", url: "https://marybanks.net/apostle-mary-banks" };
+export const btOrgId = (): string => btSiteUrl() + "/#organization";
+
 export const BT_ICONS: Metadata["icons"] = {
   icon: [
     { url: "/bt/favicon-32.png", sizes: "32x32", type: "image/png" },
@@ -49,7 +74,7 @@ export function btSeo(meta: Metadata, path: string): Metadata {
     title: { absolute: title },
     metadataBase: new URL(base),
     alternates: { ...(meta.alternates || {}), canonical: url },
-    openGraph: { ...og, url, siteName: BT.name, locale: "en_US", images } as Metadata["openGraph"],
+    openGraph: { ...og, url, siteName: BT_SITE_NAME, locale: "en_US", images } as Metadata["openGraph"],
     twitter: { card: "summary_large_image", title, description, images: images?.map((i: any) => i.url) },
     icons: BT_ICONS
   };
