@@ -14,9 +14,13 @@ import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../btPageDat
 import { BtShell } from "@/components/public-bt/BtShell";
 import { BtPageHead } from "@/components/public-bt/BtPageHead";
 import { BT, BT_COPY, BT_NATION_COUNT } from "@/components/public-bt/btSiteContent";
+import { JsonLd, btAboutPageGraph } from "@/components/public-bt/BtJsonLd";
 import { IconPin, IconPlay, IconBook, IconHeart, IconGlobe, IconClock } from "@/components/public-bt/BtIcons";
 
 type PageParams = { sdSlug: string };
+
+const ABOUT_TITLE = "About " + BT.name;
+const ABOUT_DESCRIPTION = btDescription(BT.name + " is a division of " + BT.ministry + ": worldwide evangelism, discipleship, healing and preparing God's people for ministry.");
 
 const loadOrgContent = cache(async (churchId: string): Promise<{ mission?: string; about?: string }> => {
   if (!churchId) return {};
@@ -31,8 +35,8 @@ const loadOrgContent = cache(async (churchId: string): Promise<{ mission?: strin
 export async function generateMetadata({ params }: { params: Promise<PageParams> }): Promise<Metadata> {
   const { sdSlug } = await params;
   const config = await loadBtConfig(sdSlug);
-  const title = btTitle("About " + BT.name);
-  const description = btDescription(BT.name + " is a division of " + BT.ministry + ": worldwide evangelism, discipleship, healing and preparing God's people for ministry.");
+  const title = btTitle(ABOUT_TITLE);
+  const description = ABOUT_DESCRIPTION;
   return btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/about");
 }
 
@@ -64,6 +68,7 @@ export default async function AboutPage({ params }: { params: Promise<PageParams
 
   return (
     <BtShell config={config} campuses={navLinks}>
+      <JsonLd data={btAboutPageGraph(ABOUT_TITLE, ABOUT_DESCRIPTION)} />
       <BtPageHead
         eyebrow="About"
         title={<>God&rsquo;s influence <em style={{ fontStyle: "italic", color: "var(--bt-gold-deep)" }}>in the earth.</em></>}

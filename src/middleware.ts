@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { isBtPublicSite } from "@/app/[sdSlug]/(public)/(bt)/isBtSite";
+import { isBtMissingPath, BT_MISSING_REWRITE } from "@/lib/btMissingPath";
 
 // Bible Teachers public site: leftover stock ChurchApps pages that are not part of the
 // ministry's site stay reachable for members but out of search, and two old addresses move.
@@ -141,6 +142,13 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-site", `${subDomain}.huro.church`);
+  // A page that certainly does not exist (unknown center, event or top-level page) goes to an
+  // address no route matches, so the branded 404 is in the server HTML (see btMissingPath.ts).
+  if (bt && (request.method === "GET" || request.method === "HEAD") && await isBtMissingPath(request.nextUrl.pathname, subDomain, lookupBase.replace(/\/membership\/domains\/public\/lookup$/, ""))) {
+    const missing = request.nextUrl.clone();
+    missing.pathname = BT_MISSING_REWRITE;
+    return NextResponse.rewrite(missing, { request: { headers: requestHeaders } });
+  }
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   if (bt && BT_NOINDEX_PATHS.test(request.nextUrl.pathname)) response.headers.set("X-Robots-Tag", "noindex, follow");
   // The public pages are the same for every visitor (no cookies or session are read on the

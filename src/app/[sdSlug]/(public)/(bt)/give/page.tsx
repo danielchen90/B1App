@@ -16,6 +16,7 @@ import { BtShell } from "@/components/public-bt/BtShell";
 import { BtPageHead } from "@/components/public-bt/BtPageHead";
 import { BT, BT_LINKS, getCampusExtras } from "@/components/public-bt/btSiteContent";
 import { IconGift, IconArrowRight } from "@/components/public-bt/BtIcons";
+import { JsonLd, btGivePageGraph } from "@/components/public-bt/BtJsonLd";
 import { GiveEmbed, type GiveFund } from "@/components/public-bt/GiveEmbed";
 import { ApiHelper } from "@churchapps/apphelper";
 import { trackAttrs } from "@/lib/analytics";
@@ -37,13 +38,16 @@ const loadGiving = async (churchId: string): Promise<{ enabled: boolean; funds: 
 
 type PageParams = { sdSlug: string };
 
+const GIVE_TITLE = "Give to " + BT.name;
+const GIVE_DESCRIPTION = btDescription(
+  "Your giving helps us bless many across the globe. Simple and secure online giving for " + BT.name + " and for every worship center."
+);
+
 export async function generateMetadata({ params }: { params: Promise<PageParams> }): Promise<Metadata> {
   const { sdSlug } = await params;
   const config = await loadBtConfig(sdSlug);
-  const title = btTitle("Give to " + BT.name);
-  const description = btDescription(
-    "Your giving helps us bless many across the globe. Simple and secure online giving for " + BT.name + " and for every worship center."
-  );
+  const title = btTitle(GIVE_TITLE);
+  const description = GIVE_DESCRIPTION;
   return btSeo(MetaHelper.getMetaData(title, description, description, config.appearance), "/give");
 }
 
@@ -67,6 +71,7 @@ export default async function GivePage({ params }: { params: Promise<PageParams>
 
   return (
     <BtShell config={config} campuses={navLinks}>
+      <JsonLd data={btGivePageGraph(GIVE_TITLE, GIVE_DESCRIPTION)} />
       <BtPageHead
         eyebrow="2 Corinthians 9:7"
         title={<>God loves a <em style={{ fontStyle: "italic", color: "var(--bt-gold-deep)" }}>cheerful giver.</em></>}

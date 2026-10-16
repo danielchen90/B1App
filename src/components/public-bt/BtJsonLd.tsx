@@ -93,6 +93,28 @@ const parseDays = (day: string): string[] => {
   return d.split(/\s*(?:&|,|and)\s*/).flatMap((p) => DAY_MAP[p.trim().slice(0, 3)] || []);
 };
 
+/**
+ * The next date a weekly service meets, written as local wall time ("2026-10-18T09:30"), from its
+ * own days and start time only. "Today" is taken in Eastern time, where most centers are; a
+ * service later today counts as the next one.
+ */
+const nextOccurrence = (days: string[], startTime: string): string => {
+  const now = new Date();
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", weekday: "long" })
+      .formatToParts(now).map((p) => [p.type, p.value])
+  ) as Record<string, string>;
+  const todayIdx = DAY_ORDER.indexOf(parts.weekday);
+  const nowHm = parts.hour + ":" + parts.minute;
+  const offsets = days.map((d) => {
+    let diff = (DAY_ORDER.indexOf(d) - todayIdx + 7) % 7;
+    if (diff === 0 && startTime <= nowHm) diff = 7;
+    return diff;
+  });
+  const base = Date.UTC(+parts.year, +parts.month - 1, +parts.day) + Math.min(...offsets) * 86400000;
+  return new Date(base).toISOString().slice(0, 10) + "T" + startTime;
+};
+
 /** "9:00 AM ET" -> "09:00"; "9:00 & 11:00 AM" -> ["09:00", "11:00"]. Unparseable -> []. */
 const parseTimes = (time: string): string[] => {
   const t = (time || "").toUpperCase();
@@ -222,15 +244,27 @@ export const btChurchGraph = (c: ChurchLdInput) => {
   if (c.sameAs.length) node.sameAs = Array.from(new Set(c.sameAs));
   if (c.website && c.virtual) node.sameAs = Array.from(new Set([...(node.sameAs as string[] || []), c.website]));
 
-  // Weekly services become opening hours only when the day and time are both readable.
-  const hours = c.serviceTimes.flatMap((t) => {
+  // Weekly services, only when the day and the start time are both readable. No center
+  // publishes when its services end, so these are not opening hours (which need a closing
+  // time): each is a weekly Event with a Schedule (day + start time) and no end time.
+  const services = c.serviceTimes.flatMap((t) => {
     const days = parseDays(t.day);
     const times = parseTimes(t.time);
     if (!days.length || !times.length) return [];
-    // Start times only: no center publishes when its services end, so no closing time is given.
-    return times.map((opens) => ({ "@type": "OpeningHoursSpecification", dayOfWeek: days.map((d) => "https://schema.org/" + d), opens, ...(t.label ? { name: t.label } : {}) }));
+    return times.map((startTime) => ({
+      "@type": "Event",
+      name: (t.label || "Service") + ", " + BT.name + " " + c.name,
+      startDate: nextOccurrence(days, startTime),
+      eventSchedule: { "@type": "Schedule", repeatFrequency: "P1W", byDay: days.map((d) => "https://schema.org/" + d), startTime },
+      eventStatus: "https://schema.org/EventScheduled",
+      eventAttendanceMode: c.virtual ? "https://schema.org/OnlineEventAttendanceMode" : "https://schema.org/OfflineEventAttendanceMode",
+      location: c.virtual ? { "@type": "VirtualLocation", url } : { "@type": "Church", "@id": url + "#church", name: node.name, ...(node.address ? { address: node.address } : {}) },
+      organizer: { "@id": url + "#church" },
+      url,
+      isAccessibleForFree: true
+    }));
   });
-  if (hours.length) node.openingHoursSpecification = hours;
+  if (services.length) node.event = services;
 
   return {
     "@context": "https://schema.org",
@@ -342,4 +376,59 @@ export const btEventNode = (e: EventLdInput) => {
   if (e.endsAt) node.endDate = isoInZone(e.endsAt, e.timezone);
   if (performers.length) node.performer = performers;
   return node;
+};
+
+// ── About and Give ────────────────────────────────────────────────────────────────
+
+/** /about: an AboutPage about the site's own organization (a division of Mary Banks Ministries). */
+export const btAboutPageGraph = (name: string, description: string) => {
+  const base = btSiteUrl();
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "AboutPage",
+        "@id": base + "/about#webpage",
+        url: base + "/about",
+        name,
+        description,
+        inLanguage: "en",
+        isPartOf: { "@id": base + "/#website" },
+        about: { "@id": btOrgId() },
+        mainEntity: { "@id": btOrgId() }
+      },
+      btOrganizationNode(),
+      breadcrumbs([{ name: "Home", path: "/" }, { name: "About", path: "/about" }])
+    ]
+  };
+};
+
+/** Where every gift to the ministry is made. */
+export const MINISTRY_GIVE_URL = "https://marybanks.net/give";
+
+/** /give: a WebPage whose action is a DonateAction to the ministry's giving page. */
+export const btGivePageGraph = (name: string, description: string) => {
+  const base = btSiteUrl();
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": base + "/give#webpage",
+        url: base + "/give",
+        name,
+        description,
+        inLanguage: "en",
+        isPartOf: { "@id": base + "/#website" },
+        about: { "@id": btOrgId() },
+        potentialAction: {
+          "@type": "DonateAction",
+          name: "Give to " + BT.name,
+          target: { "@type": "EntryPoint", urlTemplate: MINISTRY_GIVE_URL },
+          recipient: { "@id": btOrgId(), name: BT.name }
+        }
+      },
+      breadcrumbs([{ name: "Home", path: "/" }, { name: "Give", path: "/give" }])
+    ]
+  };
 };

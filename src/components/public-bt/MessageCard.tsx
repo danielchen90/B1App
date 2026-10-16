@@ -27,9 +27,10 @@ const CSS = `
 .bt-msg-small .bt-msg-play { width: 48px; height: 48px; }
 .bt-msg-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; z-index: 2; }
 .bt-msg-meta { display: grid; gap: 2px; }
-.bt-msg-series { font-size: .76rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--bt-gold-deep); }
+/* Darker than --bt-gold-deep / --bt-muted: the cards sit on the sunk band (#F1F0EC), where those are 4.4:1. */
+.bt-msg-series { font-size: .76rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #7A5C10; }
 .bt-msg-title { font-family: var(--bt-display-font); font-weight: 600; color: var(--bt-ink); line-height: 1.2; }
-.bt-msg-sub { font-size: .9rem; color: var(--bt-muted); }
+.bt-msg-sub { font-size: .9rem; color: #5E5E69; }
 `;
 
 interface Props {
