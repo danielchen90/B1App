@@ -294,11 +294,9 @@ export const BT_CAMPUS_EXTRAS: Record<string, BtCampusExtras> = {
       { day: "Sunday", time: "8:00 AM", label: "Worship service" },
       { day: "Tuesday", time: "7:00 PM", label: "Bible study" }
     ],
-    leaders: "Pastor Jaghram Sankar",
+    leaders: "Pastor Elizabeth Lee",
     phone: "+1 (868) 799-5833",
-    email: "jaghramsankar@hotmail.com",
-    facebookUrl: "https://www.facebook.com/bibleteacherstrinidad",
-    youtubeUrl: "https://www.youtube.com/channel/UC3vFmVJvwJBcrsT2yuI6khw"
+    facebookUrl: "https://www.facebook.com/bibleteacherstrinidad"
   }
 };
 
