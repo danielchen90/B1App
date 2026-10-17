@@ -4,8 +4,10 @@
 // notFound; renamed-alias 301 path stays wired for when the API exposes aliases), loads
 // the four anonymous public reads in parallel, merges the resolved campusContent with
 // the in-repo enrichment map (service times / contacts / socials from the ministry's
-// published site), and renders in the locked order: hero → visit info → latest sermon →
-// leadership → events → give → forms. Messages come from the center's own YouTube
+// published site), and renders: a full-bleed photo hero → an at-a-glance bar → events →
+// service times → find us → latest message + give → past messages → the pastor's word →
+// photos → leadership → forms. Sections with nothing to show are left out, and each
+// rises into view on scroll (RevealOnScroll). Messages come from the center's own YouTube
 // channel (CenterChannelHelper): the latest plus the past 10, or the ministry's latest
 // when the center has no channel.
 //
@@ -26,11 +28,13 @@ import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../../btPage
 import { BtShell } from "@/components/public-bt/BtShell";
 import { SocialLinks } from "@/components/public-bt/SocialLinks";
 import { LeadershipGrid, type PublicLeader } from "@/components/public-bt/LeadershipGrid";
-import { LiveIndicator } from "@/components/public-bt/LiveIndicatorLazy";
 import { MessageCard } from "@/components/public-bt/MessageCard";
-import { EventCards } from "@/components/public-bt/EventCards";
 import { PhotoGallery } from "@/components/public-bt/PhotoGallery";
-import { MakeMyCenter } from "@/components/public-bt/CenterActions";
+import { CenterHero } from "@/components/public-bt/CenterHero";
+import { CenterEvents } from "@/components/public-bt/CenterEvents";
+import { CenterMap } from "@/components/public-bt/CenterMap";
+import { ServiceRhythm, NextGatheringText } from "@/components/public-bt/ServiceRhythm";
+import { RevealOnScroll } from "@/components/public-bt/RevealOnScroll";
 import { TrackOnView } from "@/components/public-bt/BtAnalytics";
 import { trackAttrs } from "@/lib/analytics";
 import { NextStepForm } from "@/components/public-bt/forms/NextStepForm";
@@ -38,7 +42,7 @@ import { loadSermonFeed } from "@/helpers/SermonFeedHelper";
 import { channelFromContent } from "@/helpers/CenterChannelHelper";
 import { MessageLibrary } from "@/components/public-bt/MessageLibrary";
 import { loadPublicEvents } from "@/helpers/PublicEventsHelper";
-import { BT, BT_COPY, getCampusExtras } from "@/components/public-bt/btSiteContent";
+import { BT, BT_COPY, centerTimeZone, getCampusExtras } from "@/components/public-bt/btSiteContent";
 import { IconPhone, IconMail, IconGlobe, IconPin, IconClock, IconUser, IconArrowRight, IconGift, IconYouTube } from "@/components/public-bt/BtIcons";
 import {
   type CampusContent,
@@ -203,28 +207,55 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
   // Analytics: the same church properties on every event from this page.
   const churchProps = { church_id: campus.id, church_slug: campus.slug || "", church_name: campus.name, city: campus.city || "", country: extras?.country || "", virtual };
 
+  const timeZone = centerTimeZone(campus.slug);
+  const place = [campus.address1, cityLine.trim()].filter(Boolean).join(", ");
+  const facebookUrl = str(content.facebookUrl) || extras?.facebookUrl || null;
+  const instagramUrl = str(content.instagramUrl) || extras?.instagramUrl || null;
+  const youtubeUrl = str(content.youtubeUrl) || extras?.youtubeUrl || null;
+  const pastorNote = str(content.pastorNote);
+  const showMap = !virtual && typeof campus.latitude === "number" && typeof campus.longitude === "number";
+
   const CSS = `
-.bt-ch { border-bottom: 1px solid var(--bt-line); background: var(--bt-ivory); }
-.bt-ch-in { max-width: var(--bt-maxw); margin: 0 auto; padding: clamp(28px, 5vw, 56px) 20px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: clamp(24px, 4vw, 56px); align-items: center; }
-.bt-ch-photo { aspect-ratio: 4 / 3; border-radius: var(--bt-radius-lg); background: var(--bt-sunk) center / cover no-repeat; box-shadow: var(--bt-shadow); }
-.bt-ch-facts { display: grid; gap: 10px; margin-top: 18px; }
-.bt-ch-facts div { display: flex; gap: 10px; align-items: flex-start; color: var(--bt-body); }
-.bt-ch-facts svg { margin-top: 3px; color: var(--bt-gold); }
-.bt-visit { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
-.bt-visit .bt-card { padding: 24px; display: grid; gap: 12px; align-content: start; }
-.bt-times { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.bt-times li { display: flex; justify-content: space-between; gap: 14px; border-bottom: 1px solid var(--bt-line); padding-bottom: 10px; }
-.bt-times li b { color: var(--bt-ink); font-weight: 600; }
-.bt-contacts { display: grid; gap: 8px; }
-.bt-contacts a { display: inline-flex; align-items: center; gap: 8px; color: var(--bt-body); word-break: break-all; }
+.bt-glance-wrap { position: relative; z-index: 2; max-width: var(--bt-maxw); margin: -58px auto 0; padding: 0 20px; }
+.bt-glance { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); background: var(--bt-paper); border-radius: 22px; box-shadow: 0 30px 60px -36px rgba(24,24,32,.45), 0 0 0 1px var(--bt-line); overflow: hidden; }
+.bt-glance > div { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: center; padding: 22px 24px; border-left: 1px solid var(--bt-line); }
+.bt-glance > div:first-child { border-left: 0; }
+.bt-glance svg { grid-row: span 2; color: var(--bt-gold); }
+.bt-glance small { font-size: .72rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--bt-muted); }
+.bt-glance b, .bt-glance a { font-weight: 600; color: var(--bt-ink); line-height: 1.35; overflow-wrap: anywhere; }
+.bt-glance a:hover { color: var(--bt-gold-deep); }
+.bt-sec-sub { max-width: 620px; margin-top: 10px; }
+.bt-aside { padding: 26px; display: grid; gap: 14px; align-content: start; background: var(--bt-sunk); border: 0; }
+.bt-find { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 18px; align-items: stretch; }
+.bt-find-map { position: relative; min-height: 380px; border-radius: var(--bt-radius-lg); overflow: hidden; border: 1px solid var(--bt-line); }
+.bt-find-card { padding: 28px; display: grid; gap: 18px; align-content: start; }
+.bt-contacts { display: grid; gap: 10px; }
+.bt-contacts a { display: inline-flex; align-items: center; gap: 10px; color: var(--bt-body); overflow-wrap: anywhere; }
 .bt-contacts a:hover { color: var(--bt-ink); }
+.bt-contacts svg { color: var(--bt-gold); flex: none; }
 .bt-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; align-items: start; }
-@media (max-width: 860px) { .bt-ch-in { grid-template-columns: 1fr; } .bt-ch-photo { order: -1; } }
+.bt-give { position: relative; overflow: hidden; padding: 30px; display: grid; gap: 14px; align-content: start; border-radius: var(--bt-radius-lg); }
+.bt-give::after { content: ""; position: absolute; right: -60px; bottom: -60px; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, rgba(240,191,76,.28), transparent 70%); }
+.bt-quote { position: relative; display: grid; grid-template-columns: auto 1fr; gap: 22px; padding: clamp(26px, 4vw, 44px); }
+.bt-quote-mark { font-family: var(--bt-display-font); font-size: 5.5rem; line-height: .7; color: var(--bt-gold); }
+.bt-quote p { font-family: var(--bt-display-font); font-size: clamp(1.35rem, 2.4vw, 1.75rem); line-height: 1.4; color: var(--bt-ink); white-space: pre-line; }
+.bt-quote cite { display: block; margin-top: 16px; font-style: normal; font-weight: 600; color: var(--bt-gold-deep); }
+@media (max-width: 860px) { .bt-find { grid-template-columns: 1fr; } .bt-find-map { min-height: 300px; } }
+@media (max-width: 560px) { .bt-glance > div { border-left: 0; border-top: 1px solid var(--bt-line); } .bt-glance > div:first-child { border-top: 0; } }
 `;
+
+  const firstVisitCard = (
+    <div className="bt-card bt-aside bt-reveal" style={{ ["--d" as any]: 2 }}>
+      <div className="bt-eyebrow">{virtual ? "Joining online" : "Your first visit"}</div>
+      <p style={{ whiteSpace: "pre-line" }}>{firstVisit}</p>
+      <div><a className="bt-btn" href="#visit">{virtual ? "Say hello" : "Plan your visit"}</a></div>
+    </div>
+  );
 
   return (
     <BtShell config={config} campuses={navLinks} giveUrl={giveUrl}>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
+      <RevealOnScroll />
       <TrackOnView event="church_viewed" props={churchProps} />
       <JsonLd
         data={btChurchGraph({
@@ -244,149 +275,186 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
           website,
           virtual,
           serviceTimes,
-          sameAs: [str(content.facebookUrl) || extras?.facebookUrl, str(content.instagramUrl) || extras?.instagramUrl, str(content.youtubeUrl) || extras?.youtubeUrl].filter((u): u is string => !!u)
+          sameAs: [facebookUrl, instagramUrl, youtubeUrl].filter((u): u is string => !!u)
         })}
       />
 
-      {/* (1) Hero: the center's own photo, name, pastor, times, and what to do next */}
-      <section className="bt-ch">
-        <div className="bt-ch-in">
+      {/* (1) Hero: the center's photo edge to edge, with its name, welcome and next steps over it */}
+      <CenterHero
+        name={campus.name}
+        eyebrow={(extras?.flag ? extras.flag + " " : "") + (virtual ? "Online, join from anywhere" : (extras?.country || "Worship center"))}
+        welcome={welcome}
+        cover={cover}
+        photoCredit={photos[0] === str(content.heroImage) ? extras?.photoCredit : undefined}
+        pastor={pastor}
+        times={serviceTimes.slice(0, 2).map((t) => t.day + " " + t.time).join(" · ")}
+        place={place}
+        virtual={virtual}
+        slug={campus.slug}
+        liveKey={config.church?.subDomain || null}
+        primary={virtual && website
+          ? { label: "Join the " + campus.name, href: website, external: true, attrs: trackAttrs("online_church_joined", { ...churchProps, placement: "center_page" }) }
+          : { label: virtual ? "Join us" : "Plan your visit", href: "#visit" }}
+        directions={virtual ? null : { label: "Directions", href: directionsUrl, external: true, attrs: trackAttrs("church_directions_clicked", { ...churchProps, placement: "center_page" }) }}
+        nextHref="#glance"
+      />
+
+      {/* (2) At a glance: the four things a visitor checks first */}
+      <div id="glance" className="bt-glance-wrap" style={{ scrollMarginTop: 90 }}>
+        <div className="bt-glance bt-reveal">
+          {serviceTimes.length > 0 && (
+            <div><IconClock size={22} /><small>Next gathering</small><b><NextGatheringText times={serviceTimes} timeZone={timeZone} /></b></div>
+          )}
+          {pastor && <div><IconUser size={22} /><small>Pastor</small><b>{pastor}</b></div>}
+          {virtual
+            ? <div><IconGlobe size={22} /><small>Where</small><b>Online, from anywhere</b></div>
+            : place && <div><IconPin size={22} /><small>Where</small><a href={directionsUrl} target="_blank" rel="noopener noreferrer">{campus.city || place}</a></div>}
+          {phone
+            ? <div><IconPhone size={22} /><small>Call</small><a href={"tel:" + phone.replace(/[^+\d]/g, "")} {...trackAttrs("church_contact_clicked", { ...churchProps, method: "phone" })}>{phone}</a></div>
+            : email && <div><IconMail size={22} /><small>Write</small><a href={"mailto:" + email} {...trackAttrs("church_contact_clicked", { ...churchProps, method: "email" })}>{email}</a></div>}
+        </div>
+      </div>
+
+      {/* (3) Events: what is on now and next at this center (and network-wide) */}
+      {events.length > 0 && (
+        <section id="events" className="bt-section-tight" style={{ paddingTop: "clamp(48px, 7vw, 80px)" }}>
+          <div className="bt-section-head bt-reveal">
+            <div><div className="bt-eyebrow">Coming up</div><h2 className="bt-h2">Events at {campus.name}</h2></div>
+            <Link className="bt-link" href="/events">All events <IconArrowRight size={15} /></Link>
+          </div>
+          <CenterEvents events={events} timeZone={timeZone} centerId={campus.id} />
+        </section>
+      )}
+
+      {/* (4) Service times: the weekly rhythm, beside what a first visit is like */}
+      <section id="times" className="bt-section-tight" style={events.length > 0 ? undefined : { paddingTop: "clamp(48px, 7vw, 80px)" }}>
+        <div className="bt-section-head bt-reveal">
           <div>
-            <div style={{ minHeight: 28, marginBottom: 4 }}><LiveIndicator streamKey={config.church?.subDomain || null} /></div>
-            <div className="bt-eyebrow">{(extras?.flag ? extras.flag + " " : "") + (virtual ? "Online, join from anywhere" : (extras?.country || "Worship center"))}</div>
-            <h1 className="bt-display" style={{ fontSize: "clamp(2.4rem, 5vw, 3.6rem)", marginTop: 10 }}>{campus.name}</h1>
-            <p className="bt-lede" style={{ marginTop: 12 }}>{welcome}</p>
-            <div className="bt-ch-facts">
-              {pastor && <div><IconUser size={17} /><span>{pastor}</span></div>}
-              {serviceTimes.length > 0 && (
-                <div><IconClock size={17} /><span>{serviceTimes.slice(0, 3).map((t) => t.day + " " + t.time).join(" · ")}</span></div>
-              )}
-              {virtual
-                ? <div><IconGlobe size={17} /><span>Join from anywhere in the world</span></div>
-                : (campus.address1 || cityLine.trim()) && <div><IconPin size={17} /><span>{[campus.address1, cityLine.trim()].filter(Boolean).join(", ")}</span></div>}
-            </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 22 }}>
-              {virtual
-                ? (website ? <a className="bt-btn" href={website} target="_blank" rel="noopener noreferrer" {...trackAttrs("online_church_joined", { ...churchProps, placement: "center_page" })}>{"Join the " + campus.name}</a> : <a className="bt-btn" href="#visit">Join us</a>)
-                : <a className="bt-btn" href="#visit">Plan your visit</a>}
-              {!virtual && <a className="bt-btn bt-btn-outline" href={directionsUrl} target="_blank" rel="noopener noreferrer" {...trackAttrs("church_directions_clicked", { ...churchProps, placement: "center_page" })}><IconPin size={17} /> Directions</a>}
-              {campus.slug && <MakeMyCenter slug={campus.slug} name={campus.name} />}
-            </div>
-          </div>
-          <div className="bt-ch-photo" role="img" aria-label={campus.name + " worship center"} style={{ backgroundImage: "url('" + cover + "')" }} />
-        </div>
-      </section>
-
-      {/* (2) Visiting: times, first visit, contacts */}
-      <section className="bt-section-tight">
-        <div className="bt-visit">
-          <div className="bt-card">
             <div className="bt-eyebrow">Service times</div>
-            {serviceTimes.length > 0 ? (
-              <ul className="bt-times">
-                {serviceTimes.map((t, i) => (
-                  <li key={i}><b>{t.day}</b><span>{t.time}{t.label ? " · " + t.label : ""}</span></li>
-                ))}
-              </ul>
-            ) : (
-              <p>{extras?.timesNote || "Send the team a note for service times and they\u2019ll help you plan a visit."}</p>
-            )}
+            <h2 className="bt-h2">{virtual ? "Meet with us online" : "Gather with us"}</h2>
+            <p className="bt-sec-sub">{virtual ? "Every gathering is online, so you can join from wherever you are." : "Come as you are. Here is when " + campus.name + " meets through the week."}</p>
           </div>
-          <div className="bt-card">
-            <div className="bt-eyebrow">{virtual ? "Joining online" : "Your first visit"}</div>
-            <p style={{ whiteSpace: "pre-line" }}>{firstVisit}</p>
-          </div>
-          <div className="bt-card">
-            <div className="bt-eyebrow">Get in touch</div>
-            <div className="bt-contacts">
-              {!virtual && (campus.address1 || cityLine.trim()) && (
-                <address style={{ fontStyle: "normal" }}>{campus.address1}{campus.address1 && <br />}{cityLine}</address>
-              )}
-              {phone && <a href={"tel:" + phone.replace(/[^+\d]/g, "")} {...trackAttrs("church_contact_clicked", { ...churchProps, method: "phone" })}><IconPhone size={16} /> {phone}</a>}
-              {email && <a href={"mailto:" + email} {...trackAttrs("church_contact_clicked", { ...churchProps, method: "email" })}><IconMail size={16} /> {email}</a>}
-              {website && <a href={website} target="_blank" rel="noopener noreferrer" {...trackAttrs(virtual ? "online_church_joined" : "church_contact_clicked", { ...churchProps, method: "website", placement: "contacts" })}><IconGlobe size={16} /> {website.replace(/^https?:\/\/(www\.)?/, "")}</a>}
+        </div>
+        {serviceTimes.length > 0 ? (
+          <ServiceRhythm times={serviceTimes} timeZone={timeZone} aside={firstVisitCard} />
+        ) : (
+          <div className="bt-two">
+            <div className="bt-card bt-reveal" style={{ padding: 26, display: "grid", gap: 14 }}>
+              <span style={{ color: "var(--bt-gold)" }}><IconClock size={26} /></span>
+              <p>{extras?.timesNote || "Send the team a note for service times and they’ll help you plan a visit."}</p>
+              <div><a className="bt-btn bt-btn-outline" href="#visit">Ask about service times</a></div>
             </div>
-            <SocialLinks
-              facebookUrl={str(content.facebookUrl) || extras?.facebookUrl || null}
-              instagramUrl={str(content.instagramUrl) || extras?.instagramUrl || null}
-              youtubeUrl={str(content.youtubeUrl) || extras?.youtubeUrl || null}
-              extraLinks={extraLinks}
-            />
+            {firstVisitCard}
+          </div>
+        )}
+      </section>
+
+      {/* (5) Find us: the map and every way to reach the center */}
+      <section className="bt-band">
+        <div className="bt-section-tight">
+          <div className="bt-section-head bt-reveal">
+            <div><div className="bt-eyebrow">{virtual ? "Stay connected" : "Find us"}</div><h2 className="bt-h2">{virtual ? "Get in touch" : "Where we meet"}</h2></div>
+          </div>
+          <div className={showMap ? "bt-find" : "bt-two"}>
+            {showMap && (
+              <div className="bt-find-map bt-reveal">
+                <CenterMap campus={{ id: campus.id, slug: campus.slug || null, name: campus.name, lat: campus.latitude as number, lng: campus.longitude as number, address: place, serviceTimesLabel: timesSummary(serviceTimes), country: extras?.country || "", flag: extras?.flag || "", photo: cover, leaders: pastor || null, phone: phone || null, email: email || null }} />
+              </div>
+            )}
+            <div className="bt-card bt-find-card bt-reveal" style={{ ["--d" as any]: 1 }}>
+              {!virtual && place && (
+                <div>
+                  <div className="bt-eyebrow" style={{ marginBottom: 8 }}>Address</div>
+                  <address style={{ fontStyle: "normal", color: "var(--bt-ink)", fontWeight: 500 }}>{campus.address1}{campus.address1 && <br />}{cityLine}</address>
+                  <a className="bt-link" style={{ marginTop: 10 }} href={directionsUrl} target="_blank" rel="noopener noreferrer" {...trackAttrs("church_directions_clicked", { ...churchProps, placement: "find_us" })}>Get directions <IconArrowRight size={15} /></a>
+                </div>
+              )}
+              {(phone || email || website) && (
+                <div>
+                  <div className="bt-eyebrow" style={{ marginBottom: 10 }}>Contact</div>
+                  <div className="bt-contacts">
+                    {phone && <a href={"tel:" + phone.replace(/[^+\d]/g, "")} {...trackAttrs("church_contact_clicked", { ...churchProps, method: "phone" })}><IconPhone size={17} /> {phone}</a>}
+                    {email && <a href={"mailto:" + email} {...trackAttrs("church_contact_clicked", { ...churchProps, method: "email" })}><IconMail size={17} /> {email}</a>}
+                    {website && <a href={website} target="_blank" rel="noopener noreferrer" {...trackAttrs(virtual ? "online_church_joined" : "church_contact_clicked", { ...churchProps, method: "website", placement: "contacts" })}><IconGlobe size={17} /> {website.replace(/^https?:\/\/(www\.)?/, "")}</a>}
+                  </div>
+                </div>
+              )}
+              <SocialLinks facebookUrl={facebookUrl} instagramUrl={instagramUrl} youtubeUrl={youtubeUrl} extraLinks={extraLinks} />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* (3) Photos (when the admin has uploaded more than the cover) */}
-      {photos.length > 1 && (
+      {/* (6) Latest message + giving */}
+      <section className="bt-section-tight">
+        <div className="bt-two">
+          {sermon && (
+            <div className="bt-reveal">
+              <div className="bt-eyebrow" style={{ marginBottom: 12 }}>{ownChannel ? "The latest message" : "The latest from " + BT.ministry}</div>
+              <MessageCard sermon={sermon} feature placement="center_page" churchId={campus.id} />
+            </div>
+          )}
+          <div className="bt-give bt-dark bt-reveal" style={{ ["--d" as any]: 1 }}>
+            <span style={{ color: "var(--bt-gold-bright)" }}><IconGift size={26} /></span>
+            <h2 className="bt-h3">Give to {campus.name}</h2>
+            <p className="bt-muted-text">Your giving supports the ministry of {campus.name} and carries the Word further. Once or every month.</p>
+            <div style={{ position: "relative", zIndex: 1 }}><Link className="bt-btn" href={"/give?center=" + encodeURIComponent(campus.slug || "") + "#give-now"}>Give</Link></div>
+          </div>
+        </div>
+      </section>
+
+      {/* (7) The center's past messages from its own channel */}
+      {ownChannel && pastSermons.length > 0 && (
+        <section className="bt-section-tight bt-reveal">
+          <div className="bt-section-head">
+            <div><div className="bt-eyebrow">Past services</div><h2 className="bt-h2">Recent messages from {campus.name}</h2></div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 22px" }}>
+              <Link className="bt-link" href={"/watch/" + campus.slug}>Watch page <IconArrowRight size={15} /></Link>
+              <a className="bt-link" href={ownChannel.channelUrl + "/streams"} target="_blank" rel="noopener noreferrer"><IconYouTube size={15} /> Full archive on YouTube</a>
+            </div>
+          </div>
+          <MessageLibrary sermons={pastSermons} placement="center_page_library" churchId={campus.id} />
+        </section>
+      )}
+
+      {/* (8) A word from the pastor (when the center has written one) */}
+      {pastorNote && (
         <section className="bt-section-tight">
+          <figure className="bt-card bt-quote bt-reveal" style={{ margin: 0 }}>
+            <span className="bt-quote-mark" aria-hidden>&ldquo;</span>
+            <div>
+              <div className="bt-eyebrow" style={{ marginBottom: 12 }}>A word from the pastor</div>
+              <p>{pastorNote}</p>
+              {pastor && <cite>{pastor}</cite>}
+            </div>
+          </figure>
+        </section>
+      )}
+
+      {/* (9) Photos (when the admin has uploaded more than the cover) */}
+      {photos.length > 1 && (
+        <section className="bt-section-tight bt-reveal">
           <div className="bt-section-head"><div><div className="bt-eyebrow">Photos</div><h2 className="bt-h2">Life at {campus.name}</h2></div></div>
           <PhotoGallery photos={photos} name={campus.name} />
         </section>
       )}
 
-      {/* (4) Upcoming events at this center (and network events) */}
-      {events.length > 0 && (
-        <section className="bt-band">
-          <div className="bt-section-tight">
-            <div className="bt-section-head">
-              <div><div className="bt-eyebrow">Coming up</div><h2 className="bt-h2">Events</h2></div>
-              <Link className="bt-link" href="/events">All events <IconArrowRight size={15} /></Link>
-            </div>
-            <EventCards events={events} limit={6} />
-          </div>
-        </section>
-      )}
-
-      {/* (5) Latest message + leadership */}
-      <section className="bt-section-tight">
-        <div className="bt-two">
-          {sermon && (
-            <div>
-              <div className="bt-eyebrow" style={{ marginBottom: 12 }}>{ownChannel ? "The latest message" : "The latest from " + BT.ministry}</div>
-              <MessageCard sermon={sermon} feature placement="center_page" churchId={campus.id} />
-            </div>
-          )}
-          <div className="bt-card" style={{ padding: 26, display: "grid", gap: 12, alignContent: "start" }}>
-            <span style={{ color: "var(--bt-gold)" }}><IconGift size={24} /></span>
-            <h2 className="bt-h3">Give to {campus.name}</h2>
-            <p>Your giving supports the ministry of {campus.name} and carries the Word further. Once or every month.</p>
-            <div><Link className="bt-btn" href={"/give?center=" + encodeURIComponent(campus.slug || "") + "#give-now"}>Give</Link></div>
-          </div>
-        </div>
-      </section>
-
-      {/* (5b) The center's past 10 messages from its own channel */}
-      {ownChannel && pastSermons.length > 0 && (
-        <section className="bt-section-tight">
-          <div>
-            <div className="bt-section-head">
-              <div><div className="bt-eyebrow">Past services</div><h2 className="bt-h2">Recent messages from {campus.name}</h2></div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 22px" }}>
-                <Link className="bt-link" href={"/watch/" + campus.slug}>Watch page <IconArrowRight size={15} /></Link>
-                <a className="bt-link" href={ownChannel.channelUrl + "/streams"} target="_blank" rel="noopener noreferrer"><IconYouTube size={15} /> Full archive on YouTube</a>
-              </div>
-            </div>
-            <MessageLibrary sermons={pastSermons} placement="center_page_library" churchId={campus.id} />
-          </div>
-        </section>
-      )}
-
       {leaders.length > 0 && (
-        <section className="bt-section-tight">
-          <LeadershipGrid leaders={leaders} featuredBio={str(content.pastorNote)} />
+        <section className="bt-section-tight bt-reveal">
+          <LeadershipGrid leaders={leaders} featuredBio={pastorNote} />
         </section>
       )}
 
-      {/* (6) Plan a visit + prayer, straight to this center's inbox */}
+      {/* (10) Plan a visit + prayer, straight to this center's inbox */}
       <section id="visit" className="bt-band" style={{ scrollMarginTop: 72 }}>
         <div className="bt-section-tight">
-          <div className="bt-section-head">
+          <div className="bt-section-head bt-reveal">
             <div>
               <div className="bt-eyebrow">No account needed</div>
               <h2 className="bt-h2">{virtual ? "Say hello" : "Plan your visit"}</h2>
             </div>
           </div>
-          <div className="bt-two">
+          <div className="bt-two bt-reveal">
             <NextStepForm
               churchId={churchId}
               centers={thisCenter}

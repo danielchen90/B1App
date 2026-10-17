@@ -71,6 +71,8 @@ export interface BtCampusExtras {
   websiteUrl?: string;
   /** Campus-specific Stripe giving link (org default applies when absent). */
   givingUrl?: string;
+  /** Credit line the header photo's licence asks for, shown on the photo. */
+  photoCredit?: string;
   /** Fallbacks for a center whose admins have not written their own (Huro center website editor). */
   welcome?: string;
   whatToExpect?: string;
@@ -110,10 +112,12 @@ export const BT_CAMPUS_EXTRAS: Record<string, BtCampusExtras> = {
   },
   "cayman-islands": {
     country: "Cayman Islands",
-    flag: "🇰🇾"
+    flag: "🇰🇾",
+    photoCredit: "Photo: Coolcaesar, CC BY 4.0, via Wikimedia Commons"
   },
   "decatur": {
     ...US,
+    photoCredit: "Photo: Marc Merlin, CC BY-SA 4.0, via Wikimedia Commons",
     serviceTimes: [{ day: "Sunday", time: "10:30 AM", label: "Worship service" }],
     leaders: "Pastors Dr. Samuel & Dr. Angela Scott",
     phone: "+1 (470) 409-4694"
@@ -161,6 +165,7 @@ export const BT_CAMPUS_EXTRAS: Record<string, BtCampusExtras> = {
   },
   "indiantown": {
     ...US,
+    photoCredit: "Photo: Ebyabe, CC BY-SA 3.0, via Wikimedia Commons",
     serviceTimes: [
       { day: "Sunday", time: "9:00 & 11:00 AM", label: "Worship services" },
       { day: "Wednesday", time: "7:00 PM", label: "Bible study" }
@@ -306,6 +311,27 @@ export const isHiddenCampusSlug = (slug: string | null): boolean =>
 
 export const getCampusExtras = (slug: string | null): BtCampusExtras | undefined =>
   (slug && BT_CAMPUS_EXTRAS[slug]) || undefined;
+
+// Centers on Central time; every other U.S. center keeps Eastern.
+const CENTRAL_TIME = new Set(["baton-rouge", "shelby-mississippi", "spring-texas"]);
+const COUNTRY_TIME_ZONES: Record<string, string> = {
+  "Jamaica": "America/Jamaica",
+  "Bahamas": "America/Nassau",
+  "Cayman Islands": "America/Cayman",
+  "Trinidad & Tobago": "America/Port_of_Spain",
+  "Canada": "America/Toronto"
+};
+
+/**
+ * The IANA zone a center keeps its times in. The site renders on a UTC server, so every
+ * date or time shown for a center is formatted in this zone. Network-wide items (no
+ * center) use the ministry's home zone, Eastern.
+ */
+export const centerTimeZone = (slug: string | null | undefined): string => {
+  if (slug && CENTRAL_TIME.has(slug)) return "America/Chicago";
+  const country = getCampusExtras(slug || null)?.country || "";
+  return COUNTRY_TIME_ZONES[country] || "America/New_York";
+};
 
 /** Country display order for the locations sidebar when no visitor location is known. */
 export const BT_COUNTRY_ORDER = [

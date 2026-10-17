@@ -7,6 +7,7 @@ import Link from "next/link";
 import type { PublicEvent } from "@/helpers/PublicEventsHelper";
 import { IconPin, IconArrowRight } from "./BtIcons";
 import { trackAttrs } from "@/lib/analytics";
+import { centerTimeZone } from "./btSiteContent";
 
 const CSS = `
 .bt-ev { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
@@ -20,17 +21,20 @@ const CSS = `
 .bt-ev-desc { font-size: .92rem; color: var(--bt-body); margin-top: 8px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 `;
 
+// The server renders in UTC: every date is pinned to the event's center's zone.
 const fmt = (e: PublicEvent) => {
+  const timeZone = centerTimeZone(e.campusSlug);
   const s = new Date(e.start);
-  const day = s.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  const day = s.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone });
   if (e.allDay) {
     if (e.end) {
       const en = new Date(e.end);
-      if (en.toDateString() !== s.toDateString()) return s.toLocaleDateString("en-US", { month: "long", day: "numeric" }) + " to " + en.toLocaleDateString("en-US", { month: "long", day: "numeric" });
+      const md = (d: Date) => d.toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone });
+      if (md(en) !== md(s)) return md(s) + " to " + md(en);
     }
     return day;
   }
-  return day + " · " + s.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  return day + " · " + s.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone });
 };
 
 export const EventCards: React.FC<{ events: PublicEvent[]; limit?: number; showCenter?: boolean }> = ({ events, limit, showCenter = true }) => {
@@ -41,11 +45,12 @@ export const EventCards: React.FC<{ events: PublicEvent[]; limit?: number; showC
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       {list.map((e) => {
         const s = new Date(e.start);
+        const timeZone = centerTimeZone(e.campusSlug);
         return (
           <article key={e.id} className="bt-ev-card">
             <div className="bt-ev-date" aria-hidden>
-              <span>{s.toLocaleDateString("en-US", { month: "short" })}</span>
-              <b>{s.getDate()}</b>
+              <span>{s.toLocaleDateString("en-US", { month: "short", timeZone })}</span>
+              <b>{s.toLocaleDateString("en-US", { day: "numeric", timeZone })}</b>
             </div>
             <div style={{ minWidth: 0 }}>
               <h3 className="bt-ev-title">{e.title}</h3>

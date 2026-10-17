@@ -25,6 +25,8 @@ export interface PublicEvent {
   image?: string | null;
   /** Set on the single card kept for a repeating event, e.g. "Every Wednesday". */
   repeats?: string | null;
+  /** Every upcoming start of a repeating event, the kept one first (a nightly series lists its remaining nights). */
+  occurrences?: string[];
 }
 
 /**
@@ -47,7 +49,7 @@ export const collapseRepeats = (events: PublicEvent[]): PublicEvent[] => {
     const gapDays = Math.round((new Date(list[1].start).getTime() - first.getTime()) / 86400000);
     const weekday = first.toLocaleDateString("en-US", { weekday: "long" });
     const repeats = gapDays === 7 ? "Every " + weekday : gapDays === 14 ? "Every other " + weekday : gapDays === 1 ? "Daily" : gapDays >= 28 && gapDays <= 31 ? "Monthly" : "Repeats";
-    return { ...list[0], repeats };
+    return { ...list[0], repeats, occurrences: list.map((o) => o.start) };
   });
 };
 
