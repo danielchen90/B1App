@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { isBtPublicSite } from "@/app/[sdSlug]/(public)/(bt)/isBtSite";
-import { isBtMissingPath, BT_MISSING_REWRITE } from "@/lib/btMissingPath";
+import { isBtMissingPath, btCenterForAddress, BT_MISSING_REWRITE } from "@/lib/btMissingPath";
 
 // Bible Teachers public site: leftover stock ChurchApps pages that are not part of the
 // ministry's site stay reachable for members but out of search, and two old addresses move.
@@ -146,9 +146,17 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-site", `${subDomain}.huro.church`);
+  const apiBase = lookupBase.replace(/\/membership\/domains\/public\/lookup$/, "");
+  const isRead = request.method === "GET" || request.method === "HEAD";
+  // A center's friendly address (/ftl, /atlanta) opens its page. Temporary (307), because a
+  // center can change its address on the Website tab and the old one may go to another center.
+  if (bt && isRead) {
+    const center = await btCenterForAddress(request.nextUrl.pathname, subDomain, apiBase);
+    if (center) return NextResponse.redirect(`https://${host}/locations/${center}${request.nextUrl.search}`, 307);
+  }
   // A page that certainly does not exist (unknown center, event or top-level page) goes to an
   // address no route matches, so the branded 404 is in the server HTML (see btMissingPath.ts).
-  if (bt && (request.method === "GET" || request.method === "HEAD") && await isBtMissingPath(request.nextUrl.pathname, subDomain, lookupBase.replace(/\/membership\/domains\/public\/lookup$/, ""))) {
+  if (bt && isRead && await isBtMissingPath(request.nextUrl.pathname, subDomain, apiBase)) {
     const missing = request.nextUrl.clone();
     missing.pathname = BT_MISSING_REWRITE;
     return NextResponse.rewrite(missing, { request: { headers: requestHeaders } });

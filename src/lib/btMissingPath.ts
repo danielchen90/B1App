@@ -106,6 +106,31 @@ async function eventExists(apiBase: string, slug: string): Promise<boolean> {
   return exists;
 }
 
+/**
+ * The center slug a one-segment path stands for: a center's friendly address (set on its
+ * Website tab in Huro, e.g. /ftl) or its own slug (/atlanta). Undefined for anything else, or
+ * when the API cannot say. The middleware redirects these to /locations/<slug>.
+ */
+export async function btCenterForAddress(pathname: string, subDomain: string, apiBase: string): Promise<string | undefined> {
+  try {
+    const segments = pathname.split("/").filter(Boolean);
+    if (segments.length !== 1) return undefined;
+    const wanted = decodeURIComponent(segments[0]).toLowerCase();
+    if (!/^[a-z0-9][a-z0-9-]{0,38}[a-z0-9]$/.test(wanted) || KNOWN_FIRST_SEGMENTS.has(wanted)) return undefined;
+    const id = await churchId(apiBase, subDomain);
+    if (!id) return undefined;
+    const campuses = await cachedJson<{ id?: string; slug?: string | null }[]>(`${apiBase}/membership/public/${id}/campuses`);
+    if (!Array.isArray(campuses)) return undefined;
+    const listed = campuses.filter((c) => c?.id && c.slug && !isHiddenCampusSlug(c.slug));
+    const content = await cachedJson<Record<string, { friendlyUrl?: string }>>(`${apiBase}/membership/campusContent/public/${id}/all`);
+    const byAddress = listed.find((c) => (content?.[c.id as string]?.friendlyUrl || "").toLowerCase() === wanted);
+    const center = byAddress || listed.find((c) => (c.slug as string).toLowerCase() === wanted);
+    return center ? (center.slug as string) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 /** True only when the path is certainly a page that does not exist on this Bible Teachers site. */
 export async function isBtMissingPath(pathname: string, subDomain: string, apiBase: string): Promise<boolean> {
   try {
