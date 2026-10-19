@@ -12,7 +12,8 @@ import { VotdPage } from "./components/VotdPage";
 import { BiblePage } from "./components/BiblePage";
 import { StreamPage } from "./components/StreamPage";
 import { DefaultPageWrapper } from "./components/DefaultPageWrapper";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { centerSlugForAddress } from "../(bt)/btFriendlyUrl";
 import { SermonsPage } from "./components/SermonsPage";
 import { DonatePage } from "./components/DonatePage";
 
@@ -26,6 +27,9 @@ const loadSharedData = cache((sdSlug:string, pageSlug:string) => {
 
 export async function generateMetadata({ params }: {params:PageParams}): Promise<Metadata> {
   const { sdSlug, pageSlug } = await params;
+  // A worship center's friendly address (bibleteachers.com/ftl) goes to its page.
+  const center = await centerSlugForAddress(sdSlug, pageSlug);
+  if (center) redirect("/locations/" + center);
   const props = await loadSharedData(sdSlug, pageSlug);
   let title = props.pageData.title;
   if (!title) {
@@ -51,6 +55,8 @@ const loadData = async (sdSlug:string, pageSlug:string) => {
 export default async function Home({ params }: { params: PageParams }) {
   await EnvironmentHelper.initServerSide();
   const { sdSlug, pageSlug } = await params;
+  const center = await centerSlugForAddress(sdSlug, pageSlug);
+  if (center) redirect("/locations/" + center);
   const { pageData, config } = await loadSharedData(sdSlug, pageSlug);
 
   const getPageContent = () => {

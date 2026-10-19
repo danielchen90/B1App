@@ -21,7 +21,7 @@ import { notFound, redirect } from "next/navigation";
 import { ApiHelper } from "@churchapps/apphelper";
 import { EnvironmentHelper } from "@/helpers/EnvironmentHelper";
 import { MetaHelper } from "@/helpers/MetaHelper";
-import { btSeo, btTitle, btDescription } from "@/components/public-bt/btSeo";
+import { btSeo, btTitle, btDescription, btSiteUrl } from "@/components/public-bt/btSeo";
 import { JsonLd, btChurchGraph, usStateAbbr } from "@/components/public-bt/BtJsonLd";
 import type { PublicCampus } from "@/helpers/PublicCampusHelper";
 import { loadBtConfig, loadVisibleCampuses, toLocationLinks } from "../../btPageData";
@@ -213,6 +213,9 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
   const instagramUrl = str(content.instagramUrl) || extras?.instagramUrl || null;
   const youtubeUrl = str(content.youtubeUrl) || extras?.youtubeUrl || null;
   const pastorNote = str(content.pastorNote);
+  // The center's short address (bibleteachers.com/ftl), shown so visitors can share it.
+  const friendlyUrl = str(content.friendlyUrl);
+  const shortLink = friendlyUrl ? btSiteUrl().replace(/^https?:\/\//, "") + "/" + friendlyUrl : "";
   const showMap = !virtual && typeof campus.latitude === "number" && typeof campus.longitude === "number";
 
   const CSS = `
@@ -377,6 +380,12 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
                     {email && <a href={"mailto:" + email} {...trackAttrs("church_contact_clicked", { ...churchProps, method: "email" })}><IconMail size={17} /> {email}</a>}
                     {website && <a href={website} target="_blank" rel="noopener noreferrer" {...trackAttrs(virtual ? "online_church_joined" : "church_contact_clicked", { ...churchProps, method: "website", placement: "contacts" })}><IconGlobe size={17} /> {website.replace(/^https?:\/\/(www\.)?/, "")}</a>}
                   </div>
+                </div>
+              )}
+              {shortLink && (
+                <div>
+                  <div className="bt-eyebrow" style={{ marginBottom: 8 }}>Easy link to share</div>
+                  <a className="bt-link" href={"/" + friendlyUrl}>{shortLink}</a>
                 </div>
               )}
               <SocialLinks facebookUrl={facebookUrl} instagramUrl={instagramUrl} youtubeUrl={youtubeUrl} extraLinks={extraLinks} />

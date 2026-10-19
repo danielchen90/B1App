@@ -1,7 +1,7 @@
 // Worship-center hero: the center's photo edge to edge, darkened just enough for white
-// type, with faint vertical rules over it (a 1·3·4·3·1 grid) that draw down on load. The
-// name, welcome, pastor, times and place sit centered over the photo, then the actions:
-// a gold pill whose arrow slides through on hover, Directions, and "Make this my center".
+// type, settling in with a slow zoom on load. The name, welcome, pastor, times and place
+// sit centered over the photo, then the actions: a gold pill whose arrow slides through on
+// hover, Directions, and "Make this my center".
 // RSC; the live badge and the my-center button are the only client islands.
 
 import React from "react";
@@ -41,11 +41,6 @@ const CSS = `
 .bt-hero-shade { position: absolute; inset: 0; z-index: -2;
   background: radial-gradient(120% 80% at 50% 45%, rgba(12,12,18,.18) 0%, rgba(12,12,18,.55) 70%, rgba(12,12,18,.78) 100%),
               linear-gradient(180deg, rgba(12,12,18,.45) 0%, rgba(12,12,18,.12) 30%, rgba(12,12,18,.30) 60%, rgba(12,12,18,.86) 100%); }
-.bt-hero-grid { position: absolute; inset: 0; z-index: -1; display: grid; grid-template-columns: 1fr 3fr 4fr 3fr 1fr; pointer-events: none; }
-.bt-hero-grid span { border-left: 1px solid rgba(255,255,255,.16); transform-origin: top; animation: btHeroRule 1.6s cubic-bezier(.2,.7,.2,1) both; }
-.bt-hero-grid span:first-child { border-left: 0; }
-.bt-hero-grid span:nth-child(2) { animation-delay: .1s; } .bt-hero-grid span:nth-child(3) { animation-delay: .2s; }
-.bt-hero-grid span:nth-child(4) { animation-delay: .3s; } .bt-hero-grid span:nth-child(5) { animation-delay: .4s; }
 .bt-hero-in { position: relative; width: 100%; max-width: 960px; text-align: center; }
 .bt-hero .bt-eyebrow { color: var(--bt-gold-bright); text-shadow: 0 1px 12px rgba(0,0,0,.4); }
 .bt-root .bt-hero h1 { color: #fff; font-size: clamp(3.1rem, 9vw, 7rem); font-weight: 600; line-height: .98; margin-top: 14px; text-shadow: 0 2px 30px rgba(0,0,0,.35); }
@@ -83,18 +78,14 @@ const CSS = `
 .bt-hero-a3 { animation: btRise .9s cubic-bezier(.2,.7,.2,1) .45s both; }
 .bt-hero-a4 { animation: btRise .9s cubic-bezier(.2,.7,.2,1) .6s both; }
 @keyframes btHeroZoom { from { transform: scale(1.09); } to { transform: none; } }
-@keyframes btHeroRule { from { transform: scaleY(0); } to { transform: none; } }
 @keyframes btHeroBob { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 6px); } }
 @media (max-width: 720px) {
   .bt-hero { padding: 72px 18px 112px; min-height: clamp(560px, 92vh, 760px); }
-  .bt-hero-grid { grid-template-columns: 1fr 2fr 2fr 1fr; }
-  .bt-hero-grid span:nth-child(5) { display: none; }
-  .bt-hero-fact { font-size: .86rem; }
+      .bt-hero-fact { font-size: .86rem; }
   .bt-hero-acts > * { flex: 0 1 auto; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .bt-hero-img, .bt-hero-grid span, .bt-hero-a1, .bt-hero-a2, .bt-hero-a3, .bt-hero-a4, .bt-root a.bt-hero-next { animation: none; }
-}
+  .bt-hero-img, }
 `;
 
 const ActionLink: React.FC<{ a: CenterHeroAction; className: string; children: React.ReactNode }> = ({ a, className, children }) => (
@@ -106,7 +97,6 @@ export const CenterHero: React.FC<Props> = (p) => (
     <style dangerouslySetInnerHTML={{ __html: CSS }} />
     <div className="bt-hero-img" role="img" aria-label={p.name + " worship center"} style={{ backgroundImage: "url('" + p.cover + "')" }} />
     <div className="bt-hero-shade" aria-hidden />
-    <div className="bt-hero-grid" aria-hidden><span /><span /><span /><span /><span /></div>
 
     <div className="bt-hero-in">
       <div className="bt-hero-live bt-hero-a1"><LiveIndicator streamKey={p.liveKey || null} /></div>

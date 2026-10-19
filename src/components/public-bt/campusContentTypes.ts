@@ -45,6 +45,8 @@ export interface CampusContent {
   email?: string | typeof HIDDEN;
   /** "Your first visit": parking, what to wear, kids, how long, language help. */
   whatToExpect?: string | typeof HIDDEN;
+  /** Short address on the site (/ftl opens this center's page), set on the Website tab. */
+  friendlyUrl?: string | typeof HIDDEN;
 }
 
 /** First usable photo for a center: the hero image, else the first gallery photo. */
