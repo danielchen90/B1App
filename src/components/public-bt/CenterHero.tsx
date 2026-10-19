@@ -1,13 +1,13 @@
 // Worship-center hero: the center's photo edge to edge, darkened just enough for white
 // type, settling in with a slow zoom on load. The name, welcome, pastor, times and place
 // sit centered over the photo, then the actions: a gold pill whose arrow slides through on
-// hover, Directions, and "Make this my center".
+// hover, Give (the center's own giving link), Directions, and "Make this my center".
 // RSC; the live badge and the my-center button are the only client islands.
 
 import React from "react";
 import { LiveIndicator } from "./LiveIndicatorLazy";
 import { MakeMyCenter } from "./CenterActions";
-import { IconArrowRight, IconChevronDown, IconClock, IconGlobe, IconPin, IconUser } from "./BtIcons";
+import { IconArrowRight, IconChevronDown, IconClock, IconGift, IconGlobe, IconPin, IconUser } from "./BtIcons";
 
 export interface CenterHeroAction {
   label: string;
@@ -29,6 +29,7 @@ interface Props {
   slug?: string | null;
   liveKey?: string | null;
   primary: CenterHeroAction;
+  give?: CenterHeroAction | null;
   directions?: CenterHeroAction | null;
   nextHref: string;
 }
@@ -62,6 +63,10 @@ const CSS = `
 .bt-pill:hover .bt-pill-arrow svg:last-child { transform: none; }
 .bt-root a.bt-glass { display: inline-flex; align-items: center; gap: 8px; min-height: 50px; padding: 0 22px; border-radius: 999px; color: #fff; font-weight: 600;
   background: rgba(255,255,255,.10); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.35); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: background-color .2s, box-shadow .2s; }
+.bt-root a.bt-hero-give { display: inline-flex; align-items: center; gap: 9px; min-height: 50px; padding: 0 26px; border-radius: 999px; font-weight: 600; font-size: 1rem;
+  color: #1B1408; background: #fff; box-shadow: 0 10px 30px -12px rgba(0,0,0,.5); transition: transform .25s cubic-bezier(.2,.7,.2,1), background-color .25s; }
+.bt-hero-give svg { color: var(--bt-gold-deep); }
+.bt-root a.bt-hero-give:hover { transform: translateY(-2px); background: var(--bt-gold-soft, #FBF3DD); }
 .bt-root a.bt-glass:hover { background: rgba(255,255,255,.2); box-shadow: inset 0 0 0 1.5px #fff; }
 .bt-hero .bt-btn-outline { border-radius: 999px; min-height: 50px; background: rgba(255,255,255,.10); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.35); backdrop-filter: blur(10px); }
 .bt-root .bt-hero .bt-btn-outline, .bt-root .bt-hero .bt-btn-outline:hover { color: #fff; }
@@ -115,6 +120,7 @@ export const CenterHero: React.FC<Props> = (p) => (
           <span className="bt-pill-label">{p.primary.label}</span>
           <span className="bt-pill-arrow" aria-hidden><IconArrowRight size={19} /><IconArrowRight size={19} /></span>
         </ActionLink>
+        {p.give && <ActionLink a={p.give} className="bt-hero-give"><IconGift size={18} />{p.give.label}</ActionLink>}
         {p.directions && <ActionLink a={p.directions} className="bt-glass"><IconPin size={17} />{p.directions.label}</ActionLink>}
         {p.slug && <MakeMyCenter slug={p.slug} name={p.name} />}
       </div>

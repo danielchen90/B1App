@@ -20,6 +20,8 @@ import { JsonLd, btGivePageGraph } from "@/components/public-bt/BtJsonLd";
 import { GiveEmbed, type GiveFund } from "@/components/public-bt/GiveEmbed";
 import { ApiHelper } from "@churchapps/apphelper";
 import { trackAttrs } from "@/lib/analytics";
+import { loadAllCampusContent } from "@/helpers/LocatorCampusHelper";
+import { contentText } from "@/components/public-bt/campusContentTypes";
 
 /** Online giving is live once the church has a payment gateway and at least one fund. */
 const loadGiving = async (churchId: string): Promise<{ enabled: boolean; funds: GiveFund[] }> => {
@@ -58,14 +60,16 @@ export default async function GivePage({ params }: { params: Promise<PageParams>
   const churchId = config.church?.id || "";
   const campuses = await loadVisibleCampuses(churchId);
   const navLinks = toLocationLinks(campuses);
-  const giving = await loadGiving(churchId);
+  const [giving, allContent] = await Promise.all([loadGiving(churchId), loadAllCampusContent(churchId)]);
 
-  // Centers with their own giving link, ahead of those on the org default.
+  // Centers with their own giving link (Website tab "Online giving link", else the in-code
+  // one), ahead of those on the org default.
   const centerGiving = campuses
     .filter((c) => c.slug)
     .map((c) => {
       const extras = getCampusExtras(c.slug);
-      return { name: c.name, flag: extras?.flag || "📍", url: extras?.givingUrl || BT.giveUrl, own: !!extras?.givingUrl };
+      const own = contentText(allContent?.[c.id]?.givingUrl) || extras?.givingUrl || "";
+      return { name: c.name, flag: extras?.flag || "📍", url: own || BT.giveUrl, own: !!own && own !== BT.giveUrl };
     })
     .sort((a, b) => Number(b.own) - Number(a.own) || a.name.localeCompare(b.name));
 

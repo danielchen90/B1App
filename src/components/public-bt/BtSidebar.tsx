@@ -33,7 +33,7 @@ const NAV = [
   { label: "Give", href: "/give", icon: IconGift }
 ];
 
-export const BtSidebar: React.FC<Props> = ({ open, onClose, campuses }) => {
+export const BtSidebar: React.FC<Props> = ({ open, onClose, campuses, giveUrl }) => {
   const member = useMemberBadge();
   const [centersOpen, setCentersOpen] = React.useState(false);
   const panelRef = React.useRef<HTMLElement>(null);
@@ -175,9 +175,13 @@ export const BtSidebar: React.FC<Props> = ({ open, onClose, campuses }) => {
             </Link>
           )}
           <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
-            <Link className="bt-btn" href="/give" onClick={onClose} style={{ flex: 1, padding: "12px 18px" }}>
-              <IconGift size={17} /> Give
-            </Link>
+            {giveUrl
+              ? <a className="bt-btn" href={giveUrl} target="_blank" rel="noopener noreferrer" onClick={onClose} style={{ flex: 1, padding: "12px 18px" }}>
+                  <IconGift size={17} /> Give
+                </a>
+              : <Link className="bt-btn" href="/give" onClick={onClose} style={{ flex: 1, padding: "12px 18px" }}>
+                  <IconGift size={17} /> Give
+                </Link>}
             <Link className="bt-btn bt-btn-outline" href="/watch" onClick={onClose} style={{ flex: 1, padding: "12px 18px" }}>
               <IconYouTube size={17} /> Watch
             </Link>

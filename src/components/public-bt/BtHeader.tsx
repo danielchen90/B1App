@@ -5,8 +5,8 @@
 // Sign in). The Mary Banks sites switcher is the hosted one every Mary Banks site
 // loads (ecosystem.marybanks.net); it sits fixed in the top corner, and the bar
 // leaves it room at its end. Under 960px the menu folds into the
-// sidebar behind the hamburger. Give always goes to the site's own Give page, which
-// offers the ministry and every center, rather than straight out to a payment page.
+// sidebar behind the hamburger. Give goes to the site's own Give page, which offers the
+// ministry and every center; a center page leaves it out (its hero has its own Give).
 
 import React from "react";
 import Link from "next/link";
@@ -22,6 +22,7 @@ import type { LocationLink } from "./LocationsMenu";
 interface Props {
   campuses: LocationLink[];
   giveUrl?: string | null;
+  hideGive?: boolean;
 }
 
 const CSS = `
@@ -57,7 +58,7 @@ const CSS = `
 }
 `;
 
-export const BtHeader: React.FC<Props> = ({ campuses, giveUrl }) => {
+export const BtHeader: React.FC<Props> = ({ campuses, giveUrl, hideGive }) => {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const pathname = usePathname() || "/";
   // The tenant segment may prefix the path when rendered via the rewrite; compare tails.
@@ -81,7 +82,7 @@ export const BtHeader: React.FC<Props> = ({ campuses, giveUrl }) => {
           </nav>
 
           <div className="bt-actions">
-            <Link className="bt-btn bt-btn-sm bt-give-top" href="/give">Give</Link>
+            {!hideGive && <Link className="bt-btn bt-btn-sm bt-give-top" href="/give">Give</Link>}
             <BtAccountButton />
             <button type="button" className="bt-burger" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}>
               <IconMenu size={22} />

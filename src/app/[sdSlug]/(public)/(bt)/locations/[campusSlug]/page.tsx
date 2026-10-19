@@ -182,7 +182,10 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
   const [sermon, ...pastSermons] = sermons;
 
   const navLinks = toLocationLinks(allCampuses);
+  // Give goes straight to the center's own Stripe link (Website tab "Online giving link", else
+  // the in-code one); centers without their own give through the ministry's link.
   const giveUrl = str(content.givingUrl) || extras?.givingUrl || BT.giveUrl;
+  const giveAttrs = (placement: string) => trackAttrs("give_started", { method: "payment_link", fund_name: campus.name, placement });
 
   const apiTimes = list<ServiceTime>(content.serviceTimes);
   const serviceTimes: ServiceTime[] = apiTimes.length > 0 ? apiTimes : (extras?.serviceTimes || []);
@@ -256,7 +259,7 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
   );
 
   return (
-    <BtShell config={config} campuses={navLinks} giveUrl={giveUrl}>
+    <BtShell config={config} campuses={navLinks} giveUrl={giveUrl} hideHeaderGive>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <RevealOnScroll />
       <TrackOnView event="church_viewed" props={churchProps} />
@@ -298,6 +301,7 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
         primary={virtual && website
           ? { label: "Join the " + campus.name, href: website, external: true, attrs: trackAttrs("online_church_joined", { ...churchProps, placement: "center_page" }) }
           : { label: virtual ? "Join us" : "Plan your visit", href: "#visit" }}
+        give={{ label: "Give", href: giveUrl, external: true, attrs: giveAttrs("center_hero") }}
         directions={virtual ? null : { label: "Directions", href: directionsUrl, external: true, attrs: trackAttrs("church_directions_clicked", { ...churchProps, placement: "center_page" }) }}
         nextHref="#glance"
       />
@@ -407,7 +411,7 @@ export default async function CampusDetailPage({ params }: { params: Promise<Pag
             <span style={{ color: "var(--bt-gold-bright)" }}><IconGift size={26} /></span>
             <h2 className="bt-h3">Give to {campus.name}</h2>
             <p className="bt-muted-text">Your giving supports the ministry of {campus.name} and carries the Word further. Once or every month.</p>
-            <div style={{ position: "relative", zIndex: 1 }}><Link className="bt-btn" href={"/give?center=" + encodeURIComponent(campus.slug || "") + "#give-now"}>Give</Link></div>
+            <div style={{ position: "relative", zIndex: 1 }}><a className="bt-btn" href={giveUrl} target="_blank" rel="noopener noreferrer" {...giveAttrs("center_page")}>Give</a></div>
           </div>
         </div>
       </section>
