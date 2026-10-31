@@ -25,7 +25,7 @@ const readCookie = (name: string): string | undefined => {
 };
 
 export const clearSessionCookies = () => {
-  for (const n of ["jwt", "name", "email", "lastChurchId", "bt_member", "bt_mbid"]) document.cookie = n + "=; path=/; max-age=0; samesite=lax";
+  for (const n of ["jwt", "name", "email", "lastChurchId", "bt_member", "bt_mbid", "bt_member_pic"]) document.cookie = n + "=; path=/; max-age=0; samesite=lax";
 };
 
 export const useMemberSession = (subDomain: string): SessionState => {

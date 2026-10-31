@@ -7,32 +7,61 @@
 // lib/memberSignIn.ts), so the public site never shows a link that goes nowhere.
 //
 // The signed-in state is read from the small `bt_member` display cookie the sign-in
-// callback sets beside the real session (first name only, not a credential).
+// callback sets beside the real session (first name only, not a credential), and the
+// profile picture from `bt_member_pic` when the member's Mary Banks ID has one.
 
 import React from "react";
 import Link from "next/link";
 import { memberSignInEnabledInBrowser } from "@/lib/memberSignIn";
 import { IconUser } from "./BtIcons";
 
-const readMemberName = (): string | null => {
+const readCookie = (name: string): string | null => {
   if (typeof document === "undefined") return null;
-  const hit = document.cookie.split("; ").find((c) => c.startsWith("bt_member="));
+  const hit = document.cookie.split("; ").find((c) => c.startsWith(name + "="));
   if (!hit) return null;
   try {
-    return decodeURIComponent(hit.slice("bt_member=".length)) || null;
+    return decodeURIComponent(hit.slice(name.length + 1)) || null;
   } catch {
     return null;
   }
 };
 
-/** Whether member accounts are on, and the signed-in member's first name (null when signed out). */
-export const useMemberBadge = (): { enabled: boolean; name: string | null } => {
-  const [state, setState] = React.useState<{ enabled: boolean; name: string | null }>({ enabled: false, name: null });
+interface MemberBadge { enabled: boolean; name: string | null; picture: string | null }
+
+/**
+ * Whether member accounts are on, the signed-in member's first name (null when signed
+ * out) and their profile picture when their Mary Banks ID has one (Google accounts).
+ */
+export const useMemberBadge = (): MemberBadge => {
+  const [state, setState] = React.useState<MemberBadge>({ enabled: false, name: null, picture: null });
   React.useEffect(() => {
     const on = memberSignInEnabledInBrowser();
-    setState({ enabled: on, name: on ? readMemberName() : null });
+    const name = on ? readCookie("bt_member") : null;
+    const picture = name ? readCookie("bt_member_pic") : null;
+    setState({ enabled: on, name, picture: picture && picture.startsWith("https://") ? picture : null });
   }, []);
   return state;
+};
+
+/**
+ * The member's face inside a round badge: their profile picture, or their initial when
+ * there is none or it does not load.
+ */
+export const MemberFace: React.FC<{ name: string; picture: string | null }> = ({ name, picture }) => {
+  const [broken, setBroken] = React.useState(false);
+  if (picture && !broken) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={picture}
+        alt=""
+        referrerPolicy="no-referrer"
+        onError={() => setBroken(true)}
+        style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover", display: "block" }}
+      />
+    );
+  }
+  return <>{name.trim().charAt(0).toUpperCase()}</>;
 };
 
 const CSS = `
@@ -46,7 +75,7 @@ const CSS = `
 `;
 
 export const BtAccountButton: React.FC = () => {
-  const { enabled, name } = useMemberBadge();
+  const { enabled, name, picture } = useMemberBadge();
   if (!enabled) return null;
 
   return (
@@ -59,7 +88,7 @@ export const BtAccountButton: React.FC = () => {
         title={name ? "My Church" : "My Church: sign in"}
       >
         {name
-          ? <span className="bt-mychurch-dot" aria-hidden>{name.trim().charAt(0).toUpperCase()}</span>
+          ? <span className="bt-mychurch-dot" aria-hidden><MemberFace name={name} picture={picture} /></span>
           : <span className="bt-mychurch-dot out" aria-hidden><IconUser size={17} /></span>}
         <span className="bt-mychurch-label">My Church</span>
       </Link>

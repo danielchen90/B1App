@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { isBtPublicSite } from "@/app/[sdSlug]/(public)/(bt)/isBtSite";
 import { isBtMissingPath, btCenterForAddress, BT_MISSING_REWRITE } from "@/lib/btMissingPath";
+import { setGuard, shouldRunSilentCheck } from "@/lib/mbidSso";
 
 // Bible Teachers public site: leftover stock ChurchApps pages that are not part of the
 // ministry's site stay reachable for members but out of search, and two old addresses move.
@@ -160,6 +161,20 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     const missing = request.nextUrl.clone();
     missing.pathname = BT_MISSING_REWRITE;
     return NextResponse.rewrite(missing, { request: { headers: requestHeaders } });
+  }
+  // Quiet Mary Banks ID check: someone signed in on another Mary Banks site is signed in
+  // here too before the page shows, instead of seeing it signed out. One prompt=none
+  // round trip that always comes back to this address, signed in or as a guest; the
+  // guard cookie stops it ever running twice in a row (see lib/mbidSso.ts).
+  if (bt && shouldRunSilentCheck(request)) {
+    const start = new URL("/api/auth/mbid/start", `https://${host}`);
+    start.searchParams.set("prompt", "none");
+    start.searchParams.set("sd", subDomain);
+    start.searchParams.set("returnUrl", request.nextUrl.pathname + request.nextUrl.search);
+    const check = NextResponse.redirect(start, 307);
+    check.headers.set("Cache-Control", "no-store");
+    setGuard(check, host);
+    return check;
   }
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   if (bt && BT_NOINDEX_PATHS.test(request.nextUrl.pathname)) response.headers.set("X-Robots-Tag", "noindex, follow");

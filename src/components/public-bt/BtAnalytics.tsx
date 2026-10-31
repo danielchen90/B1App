@@ -80,8 +80,10 @@ export const BtAnalytics: React.FC = () => {
     if (sub) {
       identify({ id: sub, name: readCookie("bt_member"), email: readCookie("email"), role: "member" });
       store.set(sub);
-      if (readCookie("bt_signed_in")) {
-        track("signed_in", { method: "mary_banks_id" });
+      const signedIn = readCookie("bt_signed_in");
+      if (signedIn) {
+        // "silent": the quiet check signed them in from another Mary Banks site.
+        track("signed_in", { method: "mary_banks_id", silent: signedIn === "silent" });
         document.cookie = "bt_signed_in=; path=/; max-age=0; samesite=lax";
       }
     } else if (store.get()) {

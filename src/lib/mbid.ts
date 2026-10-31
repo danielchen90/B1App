@@ -27,6 +27,10 @@ export interface MbidFlow {
   sd: string;
   returnUrl: string;
   target: "site" | "admin";
+  /** A quiet prompt=none check started by the middleware (see lib/mbidSso.ts). */
+  silent?: boolean;
+  /** When the flow started (ms). */
+  at?: number;
 }
 
 export const b64url = (buf: Buffer): string => buf.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");

@@ -7,7 +7,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { useMemberBadge } from "./BtAccountButton";
+import { MemberFace, useMemberBadge } from "./BtAccountButton";
 import { IconArrowRight, IconCalendar, IconGift, IconUsers, IconUser } from "./BtIcons";
 
 const CSS = `
@@ -29,7 +29,7 @@ const CSS = `
 `;
 
 export const HomeMemberCard: React.FC = () => {
-  const { enabled, name } = useMemberBadge();
+  const { enabled, name, picture } = useMemberBadge();
   if (!enabled) return null;
 
   if (name) {
@@ -37,7 +37,7 @@ export const HomeMemberCard: React.FC = () => {
       <div className="bthm">
         <style dangerouslySetInnerHTML={{ __html: CSS }} />
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <span className="bthm-avatar" aria-hidden>{name.trim().charAt(0).toUpperCase()}</span>
+          <span className="bthm-avatar" aria-hidden><MemberFace name={name} picture={picture} /></span>
           <div>
             <div className="bt-eyebrow">My Church</div>
             <h2>Welcome back, {name}</h2>
